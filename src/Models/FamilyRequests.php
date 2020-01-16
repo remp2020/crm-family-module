@@ -7,6 +7,7 @@ use Crm\ApplicationModule\Selection;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\PaymentsModule\Repository\PaymentsRepository;
+use Crm\SubscriptionsModule\PaymentItem\SubscriptionTypePaymentItem;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Nette\Database\Table\IRow;
 use Nette\Utils\DateTime;
@@ -47,10 +48,39 @@ class FamilyRequests
      */
     public function createFromSubscription(IRow $subscription): array
     {
-        $masterSubscriptionType = $this->familySubscriptionTypesRepository->findByMasterSubscriptionType($subscription->subscription_type);
-        if (!$masterSubscriptionType) {
+        $familySubscriptionType = $this->familySubscriptionTypesRepository->findByMasterSubscriptionType($subscription->subscription_type);
+        if (!$familySubscriptionType) {
             throw new MissingFamilySubscriptionTypeException(
                 "Unable to find FamilySubscriptionType for subscription ID [{$subscription->id}]."
+            );
+        }
+
+        // load number of requests (slave subscriptions) to generate
+        $requestsToGenerateCount = 0;
+        if ($familySubscriptionType->count !== 0) {
+            // default option; count of request should be configured in family subscription type's count field
+            $requestsToGenerateCount = $familySubscriptionType->count;
+        } else {
+            // otherwise load it from payment item (current family subscription type)
+            $payment = $this->paymentsRepository->subscriptionPayment($subscription);
+            if (!$payment) {
+                throw new InvalidConfigurationException(
+                    "Unable to load number of family requests from subscription type or payment for subscription ID [{$subscription->id}]."
+                );
+            }
+
+            $paymentItems = $this->paymentsRepository->getPaymentItemsByType($payment, SubscriptionTypePaymentItem::TYPE);
+            foreach ($paymentItems as $paymentItem) {
+                if ($paymentItem->subscription_type->code === $familySubscriptionType->master_subscription_type->code) {
+                    $requestsToGenerateCount = $paymentItem->count;
+                    break;
+                }
+            }
+        }
+
+        if ($requestsToGenerateCount === 0) {
+            throw new InvalidConfigurationException(
+                "Unable to load number of family requests from subscription type or payment for subscription ID [{$subscription->id}]."
             );
         }
 
@@ -59,9 +89,9 @@ class FamilyRequests
 
         $newRequests = [];
 
-        if ($requestsCount < $masterSubscriptionType->count) {
-            for ($i = 0; $i < $masterSubscriptionType->count - $requestsCount; $i++) {
-                $newRequests[] = $this->familyRequestsRepository->add($subscription, $masterSubscriptionType->slave_subscription_type);
+        if ($requestsCount < $requestsToGenerateCount) {
+            for ($i = 0; $i < $requestsToGenerateCount - $requestsCount; $i++) {
+                $newRequests[] = $this->familyRequestsRepository->add($subscription, $familySubscriptionType->slave_subscription_type);
             }
         }
 

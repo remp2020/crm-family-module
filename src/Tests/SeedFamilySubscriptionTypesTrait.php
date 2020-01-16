@@ -12,12 +12,12 @@ use Crm\SubscriptionsModule\Builder\SubscriptionTypeBuilder;
  */
 trait SeedFamilySubscriptionTypesTrait
 {
-    public function seedFamilySubscriptionTypes($daysLength = 31, $familySubscriptionsCount = 5): array
+    public function seedFamilySubscriptionTypes($daysLength = 31, $familySubscriptionsCount = 5, $masterSubscriptionTypeCode = 'master_subscription'): array
     {
         $masterSubscriptionType = $this->subscriptionTypeBuilder
             ->createNew()
-            ->setName('master_subscription')
-            ->setCode('master_subscription')
+            ->setName($masterSubscriptionTypeCode)
+            ->setCode($masterSubscriptionTypeCode)
             ->setUserLabel('')
             ->setActive(true)
             ->setPrice(1)

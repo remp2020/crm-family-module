@@ -88,6 +88,9 @@ class NewSubscriptionHandler extends AbstractListener
         } catch (MissingFamilySubscriptionTypeException $exception) {
             // everything all right, we don't want to create family requests if meta is missing
             return;
+        } catch (\Exception $exception) {
+            Debugger::log($exception, Debugger::EXCEPTION);
+            return;
         }
     }
 

@@ -39,7 +39,7 @@ abstract class BaseTestCase extends DatabaseTestCase
     private $subscriptionTypesMetaRepository;
 
     /** @var FamilySubscriptionTypesRepository */
-    private $familySubscriptionTypesRepository;
+    protected $familySubscriptionTypesRepository;
 
     protected function requiredRepositories(): array
     {

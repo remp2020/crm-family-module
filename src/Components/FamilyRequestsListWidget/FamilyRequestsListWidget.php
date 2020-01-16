@@ -9,6 +9,7 @@ use Crm\FamilyModule\Models\MissingFamilySubscriptionTypeException;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Nette\Security\User;
+use Tracy\Debugger;
 
 class FamilyRequestsListWidget extends BaseWidget
 {
@@ -56,6 +57,9 @@ class FamilyRequestsListWidget extends BaseWidget
                 $this->familyRequests->createFromSubscription($activeSubscription);
             } catch (MissingFamilySubscriptionTypeException $exception) {
                 // everything all right, we don't want to create family requests if meta is missing
+                continue;
+            } catch (\Exception $exception) {
+                Debugger::log($exception, Debugger::EXCEPTION);
                 continue;
             }
 

@@ -70,6 +70,21 @@ services:
 			- setSubscriptionsTimeGap('7 days')
 ```
 
+
+### Dynamic count of child subscriptions
+
+If you don't want to have static count of generated child subscriptions defined within `family_subscription_types.count`, you can set your family subscription's value `count` to 0 and define number of child subscriptions to generate within payment item count. Conditions:
+
+- Type of payment item is `\Crm\SubscriptionsModule\PaymentItem\SubscriptionTypePaymentItem::TYPE`.
+- Subscription type of payment item is family subscription type which is defined within `family_subscription_types` table with value 0.
+- Payment item count is non zero.
+
+Example of payment item set while creating payment from within admin interface:
+
+![Custom payment item setting for dynamic family subscription type](docs/family_subscription_type_with_dynamic_count_-_add_payment.png "Custom payment item setting for dynamic family subscription type")
+
+In this case, handler `\Crm\FamilyModule\Events\NewSubscriptionHandler` generates 7 child subscriptions.
+
 ## API documentation
 
 All examples use `http://crm.press` as a base domain. Please change the host to the one you use
