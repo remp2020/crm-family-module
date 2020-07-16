@@ -1,0 +1,15 @@
+{block #head}
+    {control snippet 'family.html_head'}
+{/block}
+
+{block title}{_family.frontend.header}{/block}
+
+{block #content}
+
+{if $message == 'self'}
+    {control snippet 'family-request-error-self'}
+{elseif $message == 'in-use'}
+    {control snippet 'family-request-error-in-use'}
+{else}
+    {control snippet 'family-request-error'}
+{/if}

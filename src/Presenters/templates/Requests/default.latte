@@ -1,0 +1,16 @@
+{block #head}
+    {control snippet 'family.html_head'}
+{/block}
+
+{block #content}
+
+<div class="page-header">
+    <h1 n:block="title">{_family.frontend.new.header}</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        {control snippet 'family-request-description'}
+        {control emailForm}
+    </div>
+</div>

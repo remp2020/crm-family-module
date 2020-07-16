@@ -1,0 +1,36 @@
+services:
+	moduleManager:
+		setup:
+			- addModule(Crm\FamilyModule\FamilyModule())
+
+	filterLoader:
+		setup:
+			- register('maskEmail', [Crm\FamilyModule\Helpers\MaskEmailHelper(), process])
+
+	# API
+	- Crm\FamilyModule\Api\ActivateFamilyRequestApiHandler
+	- Crm\FamilyModule\Api\ListFamilyRequestsApiHandler
+
+	# components
+	- Crm\FamilyModule\Components\FamilyRequestsDashboardWidget\FamilyRequestsDashboardWidget
+	- Crm\FamilyModule\Components\FamilyRequestsListWidget\FamilyRequestsListWidget
+	- Crm\FamilyModule\Components\UsersAbusiveAdditionalWidget\UsersAbusiveAdditionalWidget
+
+	# events
+	- Crm\FamilyModule\Events\NewSubscriptionHandler
+
+	# models
+	- Crm\FamilyModule\Models\FamilyRequests
+	- Crm\FamilyModule\Models\DonateSubscription
+
+	# repositories
+	- Crm\FamilyModule\Repositories\FamilySubscriptionsRepository
+	- Crm\FamilyModule\Repositories\FamilyRequestsRepository
+	- Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository
+
+	# scenarios
+	- Crm\FamilyModule\Models\Scenarios\IsFamilyMasterCriteria
+	- Crm\FamilyModule\Models\Scenarios\IsFamilySlaveCriteria
+
+	# seeders
+	- Crm\FamilyModule\Seeders\FamilySeeder

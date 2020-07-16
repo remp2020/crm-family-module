@@ -1,0 +1,16 @@
+{
+  "name": "remp/crm-family-module",
+  "description": "CRM Family Module",
+  "type": "library",
+  "homepage": "https://remp2020.com",
+  "license": "MIT",
+  "require": {
+    "php": "^7.1"
+  },
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "Crm\\FamilyModule\\": "src/"
+    }
+  }
+}

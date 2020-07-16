@@ -1,0 +1,80 @@
+{if count($requests)}
+    {snippet donateWidget}
+        <div class="page-header">
+            <h1>
+                {_family.components.family_requests_list_widget.heading}
+            </h1>
+        </div>
+        <table class="table table-striped table-responsive">
+            <thead>
+            <tr>
+                <th>{_family.components.family_requests_list_widget.status}</th>
+                <th>{_family.components.family_requests_list_widget.subscription_type}</th>
+                <th colspan="2">{_family.components.family_requests_list_widget.activation_link}</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr n:foreach="$requests as $request">
+                <td>
+                    {if $request->status == 'created'}
+                        <span class="label label-info">{_family.components.family_requests_list_widget.status_created}</span>
+                    {elseif $request->status == 'accepted'}
+                        <span class="label label-success">{_family.components.family_requests_list_widget.status_accepted}</span>
+                    {elseif $request->status == 'canceled'}
+                        <span class="label label-default">{_family.components.family_requests_list_widget.status_canceled}</span>
+                    {else}
+                        {$request->status}
+                    {/if}
+                </td>
+                <td>
+                    {$request->subscription_type->user_label}
+                    <br>
+                    {$request->subscription_type|typeContent|noescape}
+                </td>
+                <td>
+                    <input readonly dir="rtl" class="form-control" id="request{$request->id}" name="request{$request->id}" value="{plink //:Family:Requests:default $request->code}" title="{plink //:Family:Requests:default $request->code}" style="cursor: text;">
+                </td>
+                <td>
+                    {if $request->status == 'created'}
+                        <button class="clip btn btn-primary" data-clipboard-target="#request{$request->id}"><i class="fa fa-copy"></i> {_family.components.family_requests_list_widget.copy_to_clipboard}</button>
+                    {elseif $request->status == 'accepted'}
+                        použité {$request->accepted_at|userDate}<br>
+                        <i>({$request->slave_user->email|maskEmail})</i>
+                    {/if}
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                var clipboard = new ClipboardJS('.clip');
+
+                $('.clip').tooltip({
+                    trigger: 'click',
+                    placement: 'right'
+                });
+
+                function showTooltip(element, message) {
+                    $(element).tooltip('hide')
+                            .attr('data-original-title', message)
+                            .tooltip('show');
+
+                    setTimeout(function() {
+                        $(element).tooltip('hide');
+                    }, 1000);
+                }
+
+                clipboard.on('success', function(element) {
+                    showTooltip(element.trigger, {_family.components.family_requests_list_widget.copied_to_clipboard});
+                });
+
+                clipboard.on('error', function(element) {
+                    showTooltip(element.trigger, {_family.components.family_requests_list_widget.copying_failed});
+                });
+            });
+        </script>
+
+    {/snippet}
+{/if}

@@ -1,0 +1,34 @@
+{block scripts}
+  <script>
+    $(document).ready(function() {
+        // highlight parent TR to distinguish
+        $("div.family_owner")
+            .closest("tr")
+            .css("background-color", "#c1dec1");
+    });
+  </script>
+{/block}
+
+{if ($familyRequestsAll > 0)}
+<div class="family_owner">
+  <span class="label label-warning">{_family.components.users_abusive_additional.master_account}</span>
+
+    {define familyGeneratedTooltip}
+      <figure>
+        <figcaption style="padding-left: 0.5em; text-align: left; border-bottom: 1px solid white; margin: 0.5em 0;">
+          {_family.components.users_abusive_additional.children.tooltip_title}
+        </figcaption>
+        <ul style="padding-left: 1.5em; text-align: left; margin-">
+          <li>{_family.components.users_abusive_additional.children.status.generated, ['count' => $familyRequestsAll]}</li>
+          <li>{_family.components.users_abusive_additional.children.status.accepted, ['count' => $familyRequestsAccepted]}</li>
+          <li>{_family.components.users_abusive_additional.children.status.unused, ['count' => $familyRequestsUnused]}</li>
+          <li>{_family.components.users_abusive_additional.children.status.canceled, ['count' => $familyRequestsCanceled]}</li>
+        </ul>
+      </figure>
+    {/define}
+
+  <span class="label label-info" data-toggle="tooltip" data-placement="top" title="{include familyGeneratedTooltip}">
+     {_family.components.users_abusive_additional.account_with_family_requests, ['count' => $familyRequestsAll]} ({$familyRequestsAccepted} / {$familyRequestsUnused} / {$familyRequestsCanceled})
+  </span>
+</div>
+{/if}

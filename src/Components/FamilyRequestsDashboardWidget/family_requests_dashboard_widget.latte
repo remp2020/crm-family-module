@@ -1,0 +1,27 @@
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">{_family.components.family_requests_dashboard_widget.title}</h3>
+  </div>
+  <ul class="list-group">
+    <li class="list-group-item">
+      {_family.components.family_requests_dashboard_widget.active_parents.label}
+      <i class="fa fa-question-circle" data-toggle="tooltip"
+         data-original-title="{_family.components.family_requests_dashboard_widget.active_parents.tooltip}"></i>
+      <span class="badge">{$familyParentsCurrentlyActiveCount}</span>
+    </li>
+
+    <li class="list-group-item">
+      {_family.components.family_requests_dashboard_widget.child_created.label}
+      <i class="fa fa-question-circle" data-toggle="tooltip"
+         data-original-title="{_family.components.family_requests_dashboard_widget.child_created.tooltip}"></i>
+      <span class="badge">{$familyChildrenGeneratedForActiveParentsCount}</span>
+    </li>
+
+    <li class="list-group-item">
+      {_family.components.family_requests_dashboard_widget.paid_subscribers_with_family_requests.label}
+      <i class="fa fa-question-circle" data-toggle="tooltip"
+         data-original-title="{_family.components.family_requests_dashboard_widget.paid_subscribers_with_family_requests.tooltip}"></i>
+      <span class="badge">{$paidSubscribersWithFamilyRequestsCount}</span>
+    </li>
+  </ul>
+</div>

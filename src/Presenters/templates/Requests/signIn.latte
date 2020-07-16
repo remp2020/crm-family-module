@@ -1,0 +1,19 @@
+{block #head}
+    {control snippet 'family.html_head'}
+{/block}
+
+{block #content}
+
+<div class="page-header">
+    <h1 n:block="title">{_family.frontend.signin.header}</h1>
+</div>
+
+<p>{_family.frontend.signin.description}</p>
+
+{control signInForm}
+
+<div class="row" style="text-align: center">
+    <p>
+        <a n:href=":Users:Users:resetPassword">{_family.frontend.signin.forgot_password}</a>
+    </p>
+</div>

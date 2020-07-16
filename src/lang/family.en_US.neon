@@ -1,0 +1,62 @@
+frontend:
+	header: "Donate subscription"
+	new:
+		header: "Donated Subscription Activation"
+
+		form:
+			email: "Email"
+			email_required: "Please enter your email"
+			email_placeholder: "For example moj@email.sk"
+			submit: "Register and activate subscription"
+			error_email: "The specified email is invalid"
+
+	signin:
+		header: "Activate donated subscription"
+		description: "Your email is already registered. Please enter your password and sign in"
+		forgot_password: "Forgot your password?"
+
+		form:
+			password: "Password"
+			password_required: "Please enter a password."
+			password_placeholder: "Your password"
+			submit: "Sign in"
+	logged_in:
+		request_info: "User %email% has given you <b>%name%</b> subscription."
+		activate: "Activate subscription for account %email%"
+
+
+components:
+	family_requests_dashboard_widget:
+		title: 'Active company/family subscriptions'
+		active_parents:
+			label: Active parents
+			tooltip: 'The number of payments for company/family subscriptions that are currently active.'
+		child_created:
+			label: Generated family requests
+			tooltip: 'The number of subscriptions generated for active parents.'
+		paid_subscribers_with_family_requests:
+			label: 'Paying subscribers + company'
+			tooltip: "Number of active subscribers with payment + number of company/family accesses. One user is once even if he has multiple subscriptions. Generated company/family doesn't need to be activated."
+
+	users_abusive_additional:
+		master_account: Master account
+		account_with_family_requests: "{0}no subscription|[1,Inf]%count% subscriptions"
+		children:
+			tooltip_title: Child subscription
+			status:
+				generated: "{0}no generated|[1,Inf]%count% generated"
+				accepted: "{0}no activated|[1,Inf]%count% activated"
+				unused: "{0}no unused|[1,Inf]%count% unused"
+				canceled: "{0}no cancelled|[1,Inf]%count% cancelled"
+
+	family_requests_list_widget:
+		heading: Subscription management
+		status: Status
+		subscription_type: Subscription type
+		activation_link: Activation link
+		status_created: waiting for activation
+		status_accepted: accepted
+		status_canceled: canceled
+		copy_to_clipboard: Copy to cliboard
+		copied_to_clipboard: Copied successfully
+		copying_failed: Copying failed

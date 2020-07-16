@@ -1,0 +1,16 @@
+{block #head}
+    {control snippet 'family.html_head'}
+{/block}
+
+{block #content}
+
+<div class="page-header">
+    <h1 n:block="title">{_family.frontend.new.header}</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <p>{_family.frontend.logged_in.request_info, ['email'=> $request->master_user->email, 'name' => $request->subscription_type->user_label]|noescape}</p>
+        {control confirmRequest}
+    </div>
+</div>

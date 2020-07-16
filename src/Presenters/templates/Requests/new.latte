@@ -1,0 +1,33 @@
+{block #head}
+    {control snippet 'family.html_head'}
+{/block}
+
+{block title}Darujte 30-dňové webové predplatné{/block}
+
+{block #content}
+
+{if !$isLogged}
+    <div class="page-header">
+        <h1>Darujte 30-dňové webové predplatné</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <p>
+                Pre darovanie predplatného sa <a n:href="onlyLogged" style="text-decoration:underline">prihláste do vášho konta tu</a>.
+            </p>
+        </div>
+    </div>
+{else}
+    {if $hasSubscription}
+        {control 'simpleWidget', 'donate.subscription'}
+    {else}
+        <div class="page-header">
+            <h1>Darujte 30-dňové webové predplatné</h1>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p class="alert alert-info">Predplatné môžu darovať len naši aktívni predplatitelia: <a href="/" style="text-decoration: underline">vyberte si z našej ponuky predplatných tu</p>
+            </div>
+        </div>
+    {/if}
+{/if}
