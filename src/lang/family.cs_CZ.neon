@@ -24,6 +24,11 @@ frontend:
 		request_info: "Uživatel <i>%email%</i> Vám poskytl předplatné typu <b>%name%</b>."
 		activate: "Aktivovat předplatné na účet %email%"
 
+	family_requests_statuses:
+		status_created: čeká na použití
+		status_accepted: použitý
+		status_canceled: zrušen
+
 
 components:
 	family_requests_dashboard_widget:
@@ -54,9 +59,22 @@ components:
 		status: Stav
 		subscription_type: Typ předplatného
 		activation_link: Aktivační odkaz
-		status_created: čeká na použití
-		status_accepted: použitý
-		status_canceled: zrušen
 		copy_to_clipboard: Zkopírovat odkaz
 		copied_to_clipboard: Odkaz zkopírovaný
 		copying_failed: Kopírování selhalo
+
+	master_family_subscription_info:
+		title: 'Rodičovské firemní/rodinné předplatné'
+		stats:
+			title: 'Aktivní'
+			active_tooltip: 'Počet aktivovaných přístupů'
+			total_tooltip: 'Počet vygenerovaných přístupů'
+		modal:
+			status: Stav
+			activation_link: Aktivační odkaz
+			slave_account: Dceřiné konto
+			copy_to_clipboard: Zkopírovat odkaz
+
+	slave_family_subscription_info:
+		title: 'Dceřiné předplatné'
+		master_account: Rodičovské konto

@@ -3,6 +3,8 @@
 namespace Crm\FamilyModule\Repositories;
 
 use Crm\ApplicationModule\Repository;
+use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
+use Nette\Database\Context;
 use Nette\Database\Table\IRow;
 use Nette\Database\Table\Selection;
 use Nette\Utils\DateTime;
@@ -15,6 +17,21 @@ class FamilyRequestsRepository extends Repository
     const STATUS_CANCELED = 'canceled';
 
     protected $tableName = 'family_requests';
+
+    private $familySubscriptionTypesRepository;
+
+    private $subscriptionsRepository;
+
+    public function __construct(
+        Context $database,
+        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
+        SubscriptionsRepository $subscriptionsRepository
+    ) {
+        parent::__construct($database);
+
+        $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
+        $this->subscriptionsRepository = $subscriptionsRepository;
+    }
 
     public function add(IRow $subscription, IRow $subscriptionType, $status = self::STATUS_CREATED, DateTime $expiresAt = null)
     {
@@ -45,6 +62,13 @@ class FamilyRequestsRepository extends Repository
         return $this->getTable()->where(['master_subscription_id' => $subscription->id]);
     }
 
+    public function masterSubscriptionUsedFamilyRequests(IRow $subscription): Selection
+    {
+        return $this->masterSubscriptionFamilyRequest($subscription)->where([
+            'status NOT' => [self::STATUS_CREATED],
+        ]);
+    }
+
     public function masterSubscriptionUnusedFamilyRequests(IRow $subscription): Selection
     {
         return $this->getTable()
@@ -69,5 +93,19 @@ class FamilyRequestsRepository extends Repository
             'slave_user_id' => $user->id,
             'status' => FamilyRequestsRepository::STATUS_ACCEPTED
         ])->count('*') > 0;
+    }
+
+    final public function userMasterSubscriptions(IRow $user)
+    {
+        return $this->subscriptionsRepository->userSubscriptions($user->id)
+            ->where('subscription_type_id IN ?', $this->familySubscriptionTypesRepository->masterSubscriptionTypes());
+    }
+
+    final public function findByMasterSubscriptionSlaveUser(IRow $familySubscription)
+    {
+        return $this->getTable()->where([
+            'master_subscription_id' => $familySubscription->master_subscription_id,
+            'slave_user_id' => $familySubscription->slave_subscription->user_id
+        ])->fetch();
     }
 }

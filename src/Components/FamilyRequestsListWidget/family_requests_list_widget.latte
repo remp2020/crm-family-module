@@ -17,11 +17,11 @@
             <tr n:foreach="$requests as $request">
                 <td>
                     {if $request->status == 'created'}
-                        <span class="label label-info">{_family.components.family_requests_list_widget.status_created}</span>
+                        <span class="label label-info">{_family.frontend.family_requests_statuses.status_created}</span>
                     {elseif $request->status == 'accepted'}
-                        <span class="label label-success">{_family.components.family_requests_list_widget.status_accepted}</span>
+                        <span class="label label-success">{_family.frontend.family_requests_statuses.status_accepted}</span>
                     {elseif $request->status == 'canceled'}
-                        <span class="label label-default">{_family.components.family_requests_list_widget.status_canceled}</span>
+                        <span class="label label-default">{_family.frontend.family_requests_statuses.status_canceled}</span>
                     {else}
                         {$request->status}
                     {/if}

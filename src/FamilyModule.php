@@ -71,6 +71,16 @@ class FamilyModule extends CrmModule
             'dashboard.simplewidget.additional',
             $this->getInstance(\Crm\FamilyModule\Components\FamilyRequestsDashboardWidget\FamilyRequestsDashboardWidget::class)
         );
+
+        $widgetManager->registerWidget(
+            'admin.user.detail.center',
+            $this->getInstance(\Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget\MasterFamilySubscriptionInfoWidget::class)
+        );
+
+        $widgetManager->registerWidget(
+            'admin.user.detail.center',
+            $this->getInstance(\Crm\FamilyModule\Components\SlaveFamilySubscriptionInfoWidget\SlaveFamilySubscriptionInfoWidget::class)
+        );
     }
 
     public function registerSeeders(SeederManager $seederManager)

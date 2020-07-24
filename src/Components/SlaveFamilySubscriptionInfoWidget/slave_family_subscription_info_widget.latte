@@ -1,0 +1,27 @@
+<div class="panel panel-default">
+    <div class="panel-heading">{_family.components.slave_family_subscription_info.title}</div>
+    <div class="panel-body table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+            <th>{_subscriptions.menu.subscriptions}</th>
+            <th>{_family.components.slave_family_subscription_info.master_account}</th>
+            </thead>
+            <tbody>
+            <tr n:foreach="$familySubscriptions as $familySubscription">
+                <td>
+                    <small class="text-muted">#{$familySubscription->slave_subscription_id}</small>
+                    <a href="{plink :Subscriptions:SubscriptionTypesAdmin:Show $familySubscription->slave_subscription_id}">
+                        {$familySubscription->slave_subscription->subscription_type->name}
+                    </a>
+                    <br>
+                    <small>{$familySubscription->slave_subscription->start_time|userDate} - {$familySubscription->slave_subscription->end_time|userDate}</small>
+
+                </td>
+                <td><a href="{plink :Users:UsersAdmin:Show $familySubscription->master_subscription->user_id}"
+                       class="text-nowrap"><i
+                                class="fa fa-user"></i> {$familySubscription->master_subscription->user->email}</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

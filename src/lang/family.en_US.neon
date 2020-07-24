@@ -24,6 +24,11 @@ frontend:
 		request_info: "User %email% has given you <b>%name%</b> subscription."
 		activate: "Activate subscription for account %email%"
 
+	family_requests_statuses:
+		status_created: waiting for activation
+		status_accepted: accepted
+		status_canceled: canceled
+
 
 components:
 	family_requests_dashboard_widget:
@@ -54,9 +59,22 @@ components:
 		status: Status
 		subscription_type: Subscription type
 		activation_link: Activation link
-		status_created: waiting for activation
-		status_accepted: accepted
-		status_canceled: canceled
 		copy_to_clipboard: Copy to cliboard
 		copied_to_clipboard: Copied successfully
 		copying_failed: Copying failed
+
+	master_family_subscription_info:
+		title: 'Master company/family subscriptions'
+		stats:
+			title: 'Active'
+			active_tooltip: 'Number of activated family requests'
+			total_tooltip: 'Number of generated family requests'
+		modal:
+			status: Status
+			activation_link: Activation link
+			slave_account: Slave account
+			copy_to_clipboard: Copy to cliboard
+
+	slave_family_subscription_info:
+		title: 'Slave subscriptions'
+		master_account: Master account
