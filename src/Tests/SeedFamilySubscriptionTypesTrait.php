@@ -2,6 +2,7 @@
 
 namespace Crm\FamilyModule\Tests;
 
+use Crm\FamilyModule\Models\Extension\ExtendFamilyExtension;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Builder\SubscriptionTypeBuilder;
 
@@ -21,6 +22,7 @@ trait SeedFamilySubscriptionTypesTrait
             ->setActive(true)
             ->setPrice(1)
             ->setLength($daysLength)
+            ->setExtensionMethod(ExtendFamilyExtension::METHOD_CODE)
             ->setContentAccessOption('web', 'mobile')
             ->save();
 
@@ -32,6 +34,7 @@ trait SeedFamilySubscriptionTypesTrait
             ->setActive(true)
             ->setPrice(0)
             ->setLength($daysLength)
+            ->setExtensionMethod(ExtendFamilyExtension::METHOD_CODE)
             ->setContentAccessOption('web', 'mobile')
             ->save();
 

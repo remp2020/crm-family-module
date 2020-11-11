@@ -36,3 +36,9 @@ services:
 
 	# seeders
 	- Crm\FamilyModule\Seeders\FamilySeeder
+	- Crm\FamilyModule\Seeders\SubscriptionExtensionMethodsSeeder
+
+	extensionMethodFactory:
+		setup:
+			# register subscription extension method for family subscription types
+			- registerExtension(Crm\FamilyModule\Models\Extension\ExtendFamilyExtension::METHOD_CODE, Crm\FamilyModule\Models\Extension\ExtendFamilyExtension())

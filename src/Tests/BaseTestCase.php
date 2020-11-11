@@ -33,7 +33,7 @@ abstract class BaseTestCase extends DatabaseTestCase
     use SeedFamilySubscriptionTypesTrait;
 
     /** @var SubscriptionTypeBuilder */
-    private $subscriptionTypeBuilder;
+    protected $subscriptionTypeBuilder;
 
     /** @var SubscriptionTypesMetaRepository */
     private $subscriptionTypesMetaRepository;
@@ -75,6 +75,7 @@ abstract class BaseTestCase extends DatabaseTestCase
         return [
             ContentAccessSeeder::class,
             SubscriptionExtensionMethodsSeeder::class,
+            \Crm\FamilyModule\Seeders\SubscriptionExtensionMethodsSeeder::class,
             SubscriptionLengthMethodSeeder::class,
             SubscriptionTypeNamesSeeder::class,
             FamilySeeder::class,

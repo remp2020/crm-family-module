@@ -32,4 +32,12 @@ class FamilySubscriptionTypesRepository extends Repository
     {
         return $this->getTable()->fetchAssoc('master_subscription_type_id=master_subscription_type_id');
     }
+
+    /**
+     * Return all company/family child subscription types.
+     */
+    final public function slaveSubscriptionTypes(): array
+    {
+        return $this->getTable()->fetchAssoc('slave_subscription_type_id=slave_subscription_type_id');
+    }
 }

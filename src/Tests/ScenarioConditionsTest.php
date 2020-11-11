@@ -62,6 +62,13 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
         ]);
     }
 
+    protected function requiredSeeders(): array
+    {
+        return array_merge(parent::requiredSeeders(), [
+            \Crm\FamilyModule\Seeders\SubscriptionExtensionMethodsSeeder::class,
+        ]);
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
