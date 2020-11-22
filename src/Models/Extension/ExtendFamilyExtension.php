@@ -43,6 +43,8 @@ class ExtendFamilyExtension implements ExtensionInterface
             WHERE `user_id` = ?
               AND `subscription_type_id` IN (?)
               AND `end_time` > ?
+          ORDER BY `end_time` DESC
+          LIMIT 1
 SQL;
 
         $userFamilySubscriptions = $this->database->getConnection()->query($sql, $user->id, $familySubscriptionTypeIds, new DateTime())->fetchAll();
@@ -52,13 +54,6 @@ SQL;
             return new Extension(new DateTime());
         }
 
-        // find subscription with newest end_time
-        $latestUserFamilySubscription = reset($userFamilySubscriptions);
-        foreach ($userFamilySubscriptions as $subscription) {
-            if ($subscription->end_time > $latestUserFamilySubscription->end_time) {
-                $latestUserFamilySubscription = $subscription;
-            }
-        }
-        return new Extension($latestUserFamilySubscription->end_time, true);
+        return new Extension(reset($userFamilySubscriptions)->end_time, true);
     }
 }
