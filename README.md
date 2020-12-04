@@ -48,6 +48,14 @@ These codes can be accessed via two channels:
     ```
 - As family codes via API. You can access all available family codes with parent's account token via [`/api/v1/family/list`](#get-apiv1familylist) API. These codes can be then activated via [`/api/v1/family/activate`](#post-apiv1familyactivate) API.
 
+### ExtendFamilyExtension
+
+You can use `ExtendFamilyExtension` subscription type extension method to extend your family/company subscriptions.
+
+If CRM is creating new subscription with subscription type with this extension method, it tries to find all actual family subscriptions. If there is one, new subscription is appended after the actual. Otherwise the new subscription starts immediately (ignoring other non-family subscriptions).
+
+The extension is registered automatically. If `FamilyModule` is enabled, you should be able to select it in your subscription type form.
+
 ## API documentation
 
 All examples use `http://crm.press` as a base domain. Please change the host to the one you use
