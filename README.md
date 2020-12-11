@@ -56,6 +56,20 @@ If CRM is creating new subscription with subscription type with this extension m
 
 The extension is registered automatically. If `FamilyModule` is enabled, you should be able to select it in your subscription type form.
 
+### Renewal of child subscriptions
+
+If the parent user account renews family/company subscription and new subscription starts at the same time as the previous one ends, child accounts are given new (renewed) subscriptions too. It's done automatically by event handler `\Crm\FamilyModule\Events\NewSubscriptionHandler`.
+
+This time gap between subscriptions can be configured within your main config. For example if you want to allow renewal only 7 days after end of the subscription:
+
+```latte
+services:
+	# ...
+	familyNewSubscriptionHandler:
+		setup:
+			- setSubscriptionsTimeGap('7 days')
+```
+
 ## API documentation
 
 All examples use `http://crm.press` as a base domain. Please change the host to the one you use

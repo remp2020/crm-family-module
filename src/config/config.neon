@@ -19,7 +19,7 @@ services:
 	- Crm\FamilyModule\Components\SlaveFamilySubscriptionInfoWidget\SlaveFamilySubscriptionInfoWidget
 
 	# events
-	- Crm\FamilyModule\Events\NewSubscriptionHandler
+	familyNewSubscriptionHandler: Crm\FamilyModule\Events\NewSubscriptionHandler
 
 	# models
 	- Crm\FamilyModule\Models\FamilyRequests

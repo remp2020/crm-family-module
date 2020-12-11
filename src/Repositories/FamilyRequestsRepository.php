@@ -78,6 +78,15 @@ class FamilyRequestsRepository extends Repository
             ]);
     }
 
+    public function masterSubscriptionAcceptedFamilyRequests(IRow $subscription): Selection
+    {
+        return $this->getTable()
+            ->where([
+                'master_subscription_id' => $subscription->id,
+                'status' => self::STATUS_ACCEPTED,
+            ]);
+    }
+
     public function cancelCreatedRequests(IRow $user)
     {
         return $this->getTable()->where(['master_user_id' => $user->id, 'status' => self::STATUS_CREATED])->update([

@@ -6,6 +6,7 @@ use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Models\FamilyChildSubscriptionRenewalException;
 use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Models\MissingFamilySubscriptionTypeException;
+use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\PaymentsModule\Repository\PaymentsRepository;
@@ -36,6 +37,10 @@ class NewSubscriptionHandler extends AbstractListener
 
     private $familySubscriptionTypesRepository;
 
+    private $familyRequestsRepository;
+
+    private $subscriptionsTimeGap;
+
     public function __construct(
         SubscriptionsRepository $subscriptionsRepository,
         SubscriptionMetaRepository $subscriptionMetaRepository,
@@ -44,7 +49,8 @@ class NewSubscriptionHandler extends AbstractListener
         RecurrentPaymentsRepository $recurrentPaymentsRepository,
         FamilySubscriptionsRepository $familySubscriptionsRepository,
         DonateSubscription $donateSubscription,
-        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository
+        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
+        FamilyRequestsRepository $familyRequestsRepository
     ) {
         $this->familyRequests = $familyRequests;
         $this->paymentsRepository = $paymentsRepository;
@@ -54,6 +60,12 @@ class NewSubscriptionHandler extends AbstractListener
         $this->subscriptionsRepository = $subscriptionsRepository;
         $this->subscriptionMetaRepository = $subscriptionMetaRepository;
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
+        $this->familyRequestsRepository = $familyRequestsRepository;
+    }
+
+    public function setSubscriptionsTimeGap(string $gap): void
+    {
+        $this->subscriptionsTimeGap = $gap;
     }
 
     public function handle(EventInterface $event)
@@ -69,7 +81,7 @@ class NewSubscriptionHandler extends AbstractListener
 
             // Check if this has previous family subscription
             $previousFamilySubscription = $this->getPreviousFamilyPaymentSubscription($subscription);
-            if ($previousFamilySubscription) {
+            if ($previousFamilySubscription && $this->hasEnoughRequests($subscription, $previousFamilySubscription)) {
                 $this->linkNextFamilySubscription($subscription, $previousFamilySubscription);
                 $this->activateChildSubscriptions($subscription, $previousFamilySubscription, $requests);
             }
@@ -90,27 +102,32 @@ class NewSubscriptionHandler extends AbstractListener
             }
         }
 
-        // Second, try to find previous family subscription (without time gap)
+        // Second, try to find previous family subscription with time gap (if set by setSubscriptionsTimeGap)
+        if ($this->subscriptionsTimeGap !== null) {
+            $dateGapStart = (new \DateTime($subscription->start_time))->modify('-' . $this->subscriptionsTimeGap);
+        } else {
+            $dateGapStart = $subscription->start_time;
+        }
+
         $previousFamilySubscription = $this->subscriptionsRepository->getTable()
             ->where([
                 'id != ?' => $subscription->id,
                 'user_id' => $subscription->user_id,
-                'start_time <= ?' => $subscription->start_time,
-                'end_time >= ?' => $subscription->start_time,
+                'end_time BETWEEN ? AND ?' => [$dateGapStart, $subscription->start_time],
                 'subscription_type_id IN (?)' => array_values($this->familySubscriptionTypesRepository->masterSubscriptionTypes()),
-            ])
-            // if there are multiple ones, take one having the latest end
-            ->order('end_time DESC')
-            ->limit(1)
-            ->fetch();
+            ]);
 
-        return $previousFamilySubscription;
+        if ($previousFamilySubscription->count('*') > 1) {
+            return null;
+        }
+
+        return $previousFamilySubscription->fetch();
     }
 
 
     /**
-     * @param IRow  $newSubscription
-     * @param IRow  $previousSubscription
+     * @param IRow $newSubscription
+     * @param IRow $previousSubscription
      * @param array $familyRequests
      *
      * @return array
@@ -153,5 +170,16 @@ class NewSubscriptionHandler extends AbstractListener
     private function linkNextFamilySubscription(IRow $subscription, $previousFamilySubscription): void
     {
         $this->subscriptionMetaRepository->add($previousFamilySubscription, FamilyRequests::NEXT_FAMILY_SUBSCRIPTION_META, $subscription->id);
+    }
+
+    private function hasEnoughRequests($newSubscription, $previousSubscription): bool
+    {
+        $newRequestsCount = $this->familyRequestsRepository->masterSubscriptionUnusedFamilyRequests($newSubscription)
+            ->count('*');
+
+        $previousRequestsCount = $this->familyRequestsRepository->masterSubscriptionAcceptedFamilyRequests($previousSubscription)
+            ->count('*');
+
+        return $newRequestsCount >= $previousRequestsCount;
     }
 }
