@@ -109,7 +109,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             $masterSubscriptionType,
             $masterUser,
             'family',
-            new DateTime('now - 31 days'),
+            new DateTime('now - 30 days'),
             new DateTime('now + 1 days'),
             true
         ), 1);
@@ -128,8 +128,8 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             $masterSubscriptionType,
             $masterUser,
             'family',
-            new DateTime('now - 1 days'),
-            new DateTime('now + 29 days'),
+            new DateTime('now + 1 days'),
+            new DateTime('now + 31 days'),
             true
         ), 1);
 
