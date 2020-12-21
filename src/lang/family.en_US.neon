@@ -29,6 +29,8 @@ frontend:
 		status_accepted: accepted
 		status_canceled: canceled
 
+	family_requests:
+		failed_to_generate: "Failed to generate business accessess. Please contact support. Subscription ID: %subscription_id%."
 
 components:
 	family_requests_dashboard_widget:

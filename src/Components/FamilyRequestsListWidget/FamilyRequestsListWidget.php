@@ -8,6 +8,7 @@ use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Models\MissingFamilySubscriptionTypeException;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
+use Nette\Localization\ITranslator;
 use Nette\Security\User;
 use Tracy\Debugger;
 
@@ -23,18 +24,22 @@ class FamilyRequestsListWidget extends BaseWidget
 
     private $user;
 
+    private $translator;
+
     public function __construct(
         WidgetManager $widgetManager,
         User $user,
         FamilyRequests $familyRequests,
         FamilyRequestsRepository $familyRequestsRepository,
-        SubscriptionsRepository $subscriptionsRepository
+        SubscriptionsRepository $subscriptionsRepository,
+        ITranslator $translator
     ) {
         parent::__construct($widgetManager);
         $this->familyRequests = $familyRequests;
         $this->familyRequestsRepository = $familyRequestsRepository;
         $this->subscriptionsRepository = $subscriptionsRepository;
         $this->user = $user;
+        $this->translator = $translator;
     }
 
     public function header($id = '')
@@ -60,6 +65,13 @@ class FamilyRequestsListWidget extends BaseWidget
                 continue;
             } catch (\Exception $exception) {
                 Debugger::log($exception, Debugger::EXCEPTION);
+                $this->flashMessage(
+                    $this->translator->translate(
+                        'family.frontend.family_requests.failed_to_generate',
+                        ['subscription_id' => $activeSubscription->id]
+                    ),
+                    'error'
+                );
                 continue;
             }
 

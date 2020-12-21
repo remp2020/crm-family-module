@@ -29,6 +29,8 @@ frontend:
 		status_accepted: použitý
 		status_canceled: zrušený
 
+	family_requests:
+		failed_to_generate: "Generovanie firemných prístupov zlyhalo. Kontaktujte prosím podporu. ID predplatného: %subscription_id%."
 
 components:
 	family_requests_dashboard_widget:

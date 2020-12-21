@@ -1,3 +1,19 @@
+{foreach $flashes as $flash}
+    {if $flash->type == 'info'}
+        <div class="alert alert-success">
+            <strong>{_system.message.success|noescape}</strong> {$flash->message|noescape}
+        </div>
+    {elseif $flash->type == 'error'}
+        <div class="alert alert-danger">
+            <strong>{_system.message.error|noescape}</strong> {$flash->message|noescape}
+        </div>
+    {else}
+        <div class="alert alert-warning">
+        <strong>{_system.message.warning|noescape}</strong> {$flash->message|noescape}
+    </div>
+    {/if}
+{/foreach}
+
 {if count($requests)}
     {snippet donateWidget}
         <div class="page-header">
