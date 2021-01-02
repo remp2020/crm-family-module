@@ -76,6 +76,8 @@ components:
 			activation_link: Activation link
 			slave_account: Slave account
 			copy_to_clipboard: Copy to cliboard
+			email_placeholder: E-mail of existing user
+			activate: Activate
 
 	slave_family_subscription_info:
 		title: 'Slave subscriptions'

@@ -5,9 +5,9 @@ namespace Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget;
 
 use Crm\ApplicationModule\Widget\BaseWidget;
 use Crm\ApplicationModule\Widget\WidgetManager;
+use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
-use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Crm\UsersModule\Repository\UsersRepository;
 use Nette\Database\IRow;
 
@@ -19,24 +19,23 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
 
     private $familySubscriptionTypesRepository;
 
-    private $subscriptionsRepository;
-
     private $usersRepository;
 
+    private $donateSubscription;
 
     public function __construct(
         WidgetManager $widgetManager,
         FamilyRequestsRepository $familyRequestsRepository,
         FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
-        SubscriptionsRepository $subscriptionsRepository,
-        UsersRepository $usersRepository
+        UsersRepository $usersRepository,
+        DonateSubscription $donateSubscription
     ) {
         parent::__construct($widgetManager);
 
         $this->familyRequestsRepository = $familyRequestsRepository;
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
-        $this->subscriptionsRepository = $subscriptionsRepository;
         $this->usersRepository = $usersRepository;
+        $this->donateSubscription = $donateSubscription;
     }
 
     public function identifier()
@@ -70,5 +69,21 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
             ];
         }
         return $subscriptionsData;
+    }
+
+    public function handleActivateSubscription($email, $familyRequestCode)
+    {
+        $user = $this->usersRepository->getByEmail($this->presenter->getParameter('email'));
+        if (!$user) {
+            return;
+        }
+
+        $familyRequest = $this->familyRequestsRepository->findByCode($this->presenter->getParameter('familyRequestCode'));
+        if (!$familyRequest) {
+            return;
+        }
+
+        $this->donateSubscription->connectFamilyUser($user, $familyRequest);
+        $this->redirect('this');
     }
 }

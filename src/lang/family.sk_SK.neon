@@ -76,6 +76,8 @@ components:
 			activation_link: Aktivačný odkaz
 			slave_account: Dcérske konto
 			copy_to_clipboard: Skopírovať odkaz
+			email_placeholder: E-mail existujúceho používateľa
+			activate: Aktivovať
 
 	slave_family_subscription_info:
 		title: 'Dcérske predplatné'
