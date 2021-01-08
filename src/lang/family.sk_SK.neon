@@ -71,6 +71,7 @@ components:
 			title: 'Aktívne'
 			active_tooltip: 'Počet aktivovaných prístupov'
 			total_tooltip: 'Počet vygenerovaných prístupov'
+			canceled_tooltip: 'Počet zrušených prístupov: %number%'
 		modal:
 			status: Stav
 			activation_link: Aktivačný odkaz
@@ -78,6 +79,7 @@ components:
 			copy_to_clipboard: Skopírovať odkaz
 			email_placeholder: E-mail existujúceho používateľa
 			activate: Aktivovať
+			canceled_requests: Zrušené prístupy
 
 	slave_family_subscription_info:
 		title: 'Dcérske predplatné'

@@ -51,20 +51,21 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
             return;
         }
 
-        $this->template->subscriptions = $userMasterSubscriptions;
-        $this->template->subscriptionsData = $this->getSubscriptionsAdditionalData($userMasterSubscriptions);
+        $this->template->subscriptionsData = $this->getSubscriptionsData($userMasterSubscriptions);
 
         $this->template->setFile(__DIR__ . '/' . $this->templateName);
         $this->template->render();
     }
 
-    private function getSubscriptionsAdditionalData($subscriptions)
+    private function getSubscriptionsData($subscriptions)
     {
         $subscriptionsData = [];
         foreach ($subscriptions as $subscription) {
             $subscriptionsData[$subscription->id] = [
-                'usedFamilyRequests' => $this->familyRequestsRepository->masterSubscriptionUsedFamilyRequests($subscription)->count('*'),
-                'totalFamilyRequests' => $this->familyRequestsRepository->masterSubscriptionFamilyRequest($subscription)->count('*'),
+                'subscription' => $subscription,
+                'usedFamilyRequests' => $this->familyRequestsRepository->masterSubscriptionAcceptedFamilyRequests($subscription),
+                'activeFamilyRequests' => $this->familyRequestsRepository->masterSubscriptionActiveFamilyRequests($subscription),
+                'canceledFamilyRequests' => $this->familyRequestsRepository->masterSubscriptionCanceledFamilyRequests($subscription),
                 'familyType' => $this->familySubscriptionTypesRepository->findByMasterSubscriptionType($subscription->subscription_type)
             ];
         }

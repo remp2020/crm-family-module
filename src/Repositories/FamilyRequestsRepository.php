@@ -59,23 +59,17 @@ class FamilyRequestsRepository extends Repository
 
     public function masterSubscriptionFamilyRequest(IRow $subscription): Selection
     {
-        return $this->getTable()->where(['master_subscription_id' => $subscription->id]);
+        return $subscription->related('family_requests', 'master_subscription_id');
     }
 
-    public function masterSubscriptionUsedFamilyRequests(IRow $subscription): Selection
+    public function masterSubscriptionActiveFamilyRequests(IRow $subscription): Selection
     {
-        return $this->masterSubscriptionFamilyRequest($subscription)->where([
-            'status NOT' => [self::STATUS_CREATED],
-        ]);
+        return $this->masterSubscriptionFamilyRequest($subscription)->where('status', [self::STATUS_CREATED, self::STATUS_ACCEPTED]);
     }
 
     public function masterSubscriptionUnusedFamilyRequests(IRow $subscription): Selection
     {
-        return $this->getTable()
-            ->where([
-                'master_subscription_id' => $subscription->id,
-                'status' => self::STATUS_CREATED,
-            ]);
+        return $this->masterSubscriptionFamilyRequest($subscription)->where('status', self::STATUS_CREATED);
     }
 
     public function masterSubscriptionAcceptedFamilyRequests(IRow $subscription): Selection
@@ -85,6 +79,11 @@ class FamilyRequestsRepository extends Repository
                 'master_subscription_id' => $subscription->id,
                 'status' => self::STATUS_ACCEPTED,
             ]);
+    }
+
+    public function masterSubscriptionCanceledFamilyRequests(IRow $subscription): Selection
+    {
+        return $this->masterSubscriptionFamilyRequest($subscription)->where('status', self::STATUS_CANCELED);
     }
 
     public function cancelCreatedRequests(IRow $user)
@@ -100,7 +99,7 @@ class FamilyRequestsRepository extends Repository
         return $this->getTable()->where([
             'master_subscription_id' => $masterSubscription->id,
             'slave_user_id' => $user->id,
-            'status' => FamilyRequestsRepository::STATUS_ACCEPTED
+            'status' => self::STATUS_ACCEPTED
         ])->count('*') > 0;
     }
 

@@ -71,6 +71,7 @@ components:
 			title: 'Active'
 			active_tooltip: 'Number of activated family requests'
 			total_tooltip: 'Number of generated family requests'
+			canceled_tooltip: 'Number of canceled family requests: %number%'
 		modal:
 			status: Status
 			activation_link: Activation link
@@ -78,6 +79,7 @@ components:
 			copy_to_clipboard: Copy to cliboard
 			email_placeholder: E-mail of existing user
 			activate: Activate
+			canceled_requests: Canceled requests
 
 	slave_family_subscription_info:
 		title: 'Slave subscriptions'

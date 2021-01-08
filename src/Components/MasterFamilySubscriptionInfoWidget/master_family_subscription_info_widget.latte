@@ -8,7 +8,8 @@
             <th>{_system.actions}</th>
             </thead>
             <tbody>
-            <tr n:foreach="$subscriptions as $subscription">
+            <tr n:foreach="$subscriptionsData as $subscriptionData">
+                {var $subscription = $subscriptionData['subscription']}
                 <td>
                     <small class="text-muted">#{$subscription->id}</small>
                     <i n:if="$subscription->note" class="fa fa-info-circle text-danger fa-wh" data-toggle="tooltip"
@@ -19,10 +20,18 @@
                     <br>
                     <small>{$subscription->start_time|userDate} - {$subscription->end_time|userDate}</small>
                 </td>
-                <td><span data-toggle="tooltip" data-placement="top"
-                          title={_family.components.master_family_subscription_info.stats.active_tooltip}>{$subscriptionsData[$subscription->id]['usedFamilyRequests']}</span>
+                <td style="white-space: nowrap;">
+                    <span data-toggle="tooltip" data-placement="top"
+                          title={_family.components.master_family_subscription_info.stats.active_tooltip}>{$subscriptionData['usedFamilyRequests']->count()}</span>
                     / <span data-toggle="tooltip" data-placement="top"
-                            title={_family.components.master_family_subscription_info.stats.total_tooltip}>{$subscriptionsData[$subscription->id]['totalFamilyRequests']}</span>
+                            title={_family.components.master_family_subscription_info.stats.total_tooltip}>{$subscriptionData['activeFamilyRequests']->count()}</span>
+                    <i n:if="$subscriptionData['canceledFamilyRequests']->count()"
+                       class="fa fa-exclamation-circle"
+                       data-toggle="tooltip"
+                       data-html="true"
+                       title="{_family.components.master_family_subscription_info.stats.canceled_tooltip, ['number' => $subscriptionData['canceledFamilyRequests']->count()]}"
+                    ></i>
+
                 </td>
                 <td><a href="#" data-toggle="modal" data-target="#detail-modal-{$subscription->id}"
                        data-id={$subscription->id} class="btn btn-sm btn-primary" title="{_system.show}"><i
@@ -33,7 +42,8 @@
     </div>
 </div>
 
-<div n:foreach="$subscriptions as $subscription" class="modal fade" id="detail-modal-{$subscription->id}">
+<div n:foreach="$subscriptionsData as $subscriptionData" class="modal fade" id="detail-modal-{$subscriptionData['subscription']->id}">
+    {var $subscription = $subscriptionData['subscription']}
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -42,9 +52,9 @@
                                 aria-hidden="true">&times;</span></button>
                 </div>
                 <h1>
-                    {$subscriptionsData[$subscription->id]['familyType']->slave_subscription_type->user_label}
+                    {$subscriptionData['familyType']->slave_subscription_type->user_label}
                 </h1>
-                {$subscriptionsData[$subscription->id]['familyType']->slave_subscription_type|typeContent|noescape}
+                {$subscriptionData['familyType']->slave_subscription_type|typeContent|noescape}
                 <br>
                 <b>{$subscription->start_time|userDate,true} - {$subscription->end_time|userDate,true}</b>
             </div>
@@ -58,7 +68,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr n:foreach="$subscription->related('family_requests') as $request">
+                    <tr n:foreach="$subscriptionData['activeFamilyRequests'] as $request">
                         <td>
                             {if $request->status == \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_CREATED}
                                 <span class="label label-info">{_family.frontend.family_requests_statuses.status_created}</span>
@@ -105,6 +115,42 @@
                     </tr>
                     </tbody>
                 </table>
+
+                {if $subscriptionData['canceledFamilyRequests']->count()}
+                    <h3>{_family.components.master_family_subscription_info.modal.canceled_requests}</h3>
+                    <table class="table table-striped table-responsive">
+                        <thead>
+                            <tr>
+                                <th>{_family.components.master_family_subscription_info.modal.status}</th>
+                                <th colspan="2">{_family.components.master_family_subscription_info.modal.activation_link}</th>
+                                <th>{_family.components.master_family_subscription_info.modal.slave_account}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr n:foreach="$subscriptionData['canceledFamilyRequests'] as $request">
+                            <td>
+                                <span class="label label-default">{_family.frontend.family_requests_statuses.status_canceled}</span>
+                            </td>
+                            <td>
+                                <input readonly dir="rtl" class="form-control" id="request{$request->id}"
+                                       name="request{$request->id}"
+                                       value="{plink //:Family:Requests:default $request->code}"
+                                       title="{plink //:Family:Requests:default $request->code}" style="cursor: text;">
+                            </td>
+                            <td>
+                                {_family.frontend.family_requests_statuses.status_canceled} {$request->canceled_at|userDate,true}
+                            </td>
+                            <td>
+                                {if $request->slave_user_id}
+                                    <a href="{plink :Users:UsersAdmin:Show $request->slave_user_id}">
+                                        <i class="fa fa-user"></i> {$request->slave_user->email}
+                                    </a>
+                                {/if}
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                {/if}
             </div>
         </div>
     </div>
