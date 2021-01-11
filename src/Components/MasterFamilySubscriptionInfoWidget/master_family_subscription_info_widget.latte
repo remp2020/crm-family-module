@@ -101,15 +101,26 @@
                                 <a href="{plink :Users:UsersAdmin:Show $request->slave_user_id}">
                                     <i class="fa fa-user"></i> {$request->slave_user->email}
                                 </a>
-                            {else}
+                            {elseif $request->status == \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_CREATED && $subscription->end_time > new \DateTime}
                                 <input class="form-control" type="text" name="email" placeholder="{_family.components.master_family_subscription_info.modal.email_placeholder}" />
                             {/if}
                         </td>
                         <td>
-                            {if $request->status !== \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_ACCEPTED}
-                                <button type="button" class="btn btn-default activate-child-subscription" data-code="{$request->code}">
-                                    <i class="fa fa-play-circle"></i> {_family.components.master_family_subscription_info.modal.activate}
-                                </button>
+                            {if $subscription->end_time > new \DateTime}
+                                {if $request->status === \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_CREATED}
+                                    <button type="button" class="btn btn-default activate-child-subscription" data-code="{$request->code}">
+                                        <i class="fa fa-play-circle"></i> {_family.components.master_family_subscription_info.modal.activate}
+                                    </button>
+                                {elseif $request->status == \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_ACCEPTED}
+                                    {var $familySubscription = $subscriptionData['familySubscriptionsByRequest'][$request->id]}
+                                    <a type="button"
+                                       data-confirm="{_family.components.master_family_subscription_info.modal.stop_confirm, ['email' => $request->slave_user->email]}"
+                                       n:href="deactivateSubscription! $familySubscription->id"
+                                       class="btn btn-default"
+                                    >
+                                        <i class="fa fa-stop"></i> {_family.components.master_family_subscription_info.modal.stop}
+                                    </a>
+                                {/if}
                             {/if}
                         </td>
                     </tr>
@@ -198,6 +209,6 @@
                     }
                 }
             });
-        })
+        });
     });
 </script>

@@ -2,6 +2,7 @@
 
 namespace Crm\FamilyModule\Models;
 
+use Crm\ApplicationModule\NowTrait;
 use Crm\FamilyModule\FamilyModule;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionsRepository;
@@ -10,11 +11,12 @@ use Crm\SubscriptionsModule\Repository\SubscriptionMetaRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionTypesMetaRepository;
 use Nette\Database\Table\IRow;
-use Nette\Utils\DateTime;
 use Tracy\Debugger;
 
 class DonateSubscription
 {
+    use NowTrait;
+
     public const ERROR_INTERNAL = 'error-interal';
     public const ERROR_IN_USE = 'error-in-use'; // TODO: remp/crm/#1360 rename this constant; name isn't self explanatory (eg. ERROR_ONE_PER_USER)
     public const ERROR_SELF_USE = 'error-self-use';
@@ -67,15 +69,15 @@ class DonateSubscription
             }
         }
 
-        if ($masterSubscription->end_time <= new DateTime() || ($familyRequest->expires_at && $familyRequest->expires_at <= new DateTime())) {
+        if ($masterSubscription->end_time <= $this->getNow() || ($familyRequest->expires_at && $familyRequest->expires_at <= $this->getNow())) {
             return self::ERROR_MASTER_SUBSCRIPTION_EXPIRED;
         }
 
         $this->familyRequestsRepository->update($familyRequest, [
             'status' => FamilyRequestsRepository::STATUS_ACCEPTED,
             'slave_user_id' => $slaveUser->id,
-            'accepted_at' => new DateTime(),
-            'updated_at' => new DateTime(),
+            'accepted_at' => $this->getNow(),
+            'updated_at' => $this->getNow(),
         ]);
 
         $slaveSubscription = null;
@@ -112,7 +114,11 @@ class DonateSubscription
             return self::ERROR_INTERNAL;
         }
 
-        $familySubscription = $this->familySubscriptionsRepository->add($familyRequest->master_subscription, $slaveSubscription, FamilySubscriptionsRepository::TYPE_SINGLE);
+        $familySubscription = $this->familySubscriptionsRepository->add(
+            $familyRequest,
+            $slaveSubscription,
+            FamilySubscriptionsRepository::TYPE_SINGLE
+        );
 
         // If there is already some future family subscription, activate one of its (unused) requests as well
         $nextSubscription = $this->getNextFamilySubscription($masterSubscription);
@@ -121,6 +127,17 @@ class DonateSubscription
         }
 
         return $familySubscription;
+    }
+
+    public function stopFamilySubscription(IRow $familySubscription)
+    {
+        $this->subscriptionsRepository->update($familySubscription->slave_subscription, [
+            'end_time' => $this->getNow(),
+        ]);
+        $this->familyRequestsRepository->update($familySubscription->family_request, [
+            'status' => FamilyRequestsRepository::STATUS_CANCELED,
+            'canceled_at' => $this->getNow(),
+        ]);
     }
 
     private function activateNextFamilySubscriptionRequest(IRow $subscription, $user)

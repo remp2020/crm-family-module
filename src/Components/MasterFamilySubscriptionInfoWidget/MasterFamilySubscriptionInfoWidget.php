@@ -7,6 +7,7 @@ use Crm\ApplicationModule\Widget\BaseWidget;
 use Crm\ApplicationModule\Widget\WidgetManager;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
+use Crm\FamilyModule\Repositories\FamilySubscriptionsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\UsersModule\Repository\UsersRepository;
 use Nette\Database\IRow;
@@ -19,6 +20,8 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
 
     private $familySubscriptionTypesRepository;
 
+    private $familySubscriptionsRepository;
+
     private $usersRepository;
 
     private $donateSubscription;
@@ -27,6 +30,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
         WidgetManager $widgetManager,
         FamilyRequestsRepository $familyRequestsRepository,
         FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
+        FamilySubscriptionsRepository $familySubscriptionsRepository,
         UsersRepository $usersRepository,
         DonateSubscription $donateSubscription
     ) {
@@ -34,6 +38,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
 
         $this->familyRequestsRepository = $familyRequestsRepository;
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
+        $this->familySubscriptionsRepository = $familySubscriptionsRepository;
         $this->usersRepository = $usersRepository;
         $this->donateSubscription = $donateSubscription;
     }
@@ -68,11 +73,15 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
                 'canceledFamilyRequests' => $this->familyRequestsRepository->masterSubscriptionCanceledFamilyRequests($subscription),
                 'familyType' => $this->familySubscriptionTypesRepository->findByMasterSubscriptionType($subscription->subscription_type)
             ];
+            foreach ($subscriptionsData[$subscription->id]['activeFamilyRequests'] as $familyRequest) {
+                $familySubscription = $familyRequest->related('family_subscriptions')->fetch();
+                $subscriptionsData[$subscription->id]['familySubscriptionsByRequest'][$familyRequest->id] = $familySubscription;
+            }
         }
         return $subscriptionsData;
     }
 
-    public function handleActivateSubscription($email, $familyRequestCode)
+    public function handleActivateSubscription()
     {
         $user = $this->usersRepository->getByEmail($this->presenter->getParameter('email'));
         if (!$user) {
@@ -85,6 +94,22 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
         }
 
         $this->donateSubscription->connectFamilyUser($user, $familyRequest);
+        $this->redirect('this');
+    }
+
+    public function handleDeactivateSubscription($id)
+    {
+        $familySubscription = $this->familySubscriptionsRepository->find($id);
+        if (!$familySubscription) {
+            return;
+        }
+
+        $this->donateSubscription->stopFamilySubscription($familySubscription);
+        $this->familyRequestsRepository->add(
+            $familySubscription->master_subscription,
+            $familySubscription->slave_subscription->subscription_type
+        );
+
         $this->redirect('this');
     }
 }

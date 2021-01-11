@@ -80,6 +80,8 @@ components:
 			email_placeholder: E-mail existujúceho používateľa
 			activate: Aktivovať
 			canceled_requests: Zrušené prístupy
+			stop: Zastaviť
+			stop_confirm: "Naozaj chcete zastaviť dcérske predplatné pre %email%?"
 
 	slave_family_subscription_info:
 		title: 'Dcérske predplatné'

@@ -24,10 +24,11 @@ class FamilySubscriptionsRepository extends Repository
         $this->familyRequestsRepository = $familyRequestsRepository;
     }
 
-    public function add(IRow $masterSubscription, IRow $slaveSubscription, $type)
+    public function add(IRow $familyRequest, IRow $slaveSubscription, $type)
     {
         return $this->getTable()->insert([
-            'master_subscription_id' => $masterSubscription->id,
+            'family_request_id' => $familyRequest->id,
+            'master_subscription_id' => $familyRequest->master_subscription_id,
             'slave_subscription_id' => $slaveSubscription->id,
             'type' => $type,
             'created_at' => new DateTime(),
