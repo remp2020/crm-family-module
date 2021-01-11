@@ -10,7 +10,6 @@ class FamilySubscriptionsRequest extends AbstractMigration
     {
         $this->table('family_subscriptions')
             ->addColumn('family_request_id', 'integer', ['null' => true, 'after' => 'id'])
-            ->addForeignKey('family_request_id', 'family_requests')
             ->update();
 
         // pair family_subscriptions with their family_requests
@@ -59,6 +58,7 @@ WHERE family_request_id IS NULL");
 
         $this->table('family_subscriptions')
             ->changeColumn('family_request_id', 'integer', ['null' => false, 'after' => 'id'])
+            ->addForeignKey('family_request_id', 'family_requests')
             ->update();
     }
 
