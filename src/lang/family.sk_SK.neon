@@ -82,6 +82,8 @@ components:
 			canceled_requests: Zrušené prístupy
 			stop: Zastaviť
 			stop_confirm: "Naozaj chcete zastaviť dcérske predplatné pre %email%?"
+			error:
+				not_registered: Email nie je zaregistrovaný
 
 	slave_family_subscription_info:
 		title: 'Dcérske predplatné'

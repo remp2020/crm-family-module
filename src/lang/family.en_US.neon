@@ -82,6 +82,8 @@ components:
 			canceled_requests: Canceled requests
 			stop: Stop
 			stop_confirm: "Are you sure you want to stop child subscription for %email%?"
+			error:
+				not_registered: Email is not registered
 
 	slave_family_subscription_info:
 		title: 'Slave subscriptions'

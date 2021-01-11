@@ -102,7 +102,10 @@
                                     <i class="fa fa-user"></i> {$request->slave_user->email}
                                 </a>
                             {elseif $request->status == \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_CREATED && $subscription->end_time > new \DateTime}
-                                <input class="form-control" type="text" name="email" placeholder="{_family.components.master_family_subscription_info.modal.email_placeholder}" />
+                                <div class="form-group child-subscription-email-wrapper" style="margin-bottom: 0">
+                                    <input class="form-control" type="text" name="email" placeholder="{_family.components.master_family_subscription_info.modal.email_placeholder}" />
+                                    <span style="display: none" class="help-block child-subscription-email-error"></span>
+                                </div>
                             {/if}
                         </td>
                         <td>
@@ -196,6 +199,12 @@
         });
 
         $('.activate-child-subscription').on('click', function() {
+            var emailInputWrapper = $(this).closest('tr').find('.child-subscription-email-wrapper');
+            var emailInputError = $(this).closest('tr').find('.child-subscription-email-error');
+
+            emailInputWrapper.removeClass('has-error');
+            emailInputError.hide();
+
             $.ajax({
                 type: 'POST',
                 data: {
@@ -206,6 +215,11 @@
                 success: function (data) {
                     if (data['redirect']) {
                         window.location.href = data['redirect'];
+                    }
+                    if (data['status'] === 'error') {
+                        emailInputWrapper.addClass('has-error');
+                        emailInputError.text(data['message']);
+                        emailInputError.show();
                     }
                 }
             });

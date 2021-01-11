@@ -10,6 +10,7 @@ use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\UsersModule\Repository\UsersRepository;
+use Kdyby\Translation\ITranslator;
 use Nette\Database\IRow;
 
 class MasterFamilySubscriptionInfoWidget extends BaseWidget
@@ -26,13 +27,16 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
 
     private $donateSubscription;
 
+    private $translator;
+
     public function __construct(
         WidgetManager $widgetManager,
         FamilyRequestsRepository $familyRequestsRepository,
         FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
         FamilySubscriptionsRepository $familySubscriptionsRepository,
         UsersRepository $usersRepository,
-        DonateSubscription $donateSubscription
+        DonateSubscription $donateSubscription,
+        ITranslator $translator
     ) {
         parent::__construct($widgetManager);
 
@@ -41,6 +45,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
         $this->familySubscriptionsRepository = $familySubscriptionsRepository;
         $this->usersRepository = $usersRepository;
         $this->donateSubscription = $donateSubscription;
+        $this->translator = $translator;
     }
 
     public function identifier()
@@ -85,6 +90,11 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
     {
         $user = $this->usersRepository->getByEmail($this->presenter->getParameter('email'));
         if (!$user) {
+            $presenter = $this->getPresenter();
+            $presenter->sendJson([
+                'status' => 'error',
+                'message' => $this->translator->translate('family.components.master_family_subscription_info.modal.error.not_registered'),
+            ]);
             return;
         }
 
