@@ -11,6 +11,7 @@ use Crm\SubscriptionsModule\Repository\SubscriptionMetaRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionTypesMetaRepository;
 use Nette\Database\Table\IRow;
+use Nette\Utils\DateTime;
 use Tracy\Debugger;
 
 class DonateSubscription
@@ -63,7 +64,7 @@ class DonateSubscription
                 return self::ERROR_IN_USE;
             }
         }
-        if (isset($subscriptionMeta['family_subscription_type']) && $subscriptionMeta['family_subscription_type'] === 'days') {
+        if (isset($subscriptionMeta['family_subscription_type']) && in_array($subscriptionMeta['family_subscription_type'], ['days', 'fixed'])) {
             if ($masterSubscription->user_id === $slaveUser->id) {
                 return self::ERROR_SELF_USE;
             }
@@ -106,6 +107,27 @@ class DonateSubscription
                 $slaveUser,
                 FamilyModule::TYPE_FAMILY,
                 $startTime,
+                $endTime
+            );
+        } elseif (isset($subscriptionMeta['family_subscription_type']) && $subscriptionMeta['family_subscription_type'] === 'fixed') {
+            $endTime = null;
+            if (isset($subscriptionMeta['family_subscription_fixed_expiration'])) {
+                $endTime = DateTime::from($subscriptionMeta['family_subscription_fixed_expiration']);
+            } elseif (isset($familyRequest->subscription_type->fixed_end)) {
+                $endTime = DateTime::from($familyRequest->subscription_type->fixed_end);
+            }
+
+            if (!isset($endTime)) {
+                throw new \Exception("Missing subscription end time set either with subscription meta key 'family_subscription_fixed_expiration' or in 'fixed_end' column of gifted subscription type.");
+            }
+
+            $slaveSubscription = $this->subscriptionsRepository->add(
+                $familyRequest->subscription_type,
+                false,
+                $masterSubscription->is_paid,
+                $slaveUser,
+                FamilyModule::TYPE_FAMILY,
+                $this->getNow(),
                 $endTime
             );
         }
