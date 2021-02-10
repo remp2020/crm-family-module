@@ -5,7 +5,7 @@ namespace Crm\FamilyModule\Models\Extension;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Extension\Extension;
 use Crm\SubscriptionsModule\Extension\ExtensionInterface;
-use Nette\Database\Context;
+use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Nette\Database\Table\IRow;
 use Nette\Utils\DateTime;
 
@@ -14,15 +14,15 @@ class ExtendFamilyExtension implements ExtensionInterface
     public const METHOD_CODE = 'extend_family';
     public const METHOD_NAME = 'Extend family';
 
-    private $database;
-
     private $familySubscriptionTypesRepository;
 
+    private $subscriptionsRepository;
+
     public function __construct(
-        Context $database,
+        SubscriptionsRepository $subscriptionsRepository,
         FamilySubscriptionTypesRepository $familySubscriptionTypesRepository
     ) {
-        $this->database = $database;
+        $this->subscriptionsRepository = $subscriptionsRepository;
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
     }
 
@@ -34,26 +34,16 @@ class ExtendFamilyExtension implements ExtensionInterface
             $this->familySubscriptionTypesRepository->slaveSubscriptionTypes()
         );
 
-        // load user family subscriptions
-        // Note: This is plain DB query; we cannot use SubscriptionsRepository because of circular reference:
-        //       `Nette\InvalidStateException: Circular reference detected for services: subscriptionsRepository, extensionMethodFactory.`
-        $sql = <<<SQL
-            SELECT `end_time`, `subscription_type_id`
-            FROM `subscriptions`
-            WHERE `user_id` = ?
-              AND `subscription_type_id` IN (?)
-              AND `end_time` > ?
-          ORDER BY `end_time` DESC
-          LIMIT 1
-SQL;
-
-        $userFamilySubscriptions = $this->database->getConnection()->query($sql, $user->id, $familySubscriptionTypeIds, new DateTime())->fetchAll();
+        $userFamilySubscription = $this->subscriptionsRepository->userSubscriptions($user->id)
+            ->where('end_time > NOW()')
+            ->where('subscription_type_id IN ?', $familySubscriptionTypeIds)
+            ->fetch();
 
         // if user doesn't have family subscription, start now
-        if (count($userFamilySubscriptions) === 0) {
+        if (!$userFamilySubscription) {
             return new Extension(new DateTime());
         }
 
-        return new Extension(reset($userFamilySubscriptions)->end_time, true);
+        return new Extension($userFamilySubscription->end_time, true);
     }
 }
