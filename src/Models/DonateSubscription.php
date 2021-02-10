@@ -121,10 +121,15 @@ class DonateSubscription
                 throw new \Exception("Missing subscription end time set either with subscription meta key 'family_subscription_fixed_expiration' or in 'fixed_end' column of gifted subscription type.");
             }
 
+            $isPaid = $this->subscriptionTypesMetaRepository->getMetaValue($familyRequest->subscription_type, 'is_paid');
+            if ($isPaid === false) {
+                $isPaid = $masterSubscription->is_paid;
+            }
+
             $slaveSubscription = $this->subscriptionsRepository->add(
                 $familyRequest->subscription_type,
                 false,
-                $masterSubscription->is_paid,
+                $isPaid,
                 $slaveUser,
                 FamilyModule::TYPE_FAMILY,
                 $this->getNow(),
