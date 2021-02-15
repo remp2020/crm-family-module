@@ -16,8 +16,10 @@ class IsFamilySlaveCriteria implements ScenariosCriteriaInterface
         ];
     }
 
-    public function addCondition(Selection $selection, $values, IRow $criterionItemRow): bool
+    public function addConditions(Selection $selection, array $paramValues, IRow $criterionItemRow): bool
     {
+        $values = $paramValues['is_family_slave'];
+
         if ($values->selection) {
             $selection->where('subscription_type:family_subscription_types(slave_subscription_type_id).id IS NOT NULL');
         } else {

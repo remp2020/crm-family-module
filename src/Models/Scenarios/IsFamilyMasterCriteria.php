@@ -16,8 +16,10 @@ class IsFamilyMasterCriteria implements ScenariosCriteriaInterface
         ];
     }
 
-    public function addCondition(Selection $selection, $values, IRow $criterionItemRow): bool
+    public function addConditions(Selection $selection, array $paramValues, IRow $criterionItemRow): bool
     {
+        $values = $paramValues['is_family_master'];
+
         if ($values->selection) {
             $selection->where('subscription_type:family_subscription_types(master_subscription_type_id).id IS NOT NULL');
         } else {

@@ -125,10 +125,14 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
                             'version' => 1,
                             'nodes' => [
                                 [
-                                    'id' => 1,
                                     'key' => 'is_family_master',
-                                    'values' => [
-                                        'selection' => true
+                                    'params' => [
+                                        [
+                                            'key' => 'is_family_master',
+                                            'values' => [
+                                                'selection' => true
+                                            ]
+                                        ]
                                     ]
                                 ]
                             ]
@@ -237,10 +241,14 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
                             'version' => 1,
                             'nodes' => [
                                 [
-                                    'id' => 1,
                                     'key' => 'is_family_slave',
-                                    'values' => [
-                                        'selection' => true
+                                    'params' => [
+                                        [
+                                            'key' => 'is_family_slave',
+                                            'values' => [
+                                                'selection' => true
+                                            ]
+                                        ]
                                     ]
                                 ]
                             ]
