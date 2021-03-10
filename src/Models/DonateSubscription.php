@@ -5,7 +5,6 @@ namespace Crm\FamilyModule\Models;
 use Crm\ApplicationModule\NowTrait;
 use Crm\FamilyModule\FamilyModule;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
-use Crm\FamilyModule\Repositories\FamilySubscriptionsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionMetaRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
@@ -29,8 +28,6 @@ class DonateSubscription
 
     private $familyRequestsRepository;
 
-    private $familySubscriptionsRepository;
-
     private $subscriptionMetaRepository;
 
     private $familySubscriptionTypesRepository;
@@ -40,13 +37,11 @@ class DonateSubscription
         SubscriptionMetaRepository $subscriptionMetaRepository,
         SubscriptionTypesMetaRepository $subscriptionTypesMetaRepository,
         FamilyRequestsRepository $familyRequestsRepository,
-        FamilySubscriptionsRepository $familySubscriptionsRepository,
         FamilySubscriptionTypesRepository $familySubscriptionTypesRepository
     ) {
         $this->subscriptionsRepository = $subscriptionsRepository;
         $this->subscriptionTypesMetaRepository = $subscriptionTypesMetaRepository;
         $this->familyRequestsRepository = $familyRequestsRepository;
-        $this->familySubscriptionsRepository = $familySubscriptionsRepository;
         $this->subscriptionMetaRepository = $subscriptionMetaRepository;
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
     }
@@ -73,13 +68,6 @@ class DonateSubscription
         if ($masterSubscription->end_time <= $this->getNow() || ($familyRequest->expires_at && $familyRequest->expires_at <= $this->getNow())) {
             return self::ERROR_MASTER_SUBSCRIPTION_EXPIRED;
         }
-
-        $this->familyRequestsRepository->update($familyRequest, [
-            'status' => FamilyRequestsRepository::STATUS_ACCEPTED,
-            'slave_user_id' => $slaveUser->id,
-            'accepted_at' => $this->getNow(),
-            'updated_at' => $this->getNow(),
-        ]);
 
         $slaveSubscription = null;
         if ($familySubscriptionType && $familySubscriptionType->donation_method === 'copy') {
@@ -141,11 +129,13 @@ class DonateSubscription
             return self::ERROR_INTERNAL;
         }
 
-        $familySubscription = $this->familySubscriptionsRepository->add(
-            $familyRequest,
-            $slaveSubscription,
-            FamilySubscriptionsRepository::TYPE_SINGLE
-        );
+        $this->familyRequestsRepository->update($familyRequest, [
+            'status' => FamilyRequestsRepository::STATUS_ACCEPTED,
+            'slave_subscription_id' => $slaveSubscription->id,
+            'slave_user_id' => $slaveUser->id,
+            'accepted_at' => $this->getNow(),
+            'updated_at' => $this->getNow(),
+        ]);
 
         // If there is already some future family subscription, activate one of its (unused) requests as well
         $nextSubscription = $this->getNextFamilySubscription($masterSubscription);
@@ -153,18 +143,23 @@ class DonateSubscription
             $this->activateNextFamilySubscriptionRequest($nextSubscription, $slaveUser);
         }
 
-        return $familySubscription;
+        return $familyRequest;
     }
 
-    public function stopFamilySubscription(IRow $familySubscription)
+    public function releaseFamilyRequest(IRow $familyRequest)
     {
-        $this->subscriptionsRepository->update($familySubscription->slave_subscription, [
+        $this->subscriptionsRepository->update($familyRequest->slave_subscription, [
             'end_time' => $this->getNow(),
         ]);
-        $this->familyRequestsRepository->update($familySubscription->family_request, [
+        $this->familyRequestsRepository->update($familyRequest, [
             'status' => FamilyRequestsRepository::STATUS_CANCELED,
             'canceled_at' => $this->getNow(),
         ]);
+
+        $this->familyRequestsRepository->add(
+            $familyRequest->master_subscription,
+            $familyRequest->subscription_type
+        );
     }
 
     private function activateNextFamilySubscriptionRequest(IRow $subscription, $user)

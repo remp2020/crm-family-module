@@ -26,7 +26,6 @@ services:
 	- Crm\FamilyModule\Models\DonateSubscription
 
 	# repositories
-	- Crm\FamilyModule\Repositories\FamilySubscriptionsRepository
 	- Crm\FamilyModule\Repositories\FamilyRequestsRepository
 	- Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository
 

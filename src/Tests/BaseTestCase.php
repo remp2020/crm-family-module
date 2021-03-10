@@ -5,7 +5,6 @@ namespace Crm\FamilyModule\Tests;
 use Crm\ApplicationModule\Cache\CacheRepository;
 use Crm\ApplicationModule\Tests\DatabaseTestCase;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
-use Crm\FamilyModule\Repositories\FamilySubscriptionsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\FamilyModule\Seeders\FamilySeeder;
 use Crm\PaymentsModule\Repository\PaymentGatewaysRepository;
@@ -63,7 +62,6 @@ abstract class BaseTestCase extends DatabaseTestCase
             RecurrentPaymentsRepository::class,
             // Family subscriptions
             FamilyRequestsRepository::class,
-            FamilySubscriptionsRepository::class,
             FamilySubscriptionTypesRepository::class,
             // Cache
             CacheRepository::class

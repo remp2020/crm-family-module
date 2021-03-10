@@ -5,22 +5,22 @@ namespace Crm\FamilyModule\Components\SlaveFamilySubscriptionInfoWidget;
 
 use Crm\ApplicationModule\Widget\BaseWidget;
 use Crm\ApplicationModule\Widget\WidgetManager;
-use Crm\FamilyModule\Repositories\FamilySubscriptionsRepository;
+use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Nette\Database\IRow;
 
 class SlaveFamilySubscriptionInfoWidget extends BaseWidget
 {
     private $templateName = 'slave_family_subscription_info_widget.latte';
 
-    private $familySubscriptionsRepository;
+    private $familyRequestsRepository;
 
     public function __construct(
         WidgetManager $widgetManager,
-        FamilySubscriptionsRepository $familySubscriptionsRepository
+        FamilyRequestsRepository $familyRequestsRepository
     ) {
         parent::__construct($widgetManager);
 
-        $this->familySubscriptionsRepository = $familySubscriptionsRepository;
+        $this->familyRequestsRepository = $familyRequestsRepository;
     }
 
     public function identifier()
@@ -30,13 +30,14 @@ class SlaveFamilySubscriptionInfoWidget extends BaseWidget
 
     public function render(IRow $user)
     {
-        $userSlaveFamilySubscriptions = $this->familySubscriptionsRepository->findActiveUserSlaveFamilySubscriptions($user);
+        $userSlaveFamilyRequests = $this->familyRequestsRepository->slaveUserFamilyRequests($user)
+            ->where('status', FamilyRequestsRepository::STATUS_ACCEPTED);
 
-        if (count($userSlaveFamilySubscriptions) == 0) {
+        if (count($userSlaveFamilyRequests) === 0) {
             return;
         }
 
-        $this->template->familySubscriptions = $userSlaveFamilySubscriptions;
+        $this->template->familyRequests = $userSlaveFamilyRequests;
 
         $this->template->setFile(__DIR__ . '/' . $this->templateName);
         $this->template->render();

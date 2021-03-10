@@ -79,7 +79,7 @@ class FamilyRequestsTest extends BaseTestCase
         $this->familyRequests->createFromSubscription($subscription);
 
         // assert correct number of requests generated
-        $familyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequest($subscription)
+        $familyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($subscription)
             ->where(['status' => FamilyRequestsRepository::STATUS_CREATED])->fetchAll();
         $this->assertCount($preconfiguredCount, $familyRequests);
     }
@@ -108,7 +108,7 @@ class FamilyRequestsTest extends BaseTestCase
         $this->familyRequests->createFromSubscription($subscription);
 
         // assert correct number of requests generated
-        $familyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequest($subscription)
+        $familyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($subscription)
             ->where(['status' => FamilyRequestsRepository::STATUS_CREATED])->fetchAll();
         $this->assertCount($paymentItemCount, $familyRequests);
     }
@@ -138,7 +138,7 @@ class FamilyRequestsTest extends BaseTestCase
         $this->familyRequests->createFromSubscription($subscription);
 
         // assert correct number of requests generated
-        $familyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequest($subscription)
+        $familyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($subscription)
             ->where(['status' => FamilyRequestsRepository::STATUS_CREATED])->fetchAll();
         $this->assertCount(0, $familyRequests);
     }
@@ -173,7 +173,7 @@ class FamilyRequestsTest extends BaseTestCase
         $this->familyRequests->createFromSubscription($subscription);
 
         // assert correct number of requests generated
-        $familyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequest($subscription)
+        $familyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($subscription)
             ->where(['status' => FamilyRequestsRepository::STATUS_CREATED])->fetchAll();
         $this->assertCount(0, $familyRequests);
     }

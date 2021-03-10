@@ -6,7 +6,6 @@ use Crm\FamilyModule\Events\NewSubscriptionHandler;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
-use Crm\FamilyModule\Repositories\FamilySubscriptionsRepository;
 use Crm\PaymentsModule\Events\PaymentChangeStatusEvent;
 use Crm\PaymentsModule\Events\PaymentStatusChangeHandler;
 use Crm\PaymentsModule\PaymentItem\PaymentItemContainer;
@@ -50,9 +49,6 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
     /** @var Emitter */
     private $emitter;
 
-    /** @var FamilySubscriptionsRepository */
-    private $familySubscriptionsRepository;
-
     /** @var FamilyRequests */
     private $familyRequest;
 
@@ -80,7 +76,6 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
         $this->paymentMetaRepository = $this->inject(PaymentMetaRepository::class);
         $this->recurrentPaymentsRepository = $this->inject(RecurrentPaymentsRepository::class);
         $this->familyRequestsRepository = $this->inject(FamilyRequestsRepository::class);
-        $this->familySubscriptionsRepository = $this->inject(FamilySubscriptionsRepository::class);
         $this->subscriptionMetaRepository = $this->inject(SubscriptionMetaRepository::class);
         $this->familyRequest = $this->inject(FamilyRequests::class);
         $this->donateSubscription = $this->inject(DonateSubscription::class);
@@ -164,7 +159,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
 
         $slaveUser1 = $this->userWithRegDate('slave1@example.com');
         $slaveUser2 = $this->userWithRegDate('slave2@example.com');
-        $familyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequest($subscription)
+        $familyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($subscription)
             ->where(['status' => FamilyRequestsRepository::STATUS_CREATED])->fetchAll();
 
         // Assert slave users received subscriptions

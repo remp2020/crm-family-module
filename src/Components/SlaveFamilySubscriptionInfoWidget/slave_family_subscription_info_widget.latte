@@ -7,19 +7,19 @@
             <th>{_family.components.slave_family_subscription_info.master_account}</th>
             </thead>
             <tbody>
-            <tr n:foreach="$familySubscriptions as $familySubscription">
+            <tr n:foreach="$familyRequests as $familyRequest">
                 <td>
-                    <small class="text-muted">#{$familySubscription->slave_subscription_id}</small>
-                    <a href="{plink :Subscriptions:SubscriptionTypesAdmin:Show $familySubscription->slave_subscription_id}">
-                        {$familySubscription->slave_subscription->subscription_type->name}
+                    <small class="text-muted">#{$familyRequest->slave_subscription_id}</small>
+                    <a href="{plink :Subscriptions:SubscriptionTypesAdmin:Show $familyRequest->slave_subscription_id}">
+                        {$familyRequest->subscription_type->name}
                     </a>
                     <br>
-                    <small>{$familySubscription->slave_subscription->start_time|userDate} - {$familySubscription->slave_subscription->end_time|userDate}</small>
+                    <small>{$familyRequest->slave_subscription->start_time|userDate} - {$familyRequest->slave_subscription->end_time|userDate}</small>
 
                 </td>
-                <td><a href="{plink :Users:UsersAdmin:Show $familySubscription->master_subscription->user_id}"
+                <td><a href="{plink :Users:UsersAdmin:Show $familyRequest->master_user_id}"
                        class="text-nowrap"><i
-                                class="fa fa-user"></i> {$familySubscription->master_subscription->user->email}</a></td>
+                                class="fa fa-user"></i> {$familyRequest->master_user->email}</a></td>
             </tr>
             </tbody>
         </table>

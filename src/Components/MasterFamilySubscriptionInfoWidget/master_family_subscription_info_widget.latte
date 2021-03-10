@@ -114,11 +114,10 @@
                                     <button type="button" class="btn btn-default activate-child-subscription" data-code="{$request->code}">
                                         <i class="fa fa-play-circle"></i> {_family.components.master_family_subscription_info.modal.activate}
                                     </button>
-                                {elseif $request->status == \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_ACCEPTED}
-                                    {var $familySubscription = $subscriptionData['familySubscriptionsByRequest'][$request->id]}
+                                {elseif $request->status === \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_ACCEPTED}
                                     <a type="button"
                                        data-confirm="{_family.components.master_family_subscription_info.modal.stop_confirm, ['email' => $request->slave_user->email]}"
-                                       n:href="deactivateSubscription! $familySubscription->id"
+                                       n:href="deactivateSubscription! $request->id"
                                        class="btn btn-default"
                                     >
                                         <i class="fa fa-stop"></i> {_family.components.master_family_subscription_info.modal.stop}

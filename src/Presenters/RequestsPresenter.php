@@ -8,7 +8,6 @@ use Crm\FamilyModule\DataProviders\EmailFormDataProviderInterface;
 use Crm\FamilyModule\Helpers\MaskEmailHelper;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
-use Crm\FamilyModule\Repositories\FamilySubscriptionsRepository;
 use Crm\SubscriptionsModule\Subscription\ActualUserSubscription;
 use Crm\UsersModule\Auth\Authorizator;
 use Crm\UsersModule\Auth\InvalidEmailException;
@@ -24,8 +23,6 @@ class RequestsPresenter extends FrontendPresenter
 {
     private $familyRequestsRepository;
 
-    private $familySubscriptionsRepository;
-
     private $userManager;
 
     private $authorizator;
@@ -40,7 +37,6 @@ class RequestsPresenter extends FrontendPresenter
 
     public function __construct(
         FamilyRequestsRepository $familyRequestsRepository,
-        FamilySubscriptionsRepository $familySubscriptionsRepository,
         UserManager $userManager,
         Authorizator $authorizator,
         DonateSubscription $donateSubscription,
@@ -50,7 +46,6 @@ class RequestsPresenter extends FrontendPresenter
     ) {
         parent::__construct();
         $this->familyRequestsRepository = $familyRequestsRepository;
-        $this->familySubscriptionsRepository = $familySubscriptionsRepository;
         $this->userManager = $userManager;
         $this->authorizator = $authorizator;
         $this->donateSubscription = $donateSubscription;

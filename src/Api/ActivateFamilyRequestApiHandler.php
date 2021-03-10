@@ -164,4 +164,9 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
                 return $response;
         }
     }
+
+    public function setDonateSubscriptionNow(\DateTime $dateTime): void
+    {
+        $this->donateSubscription->setNow($dateTime);
+    }
 }

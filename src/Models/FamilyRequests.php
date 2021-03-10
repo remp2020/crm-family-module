@@ -84,7 +84,7 @@ class FamilyRequests
             );
         }
 
-        $requests = $this->familyRequestsRepository->masterSubscriptionFamilyRequest($subscription);
+        $requests = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($subscription);
         $requestsCount = $requests->count('*');
 
         $newRequests = [];

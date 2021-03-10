@@ -7,7 +7,6 @@ use Crm\FamilyModule\Models\FamilyChildSubscriptionRenewalException;
 use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Models\MissingFamilySubscriptionTypeException;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
-use Crm\FamilyModule\Repositories\FamilySubscriptionsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\PaymentsModule\Repository\PaymentsRepository;
 use Crm\PaymentsModule\Repository\RecurrentPaymentsRepository;
@@ -27,8 +26,6 @@ class NewSubscriptionHandler extends AbstractListener
 
     private $recurrentPaymentsRepository;
 
-    private $familySubscriptionsRepository;
-
     private $donateSubscription;
 
     private $subscriptionsRepository;
@@ -47,7 +44,6 @@ class NewSubscriptionHandler extends AbstractListener
         FamilyRequests $familyRequests,
         PaymentsRepository $paymentsRepository,
         RecurrentPaymentsRepository $recurrentPaymentsRepository,
-        FamilySubscriptionsRepository $familySubscriptionsRepository,
         DonateSubscription $donateSubscription,
         FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
         FamilyRequestsRepository $familyRequestsRepository
@@ -55,7 +51,6 @@ class NewSubscriptionHandler extends AbstractListener
         $this->familyRequests = $familyRequests;
         $this->paymentsRepository = $paymentsRepository;
         $this->recurrentPaymentsRepository = $recurrentPaymentsRepository;
-        $this->familySubscriptionsRepository = $familySubscriptionsRepository;
         $this->donateSubscription = $donateSubscription;
         $this->subscriptionsRepository = $subscriptionsRepository;
         $this->subscriptionMetaRepository = $subscriptionMetaRepository;
@@ -138,11 +133,11 @@ class NewSubscriptionHandler extends AbstractListener
      */
     private function activateChildSubscriptions(IRow $newSubscription, IRow $previousSubscription, array $familyRequests): array
     {
-        $previousFamilySubscriptions = $this->familySubscriptionsRepository->findByMasterSubscription($previousSubscription);
+        $previousFamilyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($previousSubscription)->where('status', FamilyRequestsRepository::STATUS_ACCEPTED);
 
         $donatedSubscriptions = [];
 
-        foreach ($previousFamilySubscriptions as $familySubscription) {
+        foreach ($previousFamilyRequests as $previousFamilyRequest) {
             $request = array_pop($familyRequests);
             // There should be enough requests generated, but if some are missing, report warning
             if (!$request) {
@@ -150,14 +145,14 @@ class NewSubscriptionHandler extends AbstractListener
                 return $donatedSubscriptions;
             }
 
-            $donatedSubscription = $this->donateSubscription->connectFamilyUser($familySubscription->slave_subscription->user, $request);
+            $donatedSubscription = $this->donateSubscription->connectFamilyUser($previousFamilyRequest->slave_subscription->user, $request);
             if ($donatedSubscription === DonateSubscription::ERROR_INTERNAL) {
-                throw new FamilyChildSubscriptionRenewalException("Unable to renew subscription for user #{$familySubscription->slave_subscription->user->id}, parent subscription #{$newSubscription->id}, request #{$request->id}");
+                throw new FamilyChildSubscriptionRenewalException("Unable to renew subscription for user #{$previousFamilyRequest->slave_subscription->user->id}, parent subscription #{$newSubscription->id}, request #{$request->id}");
             }
 
             if ($donatedSubscription === DonateSubscription::ERROR_IN_USE) {
                 // this should not happen (duplicate donations are OK in this case)
-                throw new FamilyChildSubscriptionRenewalException("Duplicated donation for user #{$familySubscription->slave_subscription->user->id}, parent subscription #{$newSubscription->id}, request #{$request->id}");
+                throw new FamilyChildSubscriptionRenewalException("Duplicated donation for user #{$previousFamilyRequest->slave_subscription->user->id}, parent subscription #{$newSubscription->id}, request #{$request->id}");
             }
 
             if ($donatedSubscription === DonateSubscription::ERROR_MASTER_SUBSCRIPTION_EXPIRED) {

@@ -7,8 +7,8 @@ use Crm\ApplicationModule\Widget\BaseWidget;
 use Crm\ApplicationModule\Widget\WidgetManager;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
-use Crm\FamilyModule\Repositories\FamilySubscriptionsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
+use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Crm\UsersModule\Repository\UsersRepository;
 use Kdyby\Translation\ITranslator;
 use Nette\Database\IRow;
@@ -21,31 +21,31 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
 
     private $familySubscriptionTypesRepository;
 
-    private $familySubscriptionsRepository;
-
     private $usersRepository;
 
     private $donateSubscription;
 
     private $translator;
 
+    private $subscriptionsRepository;
+
     public function __construct(
         WidgetManager $widgetManager,
         FamilyRequestsRepository $familyRequestsRepository,
         FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
-        FamilySubscriptionsRepository $familySubscriptionsRepository,
         UsersRepository $usersRepository,
         DonateSubscription $donateSubscription,
-        ITranslator $translator
+        ITranslator $translator,
+        SubscriptionsRepository $subscriptionsRepository
     ) {
         parent::__construct($widgetManager);
 
         $this->familyRequestsRepository = $familyRequestsRepository;
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
-        $this->familySubscriptionsRepository = $familySubscriptionsRepository;
         $this->usersRepository = $usersRepository;
         $this->donateSubscription = $donateSubscription;
         $this->translator = $translator;
+        $this->subscriptionsRepository = $subscriptionsRepository;
     }
 
     public function identifier()
@@ -55,9 +55,10 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
 
     public function render(IRow $user)
     {
-        $userMasterSubscriptions = $this->familyRequestsRepository->userMasterSubscriptions($user);
+        $userMasterSubscriptions = $this->subscriptionsRepository->userSubscriptions($user->id)
+            ->where('subscription_type_id IN ?', $this->familySubscriptionTypesRepository->masterSubscriptionTypes());
 
-        if (count($userMasterSubscriptions) == 0) {
+        if (count($userMasterSubscriptions) === 0) {
             return;
         }
 
@@ -78,10 +79,6 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
                 'canceledFamilyRequests' => $this->familyRequestsRepository->masterSubscriptionCanceledFamilyRequests($subscription),
                 'familyType' => $this->familySubscriptionTypesRepository->findByMasterSubscriptionType($subscription->subscription_type)
             ];
-            foreach ($subscriptionsData[$subscription->id]['activeFamilyRequests'] as $familyRequest) {
-                $familySubscription = $familyRequest->related('family_subscriptions')->fetch();
-                $subscriptionsData[$subscription->id]['familySubscriptionsByRequest'][$familyRequest->id] = $familySubscription;
-            }
         }
         return $subscriptionsData;
     }
@@ -107,18 +104,13 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
         $this->redirect('this');
     }
 
-    public function handleDeactivateSubscription($id)
+    public function handleDeactivateSubscription($requestId)
     {
-        $familySubscription = $this->familySubscriptionsRepository->find($id);
-        if (!$familySubscription) {
+        $familyRequest = $this->familyRequestsRepository->find($requestId);
+        if (!$familyRequest) {
             return;
         }
-
-        $this->donateSubscription->stopFamilySubscription($familySubscription);
-        $this->familyRequestsRepository->add(
-            $familySubscription->master_subscription,
-            $familySubscription->slave_subscription->subscription_type
-        );
+        $this->donateSubscription->releaseFamilyRequest($familyRequest);
 
         $this->redirect('this');
     }

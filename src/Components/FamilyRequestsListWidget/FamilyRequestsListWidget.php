@@ -76,7 +76,7 @@ class FamilyRequestsListWidget extends BaseWidget
             }
 
             $subscriptionRequests = $this->familyRequestsRepository
-                ->masterSubscriptionFamilyRequest($activeSubscription)->fetchAll();
+                ->masterSubscriptionFamilyRequests($activeSubscription)->fetchAll();
             $requests = array_merge($requests, $subscriptionRequests);
         }
 

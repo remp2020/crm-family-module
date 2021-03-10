@@ -86,6 +86,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
 
         // call & test API
         $this->handler->setRawPayload(json_encode(['code' => $testFamilyRequest->code]));
+        $this->handler->setDonateSubscriptionNow(new DateTime('2020-07-10'));
         $response = $this->handler->handle($this->getTestAuthorization($slaveUserWithoutAccepted));
         $this->assertEquals(JsonResponse::class, get_class($response));
         $this->assertEquals(Response::S201_CREATED, $response->getHttpCode());
@@ -140,11 +141,12 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
         // update expires_at to past
         $this->familyRequestsRepository->update(
             $testFamilyRequest,
-            ['expires_at' => (new DateTime())->modify('-1day')]
+            ['expires_at' => new DateTime('2020-06-10')]
         );
 
         // call & test API
         $this->handler->setRawPayload(json_encode(['code' => $testFamilyRequest->code]));
+        $this->handler->setDonateSubscriptionNow(new DateTime('2020-07-10'));
         $response = $this->handler->handle($this->getTestAuthorization($slaveUserWithoutAccepted));
         $this->assertEquals(JsonResponse::class, get_class($response));
 
@@ -162,6 +164,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
 
         // call & test API
         $this->handler->setRawPayload(json_encode(['code' => $testFamilyRequest->code]));
+        $this->handler->setDonateSubscriptionNow(new DateTime('2020-07-10'));
         $response = $this->handler->handle($this->getTestAuthorization($slaveUserWithAccepted));
         $this->assertEquals(JsonResponse::class, get_class($response));
 
@@ -210,8 +213,8 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
             $masterSubscriptionType,
             $masterUser,
             'family',
-            new DateTime('now - 1 days'),
-            new DateTime('now + 30 days'),
+            new DateTime('2020-07-01'),
+            new DateTime('2020-08-01'),
             true
         ), 1);
 
@@ -221,6 +224,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
 
         // donate one subscription to slave user & reload change
         $acceptedFamilyRequest = reset($familyRequests);
+        $this->donateSubscription->setNow(new \DateTime('2020-07-10'));
         $this->donateSubscription->connectFamilyUser(
             $slaveUserWithAccepted,
             $acceptedFamilyRequest
