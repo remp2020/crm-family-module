@@ -8,5 +8,5 @@ use Nette\Database\Table\IRow;
 
 interface EmailFormDataProviderInterface extends DataProviderInterface
 {
-    public function submit(IRow $User, Form $form): Form;
+    public function submit(IRow $user, Form $form): Form;
 }
