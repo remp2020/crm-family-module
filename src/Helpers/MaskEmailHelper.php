@@ -12,7 +12,7 @@ class MaskEmailHelper
         $domain = substr($email, $atPos);
 
         if (($len / 2) < $maxLength) {
-            $maxLength = ($len / 2);
+            $maxLength = (int)($len / 2);
         }
 
         $shortenedEmail = (($len > $minLength) ? substr($name, 0, $maxLength) : "");

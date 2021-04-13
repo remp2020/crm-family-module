@@ -1,6 +1,8 @@
 # CRM Family Module
 
-Family module is an extension to Subscriptions module providing parent/child relation between subscriptions. Parent subscription is able to trigger generation of child subscriptions via `family_requests`.  
+Family module is an extension to Subscriptions module providing parent/child relation between subscriptions. Parent subscription is able to trigger generation of child subscriptions via `family_requests`.
+
+**WARNING**: Module is close-to-production quality, but expect some major breaking changes in the future (e.g. dropping of redundant tables, changing master/slave names). 
 
 ## Installation
 

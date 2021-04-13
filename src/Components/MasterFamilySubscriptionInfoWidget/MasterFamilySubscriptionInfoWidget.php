@@ -92,7 +92,6 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
                 'status' => 'error',
                 'message' => $this->translator->translate('family.components.master_family_subscription_info.modal.error.not_registered'),
             ]);
-            return;
         }
 
         $familyRequest = $this->familyRequestsRepository->findByCode($this->presenter->getParameter('familyRequestCode'));

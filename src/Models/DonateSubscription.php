@@ -110,7 +110,7 @@ class DonateSubscription
             }
 
             $isPaid = $this->subscriptionTypesMetaRepository->getMetaValue($familyRequest->subscription_type, 'is_paid');
-            if ($isPaid === false) {
+            if ($isPaid === null) {
                 $isPaid = $masterSubscription->is_paid;
             }
 

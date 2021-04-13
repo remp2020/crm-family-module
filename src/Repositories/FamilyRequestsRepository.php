@@ -3,8 +3,6 @@
 namespace Crm\FamilyModule\Repositories;
 
 use Crm\ApplicationModule\Repository;
-use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
-use Nette\Database\Context;
 use Nette\Database\Table\IRow;
 use Nette\Database\Table\Selection;
 use Nette\Utils\DateTime;
@@ -17,21 +15,6 @@ class FamilyRequestsRepository extends Repository
     const STATUS_CANCELED = 'canceled';
 
     protected $tableName = 'family_requests';
-
-    private $familySubscriptionTypesRepository;
-
-    private $subscriptionsRepository;
-
-    public function __construct(
-        Context $database,
-        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
-        SubscriptionsRepository $subscriptionsRepository
-    ) {
-        parent::__construct($database);
-
-        $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
-        $this->subscriptionsRepository = $subscriptionsRepository;
-    }
 
     public function add(IRow $subscription, IRow $subscriptionType, $status = self::STATUS_CREATED, DateTime $expiresAt = null)
     {
