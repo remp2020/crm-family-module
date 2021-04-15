@@ -31,18 +31,18 @@ To do that, please seed the relations via `FamilySubscriptionTypesRepository::ad
 Anytime new master subscription is created, handler will create requests with codes that can be shared with other users so they can activate their access.
 
 These codes can be accessed via two channels:
- 
+
 - As activation URLs in customer zone. You can enable the default widget in your own module by attaching following widget to the placeholder:
 
     ```php
     namespace Crm\DemoModule;
-  
+
     class DemoModule
-    {  
+    {
         public function registerWidgets(\Crm\ApplicationModule\Widget\WidgetManagerInterface $widgetManager) {
             $widgetManager->registerWidget(
                 'frontend.subscriptions.top',
-                $this->getInstance(\Crm\FamilyModule\Components\FamilySubscriptionsWidget\FamilySubscriptionsWidget::class),
+                $this->getInstance(\Crm\FamilyModule\Components\FamilyRequestsListWidget\FamilyRequestsListWidget::class),
                 300
             );
         }
