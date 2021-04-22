@@ -66,7 +66,7 @@ components:
 		copying_failed: Kopírovanie zlyhalo
 
 	master_family_subscription_info:
-		title: 'Rodičovské firemné/rodinné predplatné'
+		title: 'Správa dcérskych predplatných'
 		stats:
 			title: 'Aktívne'
 			active_tooltip: 'Počet aktivovaných prístupov'
@@ -75,7 +75,7 @@ components:
 		modal:
 			status: Stav
 			activation_link: Aktivačný odkaz
-			slave_account: Dcérske konto
+			slave_account: 'Dcérske konto <i class="fa fa-question-circle" style="margin: auto;" data-toggle="tooltip" title="V prípade, že konto so zadanou e-mailovou adresou ešte neexistuje, je potrebné ho vytvoriť cez aktivačný odkaz."></i>'
 			copy_to_clipboard: Skopírovať odkaz
 			email_placeholder: E-mail existujúceho používateľa
 			activate: Aktivovať
@@ -83,7 +83,9 @@ components:
 			stop: Zastaviť
 			stop_confirm: "Naozaj chcete zastaviť dcérske predplatné pre %email%?"
 			error:
-				not_registered: Email nie je zaregistrovaný
+				not_registered: 'E-mail nie je zaregistrovaný <i class="fa fa-question-circle" style="margin: auto;" data-toggle="tooltip" title="V prípade, že konto so zadanou e-mailovou adresou ešte neexistuje, je potrebné ho vytvoriť cez aktivačný odkaz"></i>'
+			note: "Meno používateľa <br><span class=\"note-info\">(slúži pre vašu orientáciu)</span>"
+			note_placeholder: Meno používateľa
 
 	slave_family_subscription_info:
 		title: 'Dcérske predplatné'

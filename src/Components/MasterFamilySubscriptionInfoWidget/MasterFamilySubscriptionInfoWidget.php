@@ -1,8 +1,8 @@
 <?php
 
-
 namespace Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget;
 
+use Crm\AdminModule\Presenters\AdminPresenter;
 use Crm\ApplicationModule\Widget\BaseWidget;
 use Crm\ApplicationModule\Widget\WidgetManager;
 use Crm\FamilyModule\Models\DonateSubscription;
@@ -11,7 +11,6 @@ use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Crm\UsersModule\Repository\UsersRepository;
 use Kdyby\Translation\ITranslator;
-use Nette\Database\IRow;
 
 class MasterFamilySubscriptionInfoWidget extends BaseWidget
 {
@@ -53,14 +52,21 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
         return 'masterfamilysubscriptioninfowidget';
     }
 
-    public function render(IRow $user)
+    public function render(int $userId)
     {
+        $user = $this->usersRepository->find($userId);
         $userMasterSubscriptions = $this->subscriptionsRepository->userSubscriptions($user->id)
             ->where('subscription_type_id IN ?', $this->familySubscriptionTypesRepository->masterSubscriptionTypes());
 
         if (count($userMasterSubscriptions) === 0) {
             return;
         }
+
+        $isAdmin = false;
+        if ($this->getPresenter() instanceof AdminPresenter) {
+            $isAdmin = true;
+        }
+        $this->template->isAdmin = $isAdmin;
 
         $this->template->subscriptionsData = $this->getSubscriptionsData($userMasterSubscriptions);
 
@@ -110,6 +116,25 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
             return;
         }
         $this->donateSubscription->releaseFamilyRequest($familyRequest);
+
+        $this->redirect('this');
+    }
+
+    public function handleSaveNote()
+    {
+        $familyRequest = $this->familyRequestsRepository->findByCode($this->presenter->getParameter('familyRequestCode'));
+        if (!$familyRequest) {
+            $presenter = $this->getPresenter();
+            $presenter->sendJson([
+                'status' => 'error'
+            ]);
+            return;
+        }
+
+        $this->familyRequestsRepository->update($familyRequest, [
+            'updated_at' => new \DateTime(),
+            'note' => substr($this->presenter->getParameter('note'), 0, 255)
+        ]);
 
         $this->redirect('this');
     }

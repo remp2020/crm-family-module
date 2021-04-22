@@ -1,3 +1,49 @@
+<style>
+    .note-info {
+        font-weight: normal;
+        font-size: small;
+        white-space: nowrap;
+    }
+
+    .modal {
+        text-align: center;
+    }
+
+    @media screen and (min-width: 768px) {
+        .modal:before {
+            display: inline-block;
+            vertical-align: middle;
+            content: " ";
+            height: 100%;
+        }
+    }
+
+    .modal-dialog {
+        display: inline-block;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    @media (min-width: 992px) {
+        .modal-lg {
+            width: 1100px;
+        }
+    }
+
+    .tooltip {
+        z-index: 2000 !important;
+    }
+
+    .icon {
+        margin: auto;
+        display: none;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+    }
+
+</style>
+
 <div class="panel panel-default">
     <div class="panel-heading">{_family.components.master_family_subscription_info.title}</div>
     <div class="panel-body table-responsive">
@@ -11,11 +57,11 @@
             <tr n:foreach="$subscriptionsData as $subscriptionData">
                 {var $subscription = $subscriptionData['subscription']}
                 <td>
-                    <small class="text-muted">#{$subscription->id}</small>
+                    <small n:if="$isAdmin" class="text-muted">#{$subscription->id}</small>
                     <i n:if="$subscription->note" class="fa fa-info-circle text-danger fa-wh" data-toggle="tooltip"
                                                   data-placement="top" title="{$subscription->note|breaklines}"></i>
                     <a href="{plink :Subscriptions:SubscriptionTypesAdmin:Show $subscription->subscription_type->id}">
-                        {$subscription->subscription_type->name}
+                        {$subscription->subscription_type->user_label}
                     </a>
                     <br>
                     <small>{$subscription->start_time|userDate} - {$subscription->end_time|userDate}</small>
@@ -64,7 +110,9 @@
                     <tr>
                         <th>{_family.components.master_family_subscription_info.modal.status}</th>
                         <th colspan="2">{_family.components.master_family_subscription_info.modal.activation_link}</th>
-                        <th>{_family.components.master_family_subscription_info.modal.slave_account}</th>
+                        <th>{_family.components.master_family_subscription_info.modal.slave_account|noescape}</th>
+                        <th></th>
+                        <th>{_family.components.master_family_subscription_info.modal.note|noescape}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -98,12 +146,14 @@
                         </td>
                         <td>
                             {if $request->status == \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_ACCEPTED}
-                                <a href="{plink :Users:UsersAdmin:Show $request->slave_user_id}">
+                                <a href="{plink :Users:UsersAdmin:Show $request->slave_user_id}" style="white-space: nowrap">
                                     <i class="fa fa-user"></i> {$request->slave_user->email}
                                 </a>
                             {elseif $request->status == \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_CREATED && $subscription->end_time > new \DateTime}
                                 <div class="form-group child-subscription-email-wrapper" style="margin-bottom: 0">
-                                    <input class="form-control" type="text" name="email" placeholder="{_family.components.master_family_subscription_info.modal.email_placeholder}" />
+                                    <span style="display: flex">
+                                        <input class="form-control" type="text" name="email" placeholder="{_family.components.master_family_subscription_info.modal.email_placeholder}" />
+                                    </span>
                                     <span style="display: none" class="help-block child-subscription-email-error"></span>
                                 </div>
                             {/if}
@@ -125,6 +175,15 @@
                                 {/if}
                             {/if}
                         </td>
+                        <td>
+                            <div class="form-group" style="display: flex">
+                                <input class="form-control request-note" data-code="{$request->code}" type="text"
+                                       name="note" value="{$request->note}"
+                                       placeholder="{_family.components.master_family_subscription_info.modal.note_placeholder}"/>
+                                <i class="fa fa-check icon" style="color: green"></i>
+                                <i class="fa fa-times icon" style="color: red"></i>
+                            </div>
+                        </td>
                     </tr>
                     </tbody>
                 </table>
@@ -136,7 +195,8 @@
                             <tr>
                                 <th>{_family.components.master_family_subscription_info.modal.status}</th>
                                 <th colspan="2">{_family.components.master_family_subscription_info.modal.activation_link}</th>
-                                <th>{_family.components.master_family_subscription_info.modal.slave_account}</th>
+                                <th>{_family.components.master_family_subscription_info.modal.slave_account|noescape}</th>
+                                <th>{_family.components.master_family_subscription_info.modal.note|noescape}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -159,6 +219,15 @@
                                         <i class="fa fa-user"></i> {$request->slave_user->email}
                                     </a>
                                 {/if}
+                            </td>
+                            <td>
+                                <div class="form-group" style="display: flex">
+                                    <input class="form-control request-note" data-code="{$request->code}" maxlength="255" type="text"
+                                           name="note" value="{$request->note}"
+                                           placeholder="{_family.components.master_family_subscription_info.modal.note_placeholder}"/>
+                                    <i class="fa fa-check icon" style="color: green"></i>
+                                    <i class="fa fa-times icon" style="color: red"></i>
+                                </div>
                             </td>
                         </tr>
                         </tbody>
@@ -217,9 +286,38 @@
                     }
                     if (data['status'] === 'error') {
                         emailInputWrapper.addClass('has-error');
-                        emailInputError.text(data['message']);
+                        emailInputError.html(data['message']);
                         emailInputError.show();
                     }
+                }
+            });
+        });
+
+        $('.request-note').on('change', function () {
+            var check = $(this).closest('tr').find('.fa-check');
+            var times = $(this).closest('tr').find('.fa-times');
+
+            check.hide();
+            times.hide();
+
+            $.ajax({
+                type: 'POST',
+                data: {
+                    'familyRequestCode': $(this).data('code'),
+                    'note': $(this).val()
+                },
+                url: {link saveNote!},
+                success: function (data) {
+                    if (data['status'] === 'error') {
+                        times.show();
+                    } else {
+                        check.show();
+                    }
+
+                    setTimeout(() => {
+                        check.hide();
+                        times.hide();
+                    }, 5000);
                 }
             });
         });
