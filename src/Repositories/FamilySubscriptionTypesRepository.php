@@ -40,4 +40,14 @@ class FamilySubscriptionTypesRepository extends Repository
     {
         return $this->getTable()->fetchAssoc('slave_subscription_type_id=slave_subscription_type_id');
     }
+
+    final public function isMasterSubscriptionType(IRow $subscriptionType): bool
+    {
+        return $this->getTable()->where('master_subscription_type_id', $subscriptionType->id)->count('*') > 0;
+    }
+
+    final public function isSlaveSubscriptionType(IRow $subscriptionType): bool
+    {
+        return $this->getTable()->where('slave_subscription_type_id', $subscriptionType->id)->count('*') > 0;
+    }
 }

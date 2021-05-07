@@ -91,4 +91,9 @@ class FamilyRequestsRepository extends Repository
         return $this->getTable()->where('slave_subscription.user_id', $user->id)
             ->order('slave_subscription.end_time DESC, slave_subscription.start_time DESC');
     }
+
+    final public function findSlaveSubscriptionFamilyRequest(IRow $subscription)
+    {
+        return $this->getTable()->where('slave_subscription_id', $subscription->id)->fetch();
+    }
 }

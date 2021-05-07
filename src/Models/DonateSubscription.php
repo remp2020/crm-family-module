@@ -148,9 +148,13 @@ class DonateSubscription
 
     public function releaseFamilyRequest(IRow $familyRequest)
     {
-        $this->subscriptionsRepository->update($familyRequest->slave_subscription, [
-            'end_time' => $this->getNow(),
-        ]);
+        $slaveSubscription = $familyRequest->slave_subscription;
+        // already stopped subscription
+        if ($slaveSubscription->end_time >= $this->getNow()) {
+            $this->subscriptionsRepository->update($slaveSubscription, [
+                'end_time' => $this->getNow(),
+            ]);
+        }
         $this->familyRequestsRepository->update($familyRequest, [
             'status' => FamilyRequestsRepository::STATUS_CANCELED,
             'canceled_at' => $this->getNow(),

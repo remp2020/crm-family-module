@@ -42,6 +42,10 @@
         top: 10px;
     }
 
+    .table>tbody>tr>td {
+        vertical-align: middle;
+    }
+
 </style>
 
 <div class="panel panel-default">
@@ -176,7 +180,7 @@
                             {/if}
                         </td>
                         <td>
-                            <div class="form-group" style="display: flex; position: relative">
+                            <div style="display: flex; position: relative">
                                 <input class="form-control request-note" data-code="{$request->code}" type="text"
                                        name="note" value="{$request->note}"
                                        placeholder="{_family.components.master_family_subscription_info.modal.note_placeholder}"/>
@@ -221,7 +225,7 @@
                                 {/if}
                             </td>
                             <td>
-                                <div class="form-group" style="display: flex; position: relative">
+                                <div style="display: flex; position: relative">
                                     <input class="form-control request-note" data-code="{$request->code}" maxlength="255" type="text"
                                            name="note" value="{$request->note}"
                                            placeholder="{_family.components.master_family_subscription_info.modal.note_placeholder}"/>
