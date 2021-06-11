@@ -61,12 +61,17 @@
             <tr n:foreach="$subscriptionsData as $subscriptionData">
                 {var $subscription = $subscriptionData['subscription']}
                 <td>
-                    <small n:if="$isAdmin" class="text-muted">#{$subscription->id}</small>
-                    <i n:if="$subscription->note" class="fa fa-info-circle text-danger fa-wh" data-toggle="tooltip"
-                                                  data-placement="top" title="{$subscription->note|breaklines}"></i>
-                    <a href="{plink :Subscriptions:SubscriptionTypesAdmin:Show $subscription->subscription_type->id}">
+                    {if $isAdmin}
+                        <small class="text-muted">#{$subscription->id}</small>
+                        <i n:if="$subscription->note" class="fa fa-info-circle text-danger fa-wh" data-toggle="tooltip"
+                                                      data-placement="top" title="{$subscription->note|breaklines}"></i>
+
+                        <a href="{plink :Subscriptions:SubscriptionTypesAdmin:Show $subscription->subscription_type->id}">
+                            {$subscription->subscription_type->user_label}
+                        </a>
+                    {else}
                         {$subscription->subscription_type->user_label}
-                    </a>
+                    {/if}
                     <br>
                     <small>{$subscription->start_time|userDate} - {$subscription->end_time|userDate}</small>
                 </td>
@@ -150,9 +155,13 @@
                         </td>
                         <td>
                             {if $request->status == \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_ACCEPTED}
-                                <a href="{plink :Users:UsersAdmin:Show $request->slave_user_id}" style="white-space: nowrap">
+                                {if $isAdmin}
+                                    <a href="{plink :Users:UsersAdmin:Show $request->slave_user_id}" style="white-space: nowrap">
+                                        <i class="fa fa-user"></i> {$request->slave_user->email}
+                                    </a>
+                                {else}
                                     <i class="fa fa-user"></i> {$request->slave_user->email}
-                                </a>
+                                {/if}
                             {elseif $request->status == \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_CREATED && $subscription->end_time > new \DateTime}
                                 <div class="form-group child-subscription-email-wrapper" style="margin-bottom: 0">
                                     <span style="display: flex">
@@ -219,9 +228,13 @@
                             </td>
                             <td>
                                 {if $request->slave_user_id}
-                                    <a href="{plink :Users:UsersAdmin:Show $request->slave_user_id}">
+                                    {if $isAdmin}
+                                        <a href="{plink :Users:UsersAdmin:Show $request->slave_user_id}">
+                                            <i class="fa fa-user"></i> {$request->slave_user->email}
+                                        </a>
+                                    {else}
                                         <i class="fa fa-user"></i> {$request->slave_user->email}
-                                    </a>
+                                    {/if}
                                 {/if}
                             </td>
                             <td>
