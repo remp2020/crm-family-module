@@ -16,8 +16,13 @@ class FamilyRequestsRepository extends Repository
 
     protected $tableName = 'family_requests';
 
-    public function add(IRow $subscription, IRow $subscriptionType, $status = self::STATUS_CREATED, DateTime $expiresAt = null)
-    {
+    public function add(
+        IRow $subscription,
+        IRow $subscriptionType,
+        $status = self::STATUS_CREATED,
+        ?DateTime $expiresAt = null,
+        ?string $note = null
+    ) {
         return $this->getTable()->insert([
             'master_user_id' => $subscription->user_id,
             'subscription_type_id' => $subscriptionType,
@@ -27,6 +32,7 @@ class FamilyRequestsRepository extends Repository
             'created_at' => new DateTime(),
             'updated_at' => new DateTime(),
             'expires_at' => $expiresAt,
+            'note' => $note,
         ]);
     }
 

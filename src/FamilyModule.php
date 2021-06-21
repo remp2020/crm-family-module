@@ -14,6 +14,7 @@ use Crm\FamilyModule\Models\Scenarios\IsFamilyMasterCriteria;
 use Crm\FamilyModule\Models\Scenarios\IsFamilySlaveCriteria;
 use Crm\FamilyModule\Seeders\FamilySeeder;
 use Crm\FamilyModule\Seeders\SubscriptionExtensionMethodsSeeder;
+use Crm\FamilyModule\Seeders\SubscriptionTypeNamesSeeder;
 use Kdyby\Translation\Translator;
 use League\Event\Emitter;
 use Nette\DI\Container;
@@ -92,6 +93,7 @@ class FamilyModule extends CrmModule
     {
         $seederManager->addSeeder($this->getInstance(FamilySeeder::class));
         $seederManager->addSeeder($this->getInstance(SubscriptionExtensionMethodsSeeder::class));
+        $seederManager->addSeeder($this->getInstance(SubscriptionTypeNamesSeeder::class));
     }
 
     public function registerScenariosCriteria(ScenariosCriteriaStorage $scenariosCriteriaStorage)

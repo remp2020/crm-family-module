@@ -37,6 +37,7 @@ services:
 	# seeders
 	- Crm\FamilyModule\Seeders\FamilySeeder
 	- Crm\FamilyModule\Seeders\SubscriptionExtensionMethodsSeeder
+	- Crm\FamilyModule\Seeders\SubscriptionTypeNamesSeeder
 
 	- Crm\FamilyModule\Models\Extension\ExtendFamilyExtension
 	extensionMethodFactory:

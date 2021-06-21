@@ -66,6 +66,7 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
     {
         return array_merge(parent::requiredSeeders(), [
             \Crm\FamilyModule\Seeders\SubscriptionExtensionMethodsSeeder::class,
+            \Crm\FamilyModule\Seeders\SubscriptionTypeNamesSeeder::class,
         ]);
     }
 
@@ -301,8 +302,7 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
         $this->assertEquals(self::EMAIL_TEMPLATE_FAIL, $mails[0]);
 
         // Now donate slave subscription, condition element should be evaluated as false
-        $requests = $this->familyRequestsRepository->masterSubscriptionUnusedFamilyRequests($masterSubscriptions[0])->fetchAll();
-        $request = current($requests);
+        $request = $this->familyRequestsRepository->masterSubscriptionUnusedFamilyRequests($masterSubscriptions[0])->fetch();
 
         // Triggers scenario
         $this->donateSubscription->connectFamilyUser($slaveUser, $request);
