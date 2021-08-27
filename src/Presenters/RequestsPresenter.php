@@ -189,9 +189,9 @@ class RequestsPresenter extends FrontendPresenter
         $form->setTranslator($this->translator);
         $form->setRenderer(new BootstrapRenderer());
         $form->addText('email', 'family.frontend.new.form.email')
-            ->setAttribute('autofocus')
+            ->setHtmlAttribute('autofocus')
             ->setRequired('family.frontend.new.form.email_required')
-            ->setAttribute('placeholder', 'family.frontend.new.form.email_placeholder');
+            ->setHtmlAttribute('placeholder', 'family.frontend.new.form.email_placeholder');
 
         /** @var EmailFormDataProviderInterface[] $providers */
         $providers = $this->dataProviderManager->getProviders('family.dataprovider.email_form', EmailFormDataProviderInterface::class);
@@ -245,14 +245,14 @@ class RequestsPresenter extends FrontendPresenter
         $form->setRenderer(new BootstrapRenderer());
         $form->addHidden('request', $this->params['id']);
         $form->addText('username', 'family.frontend.new.form.email')
-            ->setType('email')
-            ->setAttribute('autofocus')
+            ->setHtmlType('email')
+            ->setHtmlAttribute('autofocus')
             ->setRequired('family.frontend.new.form.email_required')
-            ->setAttribute('placeholder', 'family.frontend.new.form.email_placeholder');
+            ->setHtmlAttribute('placeholder', 'family.frontend.new.form.email_placeholder');
 
         $form->addPassword('password', 'family.frontend.signin.form.password')
             ->setRequired('family.frontend.signin.form.password_required')
-            ->setAttribute('placeholder', 'family.frontend.signin.form.password_placeholder');
+            ->setHtmlAttribute('placeholder', 'family.frontend.signin.form.password_placeholder');
 
         $form->addSubmit('send', 'family.frontend.signin.form.submit');
 
