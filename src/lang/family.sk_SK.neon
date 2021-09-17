@@ -90,3 +90,13 @@ components:
 	slave_family_subscription_info:
 		title: 'Dcérske predplatné'
 		master_account: Rodičovské konto
+
+	family_subscription_type_details_widget:
+		parent:
+			title: Detaily firemného rodičovského predplatného
+			child_subscription: Dcérske predplatné
+			donation_method: Spôsob vytvorenia
+			count: Počet
+			is_paid: Platené
+		child:
+			title: Dcérské predplatné firemných predplatných

@@ -87,6 +87,12 @@ class FamilyModule extends CrmModule
             'admin.user.detail.center',
             $this->getInstance(\Crm\FamilyModule\Components\SlaveFamilySubscriptionInfoWidget\SlaveFamilySubscriptionInfoWidget::class)
         );
+
+        $widgetManager->registerWidget(
+            'subscription_types_admin.show.right',
+            $this->getInstance(\Crm\FamilyModule\Components\FamilySubscriptionTypeDetailsWidget\FamilySubscriptionTypeDetailsWidget::class),
+            200
+        );
     }
 
     public function registerSeeders(SeederManager $seederManager)

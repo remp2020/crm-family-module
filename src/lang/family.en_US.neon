@@ -90,3 +90,13 @@ components:
 	slave_family_subscription_info:
 		title: 'Child subscriptions'
 		master_account: Master account
+
+	family_subscription_type_details_widget:
+		parent:
+			title: Details of company parent subscription type
+			child_subscription: Child subscription
+			donation_method: Method of creation
+			count: Count
+			is_paid: Paid
+		child:
+			title: Child subscription of company subscription types

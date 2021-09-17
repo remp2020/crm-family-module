@@ -25,6 +25,11 @@ class FamilySubscriptionTypesRepository extends Repository
         return $this->getTable()->where(['master_subscription_type_id' => $subscriptionType->id])->fetch();
     }
 
+    final public function findBySlaveSubscriptionType(IRow $subscriptionType)
+    {
+        return $this->getTable()->where(['slave_subscription_type_id' => $subscriptionType->id])->fetchAll();
+    }
+
     /**
      * Return all company/family parent subscription types.
      */

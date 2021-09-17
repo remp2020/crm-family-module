@@ -87,7 +87,16 @@ components:
 			note: "Jméno uživatele <br><span class=\"note-info\">(slouží pro vaši orientaci)</span>"
 			note_placeholder: Jméno uživatele
 
-
 	slave_family_subscription_info:
 		title: 'Dceřiné předplatné'
 		master_account: Rodičovské konto
+
+	family_subscription_type_details_widget:
+		parent:
+			title: Detaily firemního rodičovského předplatného
+			child_subscription: Dceřiné předplatné
+			donation_method: Způsob vytvoření
+			count: Počet
+			is_paid: Placené
+		child:
+			title: Dceřiné předplatné firemních předplatných
