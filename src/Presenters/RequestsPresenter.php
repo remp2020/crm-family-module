@@ -159,7 +159,7 @@ class RequestsPresenter extends FrontendPresenter
         ]));
 
         $form->onSuccess[] = function (Form $form) {
-            $id = $form->values['request'];
+            $id = $form->getValues()['request'];
             $request = $this->familyRequest($id);
             $userRow = $this->userManager->loadUser($this->getUser());
 
@@ -174,7 +174,7 @@ class RequestsPresenter extends FrontendPresenter
                 $this->userActionsLogRepository->add($this->getUser()->id, 'family.logged.error.self-use', ['request' => $id]);
                 $this->redirect('error', ['message' => 'self']);
             } elseif ($result == DonateSubscription::ERROR_MASTER_SUBSCRIPTION_EXPIRED) {
-                $this->userActionsLogRepository->add($this->getUser()->id, 'family.register.error.master-subscription-expired', (array) $form->values);
+                $this->userActionsLogRepository->add($this->getUser()->id, 'family.register.error.master-subscription-expired', (array) $form->getValues());
                 $this->redirect('expired');
             } else {
                 $this->redirect('success');
@@ -202,11 +202,11 @@ class RequestsPresenter extends FrontendPresenter
         $form->addHidden('request', $this->params['id']);
         $form->addSubmit('submit', 'family.frontend.new.form.submit');
         $form->onSuccess[] = function (Form $form) {
-            if ($this->userManager->loadUserByEmail($form->values['email'])) {
-                $this->redirect('signIn', $form->values['request'], $form->values['email']);
+            if ($this->userManager->loadUserByEmail($form->getValues()['email'])) {
+                $this->redirect('signIn', $form->getValues()['request'], $form->getValues()['email']);
             }
             try {
-                $user = $this->userManager->addNewUser($form->values['email'], true, 'family');
+                $user = $this->userManager->addNewUser($form->getValues()['email'], true, 'family');
             } catch (InvalidEmailException $e) {
                 $form->addError('family.frontend.new.form.error_email');
                 return;
@@ -219,17 +219,17 @@ class RequestsPresenter extends FrontendPresenter
                 $form = $provider->submit($user, $form);
             }
 
-            $request = $this->familyRequest($form->values['request']);
+            $request = $this->familyRequest($form->getValues()['request']);
             $result = $this->donateSubscription->connectFamilyUser($user, $request);
 
             if ($result == DonateSubscription::ERROR_INTERNAL) {
-                $this->userActionsLogRepository->add($this->getUser()->id, 'family.register.error.internal', (array) $form->values);
+                $this->userActionsLogRepository->add($this->getUser()->id, 'family.register.error.internal', (array) $form->getValues());
                 $this->redirect('error', ['message' => 'internal']);
             } elseif ($result == DonateSubscription::ERROR_IN_USE) {
-                $this->userActionsLogRepository->add($this->getUser()->id, 'family.register.error.in-use', (array) $form->values);
+                $this->userActionsLogRepository->add($this->getUser()->id, 'family.register.error.in-use', (array) $form->getValues());
                 $this->redirect('error', ['message' => 'in-use']);
             } elseif ($result == DonateSubscription::ERROR_MASTER_SUBSCRIPTION_EXPIRED) {
-                $this->userActionsLogRepository->add($this->getUser()->id, 'family.register.error.master-subscription-expired', (array) $form->values);
+                $this->userActionsLogRepository->add($this->getUser()->id, 'family.register.error.master-subscription-expired', (array) $form->getValues());
                 $this->redirect('expired');
             } else {
                 $this->redirect('success', ['from' => 'new']);
@@ -260,22 +260,22 @@ class RequestsPresenter extends FrontendPresenter
 
         $form->onSuccess[] = function (Form $form) {
             try {
-                $this->getUser()->login(['username' => $form->values['username'], 'password' => $form->values['password']]);
+                $this->getUser()->login(['username' => $form->getValues()['username'], 'password' => $form->getValues()['password']]);
                 $this->getUser()->setAuthorizator($this->authorizator);
 
                 $user = $this->userManager->loadUser($this->getUser());
-                $request = $this->familyRequest($form->values['request']);
+                $request = $this->familyRequest($form->getValues()['request']);
 
                 $result = $this->donateSubscription->connectFamilyUser($user, $request);
 
                 if ($result == DonateSubscription::ERROR_INTERNAL) {
-                    $this->userActionsLogRepository->add($this->getUser()->id, 'family.register.error.internal', (array)$form->values);
+                    $this->userActionsLogRepository->add($this->getUser()->id, 'family.register.error.internal', (array)$form->getValues());
                     $this->redirect('error', ['message' => 'internal']);
                 } elseif ($result == DonateSubscription::ERROR_IN_USE) {
-                    $this->userActionsLogRepository->add($this->getUser()->id, 'family.register.error.in-use', (array)$form->values);
+                    $this->userActionsLogRepository->add($this->getUser()->id, 'family.register.error.in-use', (array)$form->getValues());
                     $this->redirect('error', ['message' => 'in-use']);
                 } elseif ($result == DonateSubscription::ERROR_MASTER_SUBSCRIPTION_EXPIRED) {
-                    $this->userActionsLogRepository->add($this->getUser()->id, 'family.register.error.master-subscription-expired', (array) $form->values);
+                    $this->userActionsLogRepository->add($this->getUser()->id, 'family.register.error.master-subscription-expired', (array) $form->getValues());
                     $this->redirect('expired');
                 } else {
                     /** @var EmailFormDataProviderInterface[] $providers */
