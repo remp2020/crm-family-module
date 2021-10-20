@@ -3,7 +3,7 @@
 namespace Crm\FamilyModule\Repositories;
 
 use Crm\ApplicationModule\Repository;
-use Nette\Database\Table\IRow;
+use Nette\Database\Table\ActiveRow;
 use Nette\Database\Table\Selection;
 use Nette\Utils\DateTime;
 use Nette\Utils\Random;
@@ -17,8 +17,8 @@ class FamilyRequestsRepository extends Repository
     protected $tableName = 'family_requests';
 
     public function add(
-        IRow $subscription,
-        IRow $subscriptionType,
+        ActiveRow $subscription,
+        ActiveRow $subscriptionType,
         $status = self::STATUS_CREATED,
         ?DateTime $expiresAt = null,
         ?string $note = null
@@ -41,27 +41,27 @@ class FamilyRequestsRepository extends Repository
         return $this->getTable()->where(['code' => $code])->limit(1)->fetch();
     }
 
-    public function userFamilyRequest(IRow $user)
+    public function userFamilyRequest(ActiveRow $user)
     {
         return $this->getTable()->where(['master_user_id' => $user->id]);
     }
 
-    public function masterSubscriptionFamilyRequests(IRow $subscription): Selection
+    public function masterSubscriptionFamilyRequests(ActiveRow $subscription): Selection
     {
         return $subscription->related('family_requests', 'master_subscription_id');
     }
 
-    public function masterSubscriptionActiveFamilyRequests(IRow $subscription): Selection
+    public function masterSubscriptionActiveFamilyRequests(ActiveRow $subscription): Selection
     {
         return $this->masterSubscriptionFamilyRequests($subscription)->where('status', [self::STATUS_CREATED, self::STATUS_ACCEPTED]);
     }
 
-    public function masterSubscriptionUnusedFamilyRequests(IRow $subscription): Selection
+    public function masterSubscriptionUnusedFamilyRequests(ActiveRow $subscription): Selection
     {
         return $this->masterSubscriptionFamilyRequests($subscription)->where('status', self::STATUS_CREATED);
     }
 
-    public function masterSubscriptionAcceptedFamilyRequests(IRow $subscription): Selection
+    public function masterSubscriptionAcceptedFamilyRequests(ActiveRow $subscription): Selection
     {
         return $this->getTable()
             ->where([
@@ -70,12 +70,12 @@ class FamilyRequestsRepository extends Repository
             ]);
     }
 
-    public function masterSubscriptionCanceledFamilyRequests(IRow $subscription): Selection
+    public function masterSubscriptionCanceledFamilyRequests(ActiveRow $subscription): Selection
     {
         return $this->masterSubscriptionFamilyRequests($subscription)->where('status', self::STATUS_CANCELED);
     }
 
-    public function cancelCreatedRequests(IRow $user)
+    public function cancelCreatedRequests(ActiveRow $user)
     {
         return $this->getTable()->where(['master_user_id' => $user->id, 'status' => self::STATUS_CREATED])->update([
             'status' => self::STATUS_CANCELED,
@@ -83,7 +83,7 @@ class FamilyRequestsRepository extends Repository
         ]);
     }
 
-    public function userAlreadyHasSubscriptionFrom(IRow $masterSubscription, IRow $user)
+    public function userAlreadyHasSubscriptionFrom(ActiveRow $masterSubscription, ActiveRow $user)
     {
         return $this->getTable()->where([
             'master_subscription_id' => $masterSubscription->id,
@@ -92,13 +92,13 @@ class FamilyRequestsRepository extends Repository
         ])->count('*') > 0;
     }
 
-    final public function slaveUserFamilyRequests(IRow $user)
+    final public function slaveUserFamilyRequests(ActiveRow $user)
     {
         return $this->getTable()->where('slave_subscription.user_id', $user->id)
             ->order('slave_subscription.end_time DESC, slave_subscription.start_time DESC');
     }
 
-    final public function findSlaveSubscriptionFamilyRequest(IRow $subscription)
+    final public function findSlaveSubscriptionFamilyRequest(ActiveRow $subscription)
     {
         return $this->getTable()->where('slave_subscription_id', $subscription->id)->fetch();
     }

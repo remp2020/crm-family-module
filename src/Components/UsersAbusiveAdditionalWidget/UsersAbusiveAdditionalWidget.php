@@ -6,7 +6,7 @@ use Crm\ApplicationModule\Widget\BaseWidget;
 use Crm\ApplicationModule\Widget\WidgetManager;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
-use Nette\Database\Table\IRow;
+use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
 
 class UsersAbusiveAdditionalWidget extends BaseWidget
@@ -32,7 +32,7 @@ class UsersAbusiveAdditionalWidget extends BaseWidget
         return 'usersabusiveadditionalwidget';
     }
 
-    public function render(IRow $user)
+    public function render(ActiveRow $user)
     {
         $params = $this->getPresenter()->getParameters();
 

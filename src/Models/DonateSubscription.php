@@ -9,7 +9,7 @@ use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionMetaRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionTypesMetaRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
-use Nette\Database\Table\IRow;
+use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
 use Tracy\Debugger;
 
@@ -46,7 +46,7 @@ class DonateSubscription
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
     }
 
-    public function connectFamilyUser(IRow $slaveUser, IRow $familyRequest)
+    public function connectFamilyUser(ActiveRow $slaveUser, ActiveRow $familyRequest)
     {
         $masterSubscription = $familyRequest->master_subscription;
 
@@ -146,7 +146,7 @@ class DonateSubscription
         return $familyRequest;
     }
 
-    public function releaseFamilyRequest(IRow $familyRequest)
+    public function releaseFamilyRequest(ActiveRow $familyRequest)
     {
         // do not cancel already cancelled family request (eg. second call on handler's URL)
         // otherwise multiple "substitute" child subscriptions will be generated
@@ -172,7 +172,7 @@ class DonateSubscription
         );
     }
 
-    private function activateNextFamilySubscriptionRequest(IRow $subscription, $user)
+    private function activateNextFamilySubscriptionRequest(ActiveRow $subscription, $user)
     {
         // Future family request shouldn't be shared yet
         // Grab one of the free requests
@@ -184,7 +184,7 @@ class DonateSubscription
         }
     }
 
-    private function getNextFamilySubscription(IRow $subscription)
+    private function getNextFamilySubscription(ActiveRow $subscription)
     {
         $nextSubscription = $this->subscriptionMetaRepository
             ->getMeta($subscription, FamilyRequests::NEXT_FAMILY_SUBSCRIPTION_META)

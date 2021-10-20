@@ -15,7 +15,7 @@ use Crm\UsersModule\Auth\UserManager;
 use Crm\UsersModule\Repository\AccessTokensRepository;
 use Crm\UsersModule\Tests\TestUserTokenAuthorization;
 use League\Event\Emitter;
-use Nette\Database\Table\IRow;
+use Nette\Database\Table\ActiveRow;
 use Nette\Http\Response;
 use Nette\Utils\DateTime;
 
@@ -255,7 +255,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
         );
     }
 
-    private function getTestAuthorization(IRow $user)
+    private function getTestAuthorization(ActiveRow $user)
     {
         $token = $this->accessTokensRepository->allUserTokens($user->id)->limit(1)->fetch();
         return new TestUserTokenAuthorization($token);

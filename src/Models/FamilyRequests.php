@@ -10,7 +10,7 @@ use Crm\PaymentsModule\Repository\PaymentMetaRepository;
 use Crm\PaymentsModule\Repository\PaymentsRepository;
 use Crm\SubscriptionsModule\PaymentItem\SubscriptionTypePaymentItem;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
-use Nette\Database\Table\IRow;
+use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
 
 class FamilyRequests
@@ -46,12 +46,12 @@ class FamilyRequests
     }
 
     /**
-     * @param IRow $subscription
+     * @param ActiveRow $subscription
      *
      * @return array newly created requests
      * @throws MissingFamilySubscriptionTypeException
      */
-    public function createFromSubscription(IRow $subscription): array
+    public function createFromSubscription(ActiveRow $subscription): array
     {
         $familySubscriptionType = $this->familySubscriptionTypesRepository->findByMasterSubscriptionType($subscription->subscription_type);
         if (!$familySubscriptionType) {

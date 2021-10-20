@@ -6,7 +6,7 @@ use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Extension\Extension;
 use Crm\SubscriptionsModule\Extension\ExtensionInterface;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
-use Nette\Database\Table\IRow;
+use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
 
 class ExtendFamilyExtension implements ExtensionInterface
@@ -26,7 +26,7 @@ class ExtendFamilyExtension implements ExtensionInterface
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
     }
 
-    public function getStartTime(IRow $user, IRow $subscriptionType)
+    public function getStartTime(ActiveRow $user, ActiveRow $subscriptionType)
     {
         // load IDs of all family subscription types
         $familySubscriptionTypeIds = array_merge(

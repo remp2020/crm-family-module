@@ -4,7 +4,7 @@ namespace Crm\FamilyModule\Models\Scenarios;
 
 use Crm\ApplicationModule\Criteria\ScenarioParams\BooleanParam;
 use Crm\ApplicationModule\Criteria\ScenariosCriteriaInterface;
-use Nette\Database\Table\IRow;
+use Nette\Database\Table\ActiveRow;
 use Nette\Database\Table\Selection;
 
 class IsFamilySlaveCriteria implements ScenariosCriteriaInterface
@@ -16,7 +16,7 @@ class IsFamilySlaveCriteria implements ScenariosCriteriaInterface
         ];
     }
 
-    public function addConditions(Selection $selection, array $paramValues, IRow $criterionItemRow): bool
+    public function addConditions(Selection $selection, array $paramValues, ActiveRow $criterionItemRow): bool
     {
         $values = $paramValues['is_family_slave'];
 

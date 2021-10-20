@@ -15,7 +15,7 @@ use Crm\SubscriptionsModule\Repository\SubscriptionMetaRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use League\Event\AbstractListener;
 use League\Event\EventInterface;
-use Nette\Database\Table\IRow;
+use Nette\Database\Table\ActiveRow;
 use Tracy\Debugger;
 
 class NewSubscriptionHandler extends AbstractListener
@@ -89,7 +89,7 @@ class NewSubscriptionHandler extends AbstractListener
         }
     }
 
-    private function getPreviousFamilyPaymentSubscription(IRow $subscription)
+    private function getPreviousFamilyPaymentSubscription(ActiveRow $subscription)
     {
         // First, try to link subscriptions using recurrent payments
         $payment = $this->paymentsRepository->subscriptionPayment($subscription);
@@ -124,14 +124,14 @@ class NewSubscriptionHandler extends AbstractListener
 
 
     /**
-     * @param IRow $newSubscription
-     * @param IRow $previousSubscription
+     * @param ActiveRow $newSubscription
+     * @param ActiveRow $previousSubscription
      * @param array $familyRequests
      *
      * @return array
      * @throws FamilyChildSubscriptionRenewalException
      */
-    private function activateChildSubscriptions(IRow $newSubscription, IRow $previousSubscription, array $familyRequests): array
+    private function activateChildSubscriptions(ActiveRow $newSubscription, ActiveRow $previousSubscription, array $familyRequests): array
     {
         $previousFamilyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($previousSubscription)->where('status', FamilyRequestsRepository::STATUS_ACCEPTED);
 
@@ -165,7 +165,7 @@ class NewSubscriptionHandler extends AbstractListener
         return $donatedSubscriptions;
     }
 
-    private function linkNextFamilySubscription(IRow $subscription, $previousFamilySubscription): void
+    private function linkNextFamilySubscription(ActiveRow $subscription, $previousFamilySubscription): void
     {
         $this->subscriptionMetaRepository->add($previousFamilySubscription, FamilyRequests::NEXT_FAMILY_SUBSCRIPTION_META, $subscription->id);
     }
