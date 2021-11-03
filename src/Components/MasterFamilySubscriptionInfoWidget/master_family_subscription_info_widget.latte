@@ -283,6 +283,14 @@
             showTooltip(element.trigger, 'Kopírovanie zlyhalo');
         });
 
+        // handle confirmation dialog
+        $(document).on('click', '[data-confirm]', function(e) {
+            if (!confirm($(this).data('confirm'))) {
+                e.preventDefault();
+                return false;
+            }
+        });
+
         $('.activate-child-subscription').on('click', function() {
             var emailInputWrapper = $(this).closest('tr').find('.child-subscription-email-wrapper');
             var emailInputError = $(this).closest('tr').find('.child-subscription-email-error');
