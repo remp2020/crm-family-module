@@ -148,6 +148,12 @@ class DonateSubscription
 
     public function releaseFamilyRequest(IRow $familyRequest)
     {
+        // do not cancel already cancelled family request (eg. second call on handler's URL)
+        // otherwise multiple "substitute" child subscriptions will be generated
+        if ($familyRequest->status !== FamilyRequestsRepository::STATUS_ACCEPTED) {
+            return;
+        }
+
         $slaveSubscription = $familyRequest->slave_subscription;
         // already stopped subscription
         if ($slaveSubscription->end_time >= $this->getNow()) {
