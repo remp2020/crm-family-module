@@ -77,6 +77,14 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
         $this->handler = $this->inject(ActivateFamilyRequestApiHandler::class);
     }
 
+    public function tearDown(): void
+    {
+        // reset NOW; it affects tests run after this class
+        $this->donateSubscription->setNow(null);
+
+        parent::tearDown();
+    }
+
     public function testActivateFamilyRequest()
     {
         [ , , $slaveUserWithoutAccepted, $familyRequests, ] = $this->prepareFamilyRequests();
