@@ -82,6 +82,8 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
         // reset NOW; it affects tests run after this class
         $this->donateSubscription->setNow(null);
 
+        $this->emitter->removeListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
+
         parent::tearDown();
     }
 

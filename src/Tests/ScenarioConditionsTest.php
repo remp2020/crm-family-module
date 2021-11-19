@@ -92,6 +92,13 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
         $this->emitter->addListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
     }
 
+    protected function tearDown(): void
+    {
+        $this->emitter->removeListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
+
+        parent::tearDown();
+    }
+
     /**
      * Test scenario with flows:
      * TRIGGER (master subscription) -> CONDITION (isFamilyMaster) -> MAIL (positive)

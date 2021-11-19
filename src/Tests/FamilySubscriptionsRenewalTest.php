@@ -91,6 +91,14 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
         $this->emitter->addListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
     }
 
+    protected function tearDown(): void
+    {
+        $this->emitter->removeListener(PaymentChangeStatusEvent::class, $this->inject(PaymentStatusChangeHandler::class));
+        $this->emitter->removeListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
+
+        parent::tearDown();
+    }
+
     public function testConsecutiveNonRecurrentFamilyRenewal()
     {
         [$masterSubscriptionType, ] = $this->seedFamilySubscriptionTypes();

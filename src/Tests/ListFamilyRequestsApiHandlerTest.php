@@ -72,6 +72,13 @@ class ListFamilyRequestsApiHandlerTest extends BaseTestCase
         $this->handler = $this->inject(ListFamilyRequestsApiHandler::class);
     }
 
+    protected function tearDown(): void
+    {
+        $this->emitter->removeListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
+
+        parent::tearDown();
+    }
+
     public function testListExistingFamilyRequests()
     {
         [$masterUser, $slaveUser, $acceptedFamilyRequest] = $this->prepareFamilyRequests();

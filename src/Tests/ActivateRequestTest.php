@@ -57,6 +57,13 @@ class ActivateRequestTest extends BaseTestCase
         $this->emitter->addListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
     }
 
+    protected function tearDown(): void
+    {
+        $this->emitter->removeListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
+
+        parent::tearDown();
+    }
+
     public function testMasterSubscriptionExpired()
     {
         [$masterSubscriptionType, ] = $this->seedFamilySubscriptionTypes();

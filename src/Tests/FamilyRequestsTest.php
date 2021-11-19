@@ -55,6 +55,13 @@ class FamilyRequestsTest extends BaseTestCase
         $emitter->addListener(PaymentChangeStatusEvent::class, $this->inject(PaymentStatusChangeHandler::class));
     }
 
+    protected function tearDown(): void
+    {
+        $this->inject(Emitter::class)->removeListener(PaymentChangeStatusEvent::class, $this->inject(PaymentStatusChangeHandler::class));
+
+        parent::tearDown();
+    }
+
     public function testSuccessWithPreonfiguredCount()
     {
         $preconfiguredCount = 7;
