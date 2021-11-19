@@ -50,12 +50,9 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
 
     public function requiredRepositories(): array
     {
-        return array_merge(
-            [
-                AccessTokensRepository::class,
-            ],
-            parent::requiredRepositories()
-        );
+        return array_merge(parent::requiredRepositories(), [
+            AccessTokensRepository::class,
+        ]);
     }
 
     public function setUp(): void
