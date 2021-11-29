@@ -55,6 +55,29 @@ class FamilyRequests
             );
         }
 
+        $requestsToGenerateCount = $this->getRequestsToGenerateCount($subscription, $familySubscriptionType);
+        if ($requestsToGenerateCount === 0) {
+            throw new InvalidConfigurationException(
+                "Unable to load number of family requests from subscription type or payment for subscription ID [{$subscription->id}]."
+            );
+        }
+
+        $requests = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($subscription);
+        $requestsCount = $requests->count('*');
+
+        $newRequests = [];
+
+        if ($requestsCount < $requestsToGenerateCount) {
+            for ($i = 0; $i < $requestsToGenerateCount - $requestsCount; $i++) {
+                $newRequests[] = $this->familyRequestsRepository->add($subscription, $familySubscriptionType->slave_subscription_type);
+            }
+        }
+
+        return $newRequests;
+    }
+
+    public function getRequestsToGenerateCount($subscription, $familySubscriptionType): int
+    {
         // load number of requests (slave subscriptions) to generate
         $requestsToGenerateCount = 0;
         if ($familySubscriptionType->count !== 0) {
@@ -78,24 +101,7 @@ class FamilyRequests
             }
         }
 
-        if ($requestsToGenerateCount === 0) {
-            throw new InvalidConfigurationException(
-                "Unable to load number of family requests from subscription type or payment for subscription ID [{$subscription->id}]."
-            );
-        }
-
-        $requests = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($subscription);
-        $requestsCount = $requests->count('*');
-
-        $newRequests = [];
-
-        if ($requestsCount < $requestsToGenerateCount) {
-            for ($i = 0; $i < $requestsToGenerateCount - $requestsCount; $i++) {
-                $newRequests[] = $this->familyRequestsRepository->add($subscription, $familySubscriptionType->slave_subscription_type);
-            }
-        }
-
-        return $newRequests;
+        return $requestsToGenerateCount;
     }
 
     public function activeFamilyOwners(): Selection
