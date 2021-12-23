@@ -6,6 +6,7 @@ use Crm\ApplicationModule\Cache\CacheRepository;
 use Crm\ApplicationModule\Selection;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
+use Crm\PaymentsModule\Repository\PaymentMetaRepository;
 use Crm\PaymentsModule\Repository\PaymentsRepository;
 use Crm\SubscriptionsModule\PaymentItem\SubscriptionTypePaymentItem;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
@@ -16,28 +17,32 @@ class FamilyRequests
 {
     const NEXT_FAMILY_SUBSCRIPTION_META = 'next_family_subscription_id';
 
-    private $cacheRepository;
+    private CacheRepository $cacheRepository;
 
-    private $familyRequestsRepository;
+    private FamilyRequestsRepository $familyRequestsRepository;
 
-    private $paymentsRepository;
+    private PaymentsRepository $paymentsRepository;
 
-    private $subscriptionsRepository;
+    private SubscriptionsRepository $subscriptionsRepository;
 
-    private $familySubscriptionTypesRepository;
+    private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository;
+
+    private PaymentMetaRepository $paymentMetaRepository;
 
     public function __construct(
         CacheRepository $cacheRepository,
         FamilyRequestsRepository $familyRequestsRepository,
         PaymentsRepository $paymentsRepository,
         SubscriptionsRepository $subscriptionsRepository,
-        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository
+        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
+        PaymentMetaRepository $paymentMetaRepository
     ) {
         $this->cacheRepository = $cacheRepository;
         $this->familyRequestsRepository = $familyRequestsRepository;
         $this->paymentsRepository = $paymentsRepository;
         $this->subscriptionsRepository = $subscriptionsRepository;
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
+        $this->paymentMetaRepository = $paymentMetaRepository;
     }
 
     /**
@@ -92,11 +97,17 @@ class FamilyRequests
                 );
             }
 
-            $paymentItems = $this->paymentsRepository->getPaymentItemsByType($payment, SubscriptionTypePaymentItem::TYPE);
-            foreach ($paymentItems as $paymentItem) {
-                if ($paymentItem->subscription_type->code === $familySubscriptionType->master_subscription_type->code) {
-                    $requestsToGenerateCount = $paymentItem->count;
-                    break;
+            // this is primarily for custom-made payments; there's no system support to enter these values
+            $meta = $this->paymentMetaRepository->findByPaymentAndKey($payment, 'family_subscriptions_count');
+            if ($meta) {
+                $requestsToGenerateCount = (int) $meta->value;
+            } else {
+                $paymentItems = $this->paymentsRepository->getPaymentItemsByType($payment, SubscriptionTypePaymentItem::TYPE);
+                foreach ($paymentItems as $paymentItem) {
+                    if ($paymentItem->subscription_type->code === $familySubscriptionType->master_subscription_type->code) {
+                        $requestsToGenerateCount = $paymentItem->count;
+                        break;
+                    }
                 }
             }
         }
