@@ -19,7 +19,7 @@ class ListFamilyRequestsApiHandler extends ApiHandler
         $this->familyRequestsRepository = $familyRequestsRepository;
     }
 
-    public function params()
+    public function params(): array
     {
         return [];
     }

@@ -38,7 +38,7 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
         $this->userActionsLogRepository = $userActionsLogRepository;
     }
 
-    public function params()
+    public function params(): array
     {
         return [];
     }
