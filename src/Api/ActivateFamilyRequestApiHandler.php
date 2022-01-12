@@ -5,7 +5,7 @@ namespace Crm\FamilyModule\Api;
 use Crm\ApiModule\Api\ApiHandler;
 use Crm\ApiModule\Api\JsonResponse;
 use Crm\ApiModule\Api\JsonValidationTrait;
-use Crm\ApiModule\Authorization\ApiAuthorizationInterface;
+use Crm\ApiModule\Response\ApiResponseInterface;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\SubscriptionsModule\Repository\ContentAccessRepository;
@@ -43,7 +43,7 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
         return [];
     }
 
-    public function handle(ApiAuthorizationInterface $authorization)
+    public function handle(array $params): ApiResponseInterface
     {
         $data = $authorization->getAuthorizedData();
         if (!isset($data['token'])) {
