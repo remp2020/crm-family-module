@@ -22,7 +22,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class FamilyModule extends CrmModule
 {
-    const TYPE_FAMILY = 'family';
+    public const SUBSCRIPTION_TYPE_FAMILY = 'family';
 
     private $familyRequests;
 
