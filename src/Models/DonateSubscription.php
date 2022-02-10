@@ -76,7 +76,7 @@ class DonateSubscription
                 false,
                 $familySubscriptionType->is_paid,
                 $slaveUser,
-                FamilyModule::TYPE_FAMILY,
+                FamilyModule::SUBSCRIPTION_TYPE_FAMILY,
                 $masterSubscription->start_time,
                 $masterSubscription->end_time
             );
@@ -93,7 +93,7 @@ class DonateSubscription
                 false,
                 $masterSubscription->is_paid,
                 $slaveUser,
-                FamilyModule::TYPE_FAMILY,
+                FamilyModule::SUBSCRIPTION_TYPE_FAMILY,
                 $startTime,
                 $endTime
             );
@@ -119,7 +119,7 @@ class DonateSubscription
                 false,
                 $isPaid,
                 $slaveUser,
-                FamilyModule::TYPE_FAMILY,
+                FamilyModule::SUBSCRIPTION_TYPE_FAMILY,
                 $this->getNow(),
                 $endTime
             );

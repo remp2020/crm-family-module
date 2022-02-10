@@ -7,6 +7,10 @@ services:
 		setup:
 			- register('maskEmail', [Crm\FamilyModule\Helpers\MaskEmailHelper(), process])
 
+	subscriptionsRepository:
+		setup:
+			- registerType(Crm\FamilyModule\FamilyModule::SUBSCRIPTION_TYPE_FAMILY)
+
 	# API
 	- Crm\FamilyModule\Api\ActivateFamilyRequestApiHandler
 	- Crm\FamilyModule\Api\ListFamilyRequestsApiHandler
