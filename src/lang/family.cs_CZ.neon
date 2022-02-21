@@ -1,102 +1,102 @@
 frontend:
-	header: "Darování předplatného"
-	new:
-		header: "Aktivace darovaného předplatného"
+    header: "Darování předplatného"
+    new:
+        header: "Aktivace darovaného předplatného"
 
-		form:
-			email: "Email"
-			email_required: "Prosím zadejte Váš e-mail"
-			email_placeholder: "Například moj@email.cz"
-			submit: "Zaregistrovat a aktivovat předplatné"
-			error_email: "Zadaný email je neplatný"
+        form:
+            email: "Email"
+            email_required: "Prosím zadejte Váš e-mail"
+            email_placeholder: "Například moj@email.cz"
+            submit: "Zaregistrovat a aktivovat předplatné"
+            error_email: "Zadaný email je neplatný"
 
-	signin:
-		header: "Aktivace darovaného předplatného"
-		description: "Váš e-mail je již registrován. Prosím zadejte heslo a přihlaste se."
-		forgot_password: "Zapomněli jste heslo?"
+    signin:
+        header: "Aktivace darovaného předplatného"
+        description: "Váš e-mail je již registrován. Prosím zadejte heslo a přihlaste se."
+        forgot_password: "Zapomněli jste heslo?"
 
-		form:
-			password: "Heslo"
-			password_required: "Prosím zadejte heslo."
-			password_placeholder: "Vaše heslo"
-			submit: "Přihlásit"
-	logged_in:
-		request_info: "Uživatel <i>%email%</i> Vám poskytl předplatné typu <b>%name%</b>."
-		activate: "Aktivovat předplatné na účet %email%"
+        form:
+            password: "Heslo"
+            password_required: "Prosím zadejte heslo."
+            password_placeholder: "Vaše heslo"
+            submit: "Přihlásit"
+    logged_in:
+        request_info: "Uživatel <i>%email%</i> Vám poskytl předplatné typu <b>%name%</b>."
+        activate: "Aktivovat předplatné na účet %email%"
 
-	family_requests_statuses:
-		status_created: čeká na použití
-		status_accepted: použitý
-		status_canceled: zrušen
+    family_requests_statuses:
+        status_created: čeká na použití
+        status_accepted: použitý
+        status_canceled: zrušen
 
-	family_requests:
-		failed_to_generate: "Generování firemních přístupů selhalo. Kontaktujte prosím podporu. ID předplatného: %subscription_id%."
+    family_requests:
+        failed_to_generate: "Generování firemních přístupů selhalo. Kontaktujte prosím podporu. ID předplatného: %subscription_id%."
 
 components:
-	family_requests_dashboard_widget:
-		title: 'Aktivní firemní/rodinné předplatné'
-		active_parents:
-			label: Aktivní rodiče
-			tooltip: 'Počet plateb za firemní/rodinné předplatné, jejichž předplatné je aktuálně aktivní.'
-		child_created:
-			label: Vygenerované dceřiné přístupy
-			tooltip: 'Počet přístupů vygenerovaných pro aktivní rodiče'
-		paid_subscribers_with_family_requests:
-			label: 'Předplatitelé s platbou + firemní'
-			tooltip: 'Počet předplatitelů s aktivním předplatným s platbou + počet firemních/rodinných přístupů. Jeden uživatel je jednou i když má více předplatných. Vygenerované firemní / rodinné nemusí být aktivovány.'
+    family_requests_dashboard_widget:
+        title: 'Aktivní firemní/rodinné předplatné'
+        active_parents:
+            label: Aktivní rodiče
+            tooltip: 'Počet plateb za firemní/rodinné předplatné, jejichž předplatné je aktuálně aktivní.'
+        child_created:
+            label: Vygenerované dceřiné přístupy
+            tooltip: 'Počet přístupů vygenerovaných pro aktivní rodiče'
+        paid_subscribers_with_family_requests:
+            label: 'Předplatitelé s platbou + firemní'
+            tooltip: 'Počet předplatitelů s aktivním předplatným s platbou + počet firemních/rodinných přístupů. Jeden uživatel je jednou i když má více předplatných. Vygenerované firemní / rodinné nemusí být aktivovány.'
 
-	users_abusive_additional:
-		master_account: Master konto
-		account_with_family_requests: "{0}žádné předplatné|[1,4]%count% předplatné|[5,Inf]%count% předplatných"
-		children:
-			tooltip_title: Dceřiné předplatné
-			status:
-				generated: "{0}žádné vygenerované|[1,4]%count% vygenerované|[5,Inf]%count% vygenerovaných"
-				accepted: "{0}žádné aktivovány|[1,4]%count% aktivovány|[5,Inf]%count% aktivovaných"
-				unused: "{0}žádné nepoužité|[1,4]%count% nepoužité|[5,Inf]%count% nepoužitých"
-				canceled: "{0}žádné zrušené|[1,4]%count% zrušené|[5,Inf]%count% zrušených"
+    users_abusive_additional:
+        master_account: Master konto
+        account_with_family_requests: "{0}žádné předplatné|[1,4]%count% předplatné|[5,Inf]%count% předplatných"
+        children:
+            tooltip_title: Dceřiné předplatné
+            status:
+                generated: "{0}žádné vygenerované|[1,4]%count% vygenerované|[5,Inf]%count% vygenerovaných"
+                accepted: "{0}žádné aktivovány|[1,4]%count% aktivovány|[5,Inf]%count% aktivovaných"
+                unused: "{0}žádné nepoužité|[1,4]%count% nepoužité|[5,Inf]%count% nepoužitých"
+                canceled: "{0}žádné zrušené|[1,4]%count% zrušené|[5,Inf]%count% zrušených"
 
-	family_requests_list_widget:
-		heading: Firemní předplatné
-		status: Stav
-		subscription_type: Typ předplatného
-		activation_link: Aktivační odkaz
-		copy_to_clipboard: Zkopírovat odkaz
-		copied_to_clipboard: Odkaz zkopírovaný
-		copying_failed: Kopírování selhalo
+    family_requests_list_widget:
+        heading: Firemní předplatné
+        status: Stav
+        subscription_type: Typ předplatného
+        activation_link: Aktivační odkaz
+        copy_to_clipboard: Zkopírovat odkaz
+        copied_to_clipboard: Odkaz zkopírovaný
+        copying_failed: Kopírování selhalo
 
-	master_family_subscription_info:
-		title: 'Správa dceřiných předplatných'
-		stats:
-			title: 'Aktivní'
-			active_tooltip: 'Počet aktivovaných přístupů'
-			total_tooltip: 'Počet vygenerovaných přístupů'
-			canceled_tooltip: 'Počet zrušených přístupů: %number%'
-		modal:
-			status: Stav
-			activation_link: Aktivační odkaz
-			slave_account: 'Dceřiné konto <i class="fa fa-question-circle" style="margin: auto;" data-toggle="tooltip" title="V případě, že účet se zadanou e-mailovou adresou ještě neexistuje, je třeba jej vytvořit přes aktivační odkaz."></i>'
-			copy_to_clipboard: Zkopírovat odkaz
-			email_placeholder: E-mail existujícího uživatele
-			activate: Aktivovat
-			canceled_requests: Zrušené přístupy
-			stop: Zastavit
-			stop_confirm: "Opravdu chcete zastavit předplatné pro %email%?"
-			error:
-				not_registered: 'E-mail není zaregistrován <i class="fa fa-question-circle" style="margin: auto;" data-toggle="tooltip" title="V případě, že účet se zadanou e-mailovou adresou ještě neexistuje, je třeba jej vytvořit přes aktivační odkaz"></i>'
-			note: "Jméno uživatele <br><span class=\"note-info\">(slouží pro vaši orientaci)</span>"
-			note_placeholder: Jméno uživatele
+    master_family_subscription_info:
+        title: 'Správa dceřiných předplatných'
+        stats:
+            title: 'Aktivní'
+            active_tooltip: 'Počet aktivovaných přístupů'
+            total_tooltip: 'Počet vygenerovaných přístupů'
+            canceled_tooltip: 'Počet zrušených přístupů: %number%'
+        modal:
+            status: Stav
+            activation_link: Aktivační odkaz
+            slave_account: 'Dceřiné konto <i class="fa fa-question-circle" style="margin: auto;" data-toggle="tooltip" title="V případě, že účet se zadanou e-mailovou adresou ještě neexistuje, je třeba jej vytvořit přes aktivační odkaz."></i>'
+            copy_to_clipboard: Zkopírovat odkaz
+            email_placeholder: E-mail existujícího uživatele
+            activate: Aktivovat
+            canceled_requests: Zrušené přístupy
+            stop: Zastavit
+            stop_confirm: "Opravdu chcete zastavit předplatné pro %email%?"
+            error:
+                not_registered: 'E-mail není zaregistrován <i class="fa fa-question-circle" style="margin: auto;" data-toggle="tooltip" title="V případě, že účet se zadanou e-mailovou adresou ještě neexistuje, je třeba jej vytvořit přes aktivační odkaz"></i>'
+            note: "Jméno uživatele <br><span class=\"note-info\">(slouží pro vaši orientaci)</span>"
+            note_placeholder: Jméno uživatele
 
-	slave_family_subscription_info:
-		title: 'Dceřiné předplatné'
-		master_account: Rodičovské konto
+    slave_family_subscription_info:
+        title: 'Dceřiné předplatné'
+        master_account: Rodičovské konto
 
-	family_subscription_type_details_widget:
-		parent:
-			title: Detaily firemního rodičovského předplatného
-			child_subscription: Dceřiné předplatné
-			donation_method: Způsob vytvoření
-			count: Počet
-			is_paid: Placené
-		child:
-			title: Dceřiné předplatné firemních předplatných
+    family_subscription_type_details_widget:
+        parent:
+            title: Detaily firemního rodičovského předplatného
+            child_subscription: Dceřiné předplatné
+            donation_method: Způsob vytvoření
+            count: Počet
+            is_paid: Placené
+        child:
+            title: Dceřiné předplatné firemních předplatných
