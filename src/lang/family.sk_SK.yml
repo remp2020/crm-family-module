@@ -1,0 +1,102 @@
+frontend:
+    header: "Darovanie predplatného"
+    new:
+        header: "Aktivácia darovaného predplatného"
+
+        form:
+            email: "Email"
+            email_required: "Prosím zadajte Váš email"
+            email_placeholder: "Napríklad moj@email.sk"
+            submit: "Zaregistrovať a aktivovať predplatné"
+            error_email: "Zadaný email je neplatný"
+
+    signin:
+        header: "Aktivácia darovaného predplatného"
+        description: "Váš email je už registrovaný. Prosím zadajte Vaše heslo a prihláste sa."
+        forgot_password: "Zabudli ste heslo?"
+
+        form:
+            password: "Heslo"
+            password_required: "Prosím zadajte Vaše heslo."
+            password_placeholder: "Vaše heslo"
+            submit: "Prihlásiť"
+    logged_in:
+        request_info: "Užívateľ <i>%email%</i> Vám poskytol predplatné typu <b>%name%</b>."
+        activate: "Aktivovať predplatné na účet %email%"
+
+    family_requests_statuses:
+        status_created: čaká na použitie
+        status_accepted: použitý
+        status_canceled: zrušený
+
+    family_requests:
+        failed_to_generate: "Generovanie firemných prístupov zlyhalo. Kontaktujte prosím podporu. ID predplatného: %subscription_id%."
+
+components:
+    family_requests_dashboard_widget:
+        title: 'Aktívne firemné/rodinné predplatné'
+        active_parents:
+            label: Aktívní rodičia
+            tooltip: 'Počet platieb za firemné/rodinné predplatné, ktorých predplatné je aktuálne aktívne.'
+        child_created:
+            label: Vygenerované dcérske prístupy
+            tooltip: 'Počet prístupov vygenerovaných pre aktívnych rodičov.'
+        paid_subscribers_with_family_requests:
+            label: 'Predplatitelia s platbou + firemné'
+            tooltip: 'Počet predplatiteľov s aktívnym predplatným s platbou + počet firemných/rodinných prístupov. Jeden používateľ je jeden krát aj keď má viac predplatných. Vygenerované firemné/rodinné nemusia byť aktivované.'
+
+    users_abusive_additional:
+        master_account: Master konto
+        account_with_family_requests: "{0}žiadne predplatné|[1,4]%count% predplatné|[5,Inf]%count% predplatných"
+        children:
+            tooltip_title: Dcérske predplatné
+            status:
+                generated: "{0}žiadne vygenerované|[1,4]%count% vygenerované|[5,Inf]%count% vygenerovaných"
+                accepted: "{0}žiadne aktivované|[1,4]%count% aktivované|[5,Inf]%count% aktivovaných"
+                unused: "{0}žiadne nepoužité|[1,4]%count% nepoužité|[5,Inf]%count% nepoužitých"
+                canceled: "{0}žiadne zrušené|[1,4]%count% zrušené|[5,Inf]%count% zrušených"
+
+    family_requests_list_widget:
+        heading: Firemné predplatné
+        status: Stav
+        subscription_type: Typ predplatného
+        activation_link: Aktivačný odkaz
+        copy_to_clipboard: Skopírovať odkaz
+        copied_to_clipboard: Odkaz skopírovaný
+        copying_failed: Kopírovanie zlyhalo
+
+    master_family_subscription_info:
+        title: 'Správa dcérskych predplatných'
+        stats:
+            title: 'Aktívne'
+            active_tooltip: 'Počet aktivovaných prístupov'
+            total_tooltip: 'Počet vygenerovaných prístupov'
+            canceled_tooltip: 'Počet zrušených prístupov: %number%'
+        modal:
+            status: Stav
+            activation_link: Aktivačný odkaz
+            slave_account: 'Dcérske konto <i class="fa fa-question-circle" style="margin: auto;" data-toggle="tooltip" title="V prípade, že konto so zadanou e-mailovou adresou ešte neexistuje, je potrebné ho vytvoriť cez aktivačný odkaz."></i>'
+            copy_to_clipboard: Skopírovať odkaz
+            email_placeholder: E-mail existujúceho používateľa
+            activate: Aktivovať
+            canceled_requests: Zrušené prístupy
+            stop: Zastaviť
+            stop_confirm: "Naozaj chcete zastaviť dcérske predplatné pre %email%?"
+            error:
+                not_registered: 'E-mail nie je zaregistrovaný <i class="fa fa-question-circle" style="margin: auto;" data-toggle="tooltip" title="V prípade, že konto so zadanou e-mailovou adresou ešte neexistuje, je potrebné ho vytvoriť cez aktivačný odkaz"></i>'
+            note: "Meno používateľa <br><span class=\"note-info\">(slúži pre vašu orientáciu)</span>"
+            note_placeholder: Meno používateľa
+
+    slave_family_subscription_info:
+        title: 'Dcérske predplatné'
+        master_account: Rodičovské konto
+
+    family_subscription_type_details_widget:
+        parent:
+            title: Detaily firemného rodičovského predplatného
+            child_subscription: Dcérske predplatné
+            donation_method: Spôsob vytvorenia
+            count: Počet
+            is_paid: Platené
+        child:
+            title: Dcérské predplatné firemných predplatných
