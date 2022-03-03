@@ -40,7 +40,7 @@ components:
             tooltip: 'Počet plateb za firemní/rodinné předplatné, jejichž předplatné je aktuálně aktivní.'
         child_created:
             label: Vygenerované dceřiné přístupy
-            tooltip: 'Počet přístupů vygenerovaných pro aktivní rodiče'
+            tooltip: 'Počet přístupů vygenerovaných pro aktivní rodiče.'
         paid_subscribers_with_family_requests:
             label: 'Předplatitelé s platbou + firemní'
             tooltip: 'Počet předplatitelů s aktivním předplatným s platbou + počet firemních/rodinných přístupů. Jeden uživatel je jednou i když má více předplatných. Vygenerované firemní / rodinné nemusí být aktivovány.'

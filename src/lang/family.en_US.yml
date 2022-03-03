@@ -12,7 +12,7 @@ frontend:
 
     signin:
         header: "Activate donated subscription"
-        description: "Your email is already registered. Please enter your password and sign in"
+        description: "Your email is already registered. Please enter your password and sign in."
         forgot_password: "Forgot your password?"
 
         form:
