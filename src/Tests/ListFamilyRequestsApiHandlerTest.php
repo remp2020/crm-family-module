@@ -2,7 +2,6 @@
 
 namespace Crm\FamilyModule\Tests;
 
-use Crm\ApiModule\Api\JsonResponse;
 use Crm\FamilyModule\Api\ListFamilyRequestsApiHandler;
 use Crm\FamilyModule\Events\NewSubscriptionHandler;
 use Crm\FamilyModule\Models\DonateSubscription;
@@ -16,6 +15,7 @@ use Crm\UsersModule\Tests\TestUserTokenAuthorization;
 use League\Event\Emitter;
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
+use Tomaj\NetteApi\Response\JsonApiResponse;
 
 class ListFamilyRequestsApiHandlerTest extends BaseTestCase
 {
@@ -83,7 +83,7 @@ class ListFamilyRequestsApiHandlerTest extends BaseTestCase
         // call & test API
         $this->handler->setAuthorization($this->getTestAuthorization($masterUser));
         $response = $this->handler->handle([]); // TODO: fix params
-        $this->assertEquals(JsonResponse::class, get_class($response));
+        $this->assertEquals(JsonApiResponse::class, get_class($response));
 
         $payload = $response->getPayload();
 
@@ -109,7 +109,7 @@ class ListFamilyRequestsApiHandlerTest extends BaseTestCase
         // call & test API (with non master user)
         $this->handler->setAuthorization($this->getTestAuthorization($slaveUser));
         $response = $this->handler->handle([]); // TODO: fix params
-        $this->assertEquals(JsonResponse::class, get_class($response));
+        $this->assertEquals(JsonApiResponse::class, get_class($response));
 
         $payload = $response->getPayload();
 

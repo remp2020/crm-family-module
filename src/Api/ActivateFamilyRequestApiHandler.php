@@ -3,15 +3,15 @@
 namespace Crm\FamilyModule\Api;
 
 use Crm\ApiModule\Api\ApiHandler;
-use Crm\ApiModule\Api\JsonResponse;
 use Crm\ApiModule\Api\JsonValidationTrait;
-use Crm\ApiModule\Response\ApiResponseInterface;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\SubscriptionsModule\Repository\ContentAccessRepository;
 use Crm\UsersModule\Repository\UserActionsLogRepository;
 use Nette\Database\Table\ActiveRow;
 use Nette\Http\Response;
+use Tomaj\NetteApi\Response\JsonApiResponse;
+use Tomaj\NetteApi\Response\ResponseInterface;
 use Tracy\Debugger;
 
 class ActivateFamilyRequestApiHandler extends ApiHandler
@@ -43,16 +43,15 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
         return [];
     }
 
-    public function handle(array $params): ApiResponseInterface
+    public function handle(array $params): ResponseInterface
     {
         $authorization = $this->getAuthorization();
         $data = $authorization->getAuthorizedData();
         if (!isset($data['token'])) {
-            $response = new JsonResponse([
+            $response = new JsonApiResponse(Response::S403_FORBIDDEN, [
                 'message' => 'Cannot authorize user',
                 'code' => 'cannot_authorize_user',
             ]);
-            $response->setHttpCode(Response::S403_FORBIDDEN);
             return $response;
         }
 
@@ -70,11 +69,10 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
         $requestApi = $requestValidationResult->getParsedObject();
         $familyRequest = $this->familyRequestsRepository->findByCode($requestApi->code);
         if (!$familyRequest) {
-            $response = new JsonResponse([
+            $response = new JsonApiResponse(Response::S404_NOT_FOUND, [
                 'message' => "Family request code [$requestApi->code] not found",
                 'code' => 'family_request_not_found',
             ]);
-            $response->setHttpCode(Response::S404_NOT_FOUND);
             return $response;
         }
 
@@ -96,8 +94,7 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
                 ],
             ];
 
-            $response = new JsonResponse($result);
-            $response->setHttpCode(Response::S201_CREATED);
+            $response = new JsonApiResponse(Response::S201_CREATED, $result);
 
             return $response;
         }
@@ -110,11 +107,10 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
                     'family.logged.error.internal',
                     ['request' => $requestApi->code]
                 );
-                $response = new JsonResponse([
+                $response = new JsonApiResponse(Response::S500_INTERNAL_SERVER_ERROR, [
                     'message' => 'Internal server error',
                     'code' => 'internal_server_error',
                 ]);
-                $response->setHttpCode(Response::S500_INTERNAL_SERVER_ERROR);
                 return $response;
             case DonateSubscription::ERROR_IN_USE:
                 $this->userActionsLogRepository->add(
@@ -122,11 +118,10 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
                     'family.logged.error.in-use',
                     ['request' => $requestApi->code]
                 );
-                $response = new JsonResponse([
+                $response = new JsonApiResponse(Response::S400_BAD_REQUEST, [
                     'message' => "User [$user->email] already used company code from this company subscription.",
                     'code' => 'family_request_one_per_user',
                 ]);
-                $response->setHttpCode(Response::S400_BAD_REQUEST);
                 return $response;
             case DonateSubscription::ERROR_SELF_USE:
                 $this->userActionsLogRepository->add(
@@ -134,11 +129,10 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
                     'family.logged.error.self-use',
                     ['request' => $requestApi->code]
                 );
-                $response = new JsonResponse([
+                $response = new JsonApiResponse(Response::S400_BAD_REQUEST, [
                     'message' => "Cannot activate family request code [$requestApi->code] on parent's account",
                     'code' => 'family_request_self_use_forbidden',
                 ]);
-                $response->setHttpCode(Response::S400_BAD_REQUEST);
                 return $response;
             case DonateSubscription::ERROR_MASTER_SUBSCRIPTION_EXPIRED:
                 $this->userActionsLogRepository->add(
@@ -146,22 +140,20 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
                     'family.register.error.master-subscription-expired',
                     ['user_id' => $user->id, 'request' => $requestApi->code]
                 );
-                $response = new JsonResponse([
+                $response = new JsonApiResponse(Response::S400_BAD_REQUEST, [
                     'message' => "Family request code [$requestApi->code] expired",
                     'code' => 'family_request_expired',
                 ]);
-                $response->setHttpCode(Response::S400_BAD_REQUEST);
                 return $response;
             default:
                 Debugger::log(
                     "Unknown error status [$connectResult] from family request activation of code [$requestApi->code].",
                     Debugger::ERROR
                 );
-                $response = new JsonResponse([
+                $response = new JsonApiResponse(Response::S500_INTERNAL_SERVER_ERROR, [
                     'message' => 'Internal server error',
                     'code' => 'internal_server_error',
                 ]);
-                $response->setHttpCode(Response::S500_INTERNAL_SERVER_ERROR);
                 return $response;
         }
     }
