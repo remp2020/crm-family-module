@@ -64,6 +64,10 @@ class FamilyModule extends CrmModule
             \Crm\SubscriptionsModule\Events\SubscriptionShortenedEvent::class,
             $this->getInstance(\Crm\FamilyModule\Events\SubscriptionShortenedHandler::class)
         );
+        $emitter->addListener(
+            \Crm\SubscriptionsModule\Events\SubscriptionUpdatedEvent::class,
+            $this->getInstance(\Crm\FamilyModule\Events\SubscriptionUpdatedHandler::class)
+        );
     }
 
     public function registerWidgets(WidgetManagerInterface $widgetManager)

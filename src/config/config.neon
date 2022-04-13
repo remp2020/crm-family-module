@@ -26,6 +26,7 @@ services:
 	# events
 	familyNewSubscriptionHandler: Crm\FamilyModule\Events\NewSubscriptionHandler
 	- Crm\FamilyModule\Events\SubscriptionShortenedHandler
+	- Crm\FamilyModule\Events\SubscriptionUpdatedHandler
 
 	# models
 	- Crm\FamilyModule\Models\FamilyRequests
