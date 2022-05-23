@@ -2,15 +2,17 @@
 
 namespace Crm\FamilyModule\Models\Extension;
 
+use Crm\ApplicationModule\NowTrait;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Extension\Extension;
 use Crm\SubscriptionsModule\Extension\ExtensionInterface;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Nette\Database\Table\ActiveRow;
-use Nette\Utils\DateTime;
 
 class ExtendFamilyExtension implements ExtensionInterface
 {
+    use NowTrait;
+
     public const METHOD_CODE = 'extend_family';
     public const METHOD_NAME = 'Extend family';
 
@@ -41,7 +43,7 @@ class ExtendFamilyExtension implements ExtensionInterface
 
         // if user doesn't have family subscription, start now
         if (!$userFamilySubscription) {
-            return new Extension(new DateTime());
+            return new Extension($this->getNow());
         }
 
         return new Extension($userFamilySubscription->end_time, true);
