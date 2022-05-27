@@ -1,1 +1,19 @@
-{}
+frontend:
+    header: Előfizetés ajándékozása
+    new:
+        form:
+            email_required: Kérjük, add meg az e-mail címedet
+            email: E-mail
+            email_placeholder: Például email@email.sk
+            submit: Előfizetés regisztrációja és aktiválása
+            error_email: A megadott e-mail cím érvénytelen
+        header: Ajándék előfizetés aktiválása
+    signin:
+        description: E-mail címedet már regisztráltuk. Kérjük, add meg a jelszavad és jelentkezz be.
+        form:
+            password: Jelszó
+            password_required: Kérjük, add meg a jelszavad.
+            password_placeholder: Jelszavad
+            submit: Bejelentkezés
+        header: Ajándék előfizetés aktiválása
+        forgot_password: Elfelejtetted a jelszavad?
