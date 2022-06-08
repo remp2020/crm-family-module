@@ -89,6 +89,23 @@ Example of payment item set while creating payment from within admin interface:
 
 In this case, handler `\Crm\FamilyModule\Events\NewSubscriptionHandler` generates 7 child subscriptions.
 
+### Custom type and count of child subscriptions
+
+If you want to have opportunity to define own combination of subscription types and their count you can do it by creating customizable subscription type with following steps:
+
+- Define payment items for master subscription as `\Crm\SubscriptionsModule\PaymentItem\SubscriptionTypePaymentItem::TYPE` which will represent slave subscription types.
+- Payment items must have meta (`payment_item_meta`) information with key `subscription_type_item_id` and value that refer to slave subscription type.
+- Create family subscription type (`family_subscription_types`) with master subscription and previously defined and slave subscription type let `null`.
+
+Admin interface in case of customizable subscription types is selected handles differently - display additional options for subscription type count and price. 
+
+Example of creating the payment of family subscription with customizable subscription type:
+
+![Admin form with customizable options](docs/family_form_with_customizable_options.png "Admin form with customizable options")
+
+By the creating of payment for family subscriptions the payment items are created according counts and prices entered in admin form. 
+In this case, handler `\Crm\FamilyModule\Events\NewSubscriptionHandler` generates 6 child subscriptions (5 of WEB type and 1 of KLUB type).
+
 ## API documentation
 
 All examples use `http://crm.press` as a base domain. Please change the host to the one you use

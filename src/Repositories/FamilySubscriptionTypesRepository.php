@@ -9,11 +9,11 @@ class FamilySubscriptionTypesRepository extends Repository
 {
     protected $tableName = 'family_subscription_types';
 
-    final public function add(ActiveRow $masterSubscriptionType, ActiveRow $slaveSubscriptionType, $donationMethod, $count, bool $isPaid = false)
+    final public function add(ActiveRow $masterSubscriptionType, ?ActiveRow $slaveSubscriptionType, $donationMethod, $count, bool $isPaid = false)
     {
         return $this->getTable()->insert([
             'master_subscription_type_id' => $masterSubscriptionType->id,
-            'slave_subscription_type_id' => $slaveSubscriptionType->id,
+            'slave_subscription_type_id' => $slaveSubscriptionType->id ?? null,
             'donation_method' => $donationMethod,
             'count' => $count,
             'is_paid' => $isPaid,
@@ -54,5 +54,11 @@ class FamilySubscriptionTypesRepository extends Repository
     final public function isSlaveSubscriptionType(ActiveRow $subscriptionType): bool
     {
         return $this->getTable()->where('slave_subscription_type_id', $subscriptionType->id)->count('*') > 0;
+    }
+
+    final public function getCustomizableSubscriptionTypes(): array
+    {
+        return $this->getTable()->where(['slave_subscription_type_id' => null])
+            ->fetchAll();
     }
 }

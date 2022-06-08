@@ -15,7 +15,7 @@ use Nette\Utils\DateTime;
 
 class FamilyRequests
 {
-    const NEXT_FAMILY_SUBSCRIPTION_META = 'next_family_subscription_id';
+    public const NEXT_FAMILY_SUBSCRIPTION_META = 'next_family_subscription_id';
 
     private CacheRepository $cacheRepository;
 
@@ -58,6 +58,10 @@ class FamilyRequests
             throw new MissingFamilySubscriptionTypeException(
                 "Unable to find FamilySubscriptionType for subscription ID [{$subscription->id}]."
             );
+        }
+
+        if ($familySubscriptionType->slave_subscription_type_id === null) {
+            return $this->generateRequestFromCustomSubscription($subscription);
         }
 
         $requestsToGenerateCount = $this->getRequestsToGenerateCount($subscription, $familySubscriptionType);
@@ -208,5 +212,33 @@ class FamilyRequests
         }
 
         return $callable();
+    }
+
+    private function generateRequestFromCustomSubscription(ActiveRow $subscription): array
+    {
+        $payment = $this->paymentsRepository->subscriptionPayment($subscription);
+        if (!$payment) {
+            throw new InvalidConfigurationException("Unable to find payment for subscription ID [{$subscription->id}].");
+        }
+
+        $paymentItems = $this->paymentsRepository->getPaymentItemsByType($payment, SubscriptionTypePaymentItem::TYPE);
+        if (count($paymentItems) === 0) {
+            throw new InvalidConfigurationException("No payment items associated for payment ID [{$payment->id}].");
+        }
+
+        $newRequests = [];
+        foreach ($paymentItems as $paymentItem) {
+            $count = $paymentItem->count;
+            $slaveSubscriptionType = $paymentItem->subscription_type;
+            if (!$slaveSubscriptionType) {
+                throw new InvalidConfigurationException("Unable to load slave subscription from payment item ID [{$paymentItem->id}].");
+            }
+
+            for ($i = 0; $i < $count; $i++) {
+                $newRequests[] = $this->familyRequestsRepository->add($subscription, $slaveSubscriptionType);
+            }
+        }
+
+        return $newRequests;
     }
 }

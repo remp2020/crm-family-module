@@ -1,0 +1,95 @@
+{block #content}
+
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <div class="page-header">
+            <h2>
+                {_family.admin.form.request.name} <small>{$user->public_name}</small>
+            </h2>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <fieldset class="col-md-8 col-md-offset-2">
+        {form requestForm, class => 'form-horizontal'}
+            <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger" role="alert">
+                {$error}<br>
+            </div>
+            <div class="form-group">
+                <div class="control-label col-md-2">
+                    {label subscription_type_id /}
+                </div>
+                <div class="col-md-6">
+                    {input subscription_type_id, class => 'form-control'}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="control-label col-md-2">
+                    {label payment_gateway_id /}
+                </div>
+                <div class="col-md-6">
+                    {input payment_gateway_id, class => 'form-control'}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="control-label col-md-2">
+                    {label manual_subscription /}
+                </div>
+                <div class="col-md-4">
+                    {input manual_subscription, class => 'form-control'}
+                </div>
+            </div>
+
+            <div id="subscription-start-at" class="form-group" hidden>
+                <div class="control-label col-md-2">
+                    {label subscription_start_at /}
+                </div>
+                <div class="col-md-4">
+                    {input subscription_start_at}
+                    <span class="help-block">{_family.admin.form.request.subscription_start_at.description}</span>
+                </div>
+            </div>
+
+            <div id="subscription-end-at" class="form-group" hidden>
+                <div class="control-label col-md-2">
+                    {label subscription_end_at /}
+                </div>
+                <div class="col-md-4">
+                    {input subscription_end_at}
+                    <span class="help-block">{_family.admin.form.request.subscription_end_at.description}</span>
+                </div>
+            </div>
+
+            <div>
+                <legend><span data-tag="iterator"></span>{_family.admin.form.request.items}</legend>
+                {foreach $subscriptionTypes as $subscriptionType}
+                {var $masterSubscriptionType = $subscriptionType->ref('subscription_types', 'master_subscription_type_id')}
+                <fieldset id="container-{$masterSubscriptionType->id}" hidden>
+                        {formContainer $masterSubscriptionType->id}
+                            {foreach $masterSubscriptionType->related('subscription_type_items') as $item}
+                                {formContainer $item->id}
+                                    <div class="form-group">
+                                        <div class="control-label col-md-2"><label for="count">{$item->name}</label></div>
+                                        <div class="col-md-1">{input count, class => 'form-control'}</div>
+                                        <div class="col-md-2">{input price, class => 'form-control'}</div>
+                                    </div>
+                                {/formContainer}
+                            {/foreach}
+                        {/formContainer}
+                </fieldset>
+                {/foreach}
+            </div>
+
+            <div class="form-group">
+                <div class="control-label col-md-2">
+                </div>
+                <div class="col-md-4">
+                    {input send, class => 'btn btn-primary'}
+                </div>
+            </div>
+        {/form}
+    </div>
+</div>

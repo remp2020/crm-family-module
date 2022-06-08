@@ -87,6 +87,7 @@ components:
                 wrong_status: 'Nepodařilo se aktivovat dceřiné předplatné - aktivační kód je expirován nebo použit. Znovu načtěte stránku.'
             note: "Jméno uživatele <br><span class=\"note-info\">(slouží pro vaši orientaci)</span>"
             note_placeholder: Jméno uživatele
+        add_button: Přidej rodičovské předplatné
 
     slave_family_subscription_info:
         title: 'Dceřiné předplatné'
@@ -101,3 +102,37 @@ components:
             is_paid: Placené
         child:
             title: Dceřiné předplatné firemních předplatných
+
+admin:
+    form:
+        request:
+            name: "Nová platba firemního předplatného pro:"
+            subscription_type:
+                label: Typ předplatného
+            payment_gateway:
+                label: Platební brána
+                required: Platební brána musí byť zvolená
+            subscription_start_at:
+                label: Začátek předplatného
+                placeholder: například 14.2.2022
+                required: Datum začátku předplatného je povinen
+                not_past: Datum začátku předplatného nesmí být v minulosti
+                description: "Třeba vyplnit pouze v případě, že potřebujeme posunout začátek předplatného na konkrétní datum v budoucnosti. V případě, že platba bude potvrzena později než zadaný datum, předplatné začne v době potvrzení platby."
+            subscription_end_at:
+                label: Konec předplatného
+                placeholder: například 14.2.2016
+                required: Datum konce předplatného je povinen
+                not_past: Datum konce předplatného musí být v budoucnosti
+                description: "Potřebné vyplnit pouze v případě, že potřebujeme určit konec předplatného na konkrétní datum v budoucnosti."
+            items: Položky
+            item:
+                label: Položka
+            price:
+                label: Jednotková cena
+                required: Jednotková cena položky musí být vyplněna
+                number: Jednotková cena položky musí být kladná číselná hodnota
+            count:
+                label: Počet
+                total: Celkový počet položek nemůže být nulový
+                number: Celkový počet položek musí být kladná číselná hodnota
+            send: Pridej

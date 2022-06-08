@@ -56,7 +56,7 @@ class DonateSubscription
         $subscriptionMeta = $this->subscriptionMetaRepository->subscriptionMeta($masterSubscription);
 
         if ($familySubscriptionType && $familySubscriptionType->donation_method === 'copy') {
-            if ($this->familyRequestsRepository->userAlreadyHasSubscriptionFrom($masterSubscription, $slaveUser)) {
+            if ($this->familyRequestsRepository->userAlreadyHasSubscriptionFromMasterWithSubscriptionType($masterSubscription, $slaveUser, $familyRequest->subscription_type)) {
                 return self::ERROR_IN_USE;
             }
         }

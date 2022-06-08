@@ -5,7 +5,7 @@
             <h2 class="page-header">{_family.components.family_subscription_type_details_widget.parent.title}</h2>
 
             <ul class="list-group">
-                <li class="list-group-item">
+                <li n:if="$parentFamilySubscriptionType->slave_subscription_type" class="list-group-item">
                     <b>{_family.components.family_subscription_type_details_widget.parent.child_subscription}:</b>
                     <a href="{plink :Subscriptions:SubscriptionTypesAdmin:show $parentFamilySubscriptionType->slave_subscription_type_id}">
                         {$parentFamilySubscriptionType->slave_subscription_type->name}

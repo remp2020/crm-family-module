@@ -58,17 +58,24 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
         $userMasterSubscriptions = $this->subscriptionsRepository->userSubscriptions($user->id)
             ->where('subscription_type_id IN ?', $this->familySubscriptionTypesRepository->masterSubscriptionTypes());
 
+        $hasFamilySubscription = true;
         if (count($userMasterSubscriptions) === 0) {
-            return;
+            $hasFamilySubscription = false;
         }
 
         $isAdmin = false;
         if ($this->getPresenter() instanceof AdminPresenter) {
             $isAdmin = true;
         }
-        $this->template->isAdmin = $isAdmin;
 
+        if (!$hasFamilySubscription && !$isAdmin) {
+            return;
+        }
+        $this->template->isAdmin = $isAdmin;
+        $this->template->userId = $userId;
+        $this->template->hasFamilySubscription = $hasFamilySubscription;
         $this->template->subscriptionsData = $this->getSubscriptionsData($userMasterSubscriptions);
+        $this->template->showAddButton = $isAdmin && $this->familySubscriptionTypesRepository->getCustomizableSubscriptionTypes();
 
         $this->template->setFile(__DIR__ . '/' . $this->templateName);
         $this->template->render();

@@ -73,6 +73,7 @@ components:
             total_tooltip: 'Počet vygenerovaných prístupov'
             canceled_tooltip: 'Počet zrušených prístupov: %number%'
         modal:
+            subscription_type: Typ
             status: Stav
             activation_link: Aktivačný odkaz
             slave_account: 'Dcérske konto <i class="fa fa-question-circle" style="margin: auto;" data-toggle="tooltip" title="V prípade, že konto so zadanou e-mailovou adresou ešte neexistuje, je potrebné ho vytvoriť cez aktivačný odkaz."></i>'
@@ -87,6 +88,7 @@ components:
                 wrong_status: 'Nepodarilo sa aktivovať dcérske predplatné - aktivačný kód je expirovaný alebo použitý. Znovu načítajte stránku.'
             note: "Meno používateľa <br><span class=\"note-info\">(slúži pre vašu orientáciu)</span>"
             note_placeholder: Meno používateľa
+        add_button: Pridaj rodičovské predplatné
 
     slave_family_subscription_info:
         title: 'Dcérske predplatné'
@@ -101,3 +103,37 @@ components:
             is_paid: Platené
         child:
             title: Dcérské predplatné firemných predplatných
+
+admin:
+    form:
+        request:
+            name: "Nová platba firemného predplatného pre:"
+            subscription_type:
+                label: Typ predplatného
+            payment_gateway:
+                label: Platobná brána
+                required: Platobná brána musí byť zvolená
+            subscription_start_at:
+                label: Začiatok predplatného
+                placeholder: napríklad 14.2.2022
+                required: Dátum začiatku predplatného je povinný
+                not_past: Dátum začiatku predplatného nesmie byť v minulosti
+                description: "Potrebné vyplniť len v prípade, že potrebujeme posunúť začiatok predplatného na konkrétny dátum v budúcnosti. V prípade, že platba bude potvrdená neskôr ako zadaný dátum, predplatné začne v čase potvrdenia platby."
+            subscription_end_at:
+                label: Koniec predplatného
+                placeholder: napríklad 14.2.2022
+                required: Dátum konca predplatného je povinný
+                not_past: Dátum konca predplatného musí byť v budúcnosti.
+                description: "Potrebné vyplniť len v prípade, že potrebujeme určit koniec predplatného na konkrétny dátum v budúcnosti."
+            items: Položky
+            item:
+                label: Položka
+            price:
+                label: Jednotková cena
+                required: Jednotková cena položky musí byť vyplnená
+                number: Jednotková cena položky musí byť kladná číselná hodnota
+            count:
+                label: Počet
+                total: Celkový počet položiek nemože byť nulový
+                number: Celkový počet položiek musí byť kladná číselná hodnota
+            send: Pridaj

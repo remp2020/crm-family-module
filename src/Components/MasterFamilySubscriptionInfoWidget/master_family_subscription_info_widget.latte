@@ -46,11 +46,16 @@
         vertical-align: middle;
     }
 
+    p.text-center {
+        margin-top: 10px;
+    }
+
 </style>
 
-<div class="panel panel-default">
+<div n:if="$hasFamilySubscription || $showAddButton" class="panel panel-default">
     <div class="panel-heading">{_family.components.master_family_subscription_info.title}</div>
     <div class="panel-body table-responsive">
+        {if $hasFamilySubscription}
         <table class="table table-striped table-hover">
             <thead>
             <th>{_subscriptions.menu.subscriptions}</th>
@@ -94,6 +99,10 @@
             </tr>
             </tbody>
         </table>
+        {/if}
+        <p n:if="$showAddButton" class="text-center">
+            <a class="btn btn-sm btn-default" href="{plink :Family:RequestsAdmin:Default, userId => $userId}"><i class="fa fa-plus"></i>&nbsp;{_family.components.master_family_subscription_info.add_button}</a>
+        </p>
     </div>
 </div>
 
@@ -107,9 +116,13 @@
                                 aria-hidden="true">&times;</span></button>
                 </div>
                 <h1>
-                    {$subscriptionData['familyType']->slave_subscription_type->user_label}
+                    {ifset $subscriptionData['familyType']->slave_subscription_type}
+                        {$subscriptionData['familyType']->slave_subscription_type->user_label}
+                    {/ifset}
                 </h1>
-                {$subscriptionData['familyType']->slave_subscription_type|typeContent|noescape}
+                {ifset $subscriptionData['familyType']->slave_subscription_type}
+                    {$subscriptionData['familyType']->slave_subscription_type|typeContent|noescape}
+                {/ifset}
                 <br>
                 <b>{$subscription->start_time|localizedDate,true} - {$subscription->end_time|localizedDate,true}</b>
             </div>
@@ -117,8 +130,9 @@
                 <table class="table table-striped table-responsive">
                     <thead>
                     <tr>
+                        <th>{_family.components.master_family_subscription_info.modal.subscription_type}</th>
                         <th>{_family.components.master_family_subscription_info.modal.status}</th>
-                        <th colspan="2">{_family.components.master_family_subscription_info.modal.activation_link}</th>
+                        <th>{_family.components.master_family_subscription_info.modal.activation_link}</th>
                         <th>{_family.components.master_family_subscription_info.modal.slave_account|noescape}</th>
                         <th></th>
                         <th>{_family.components.master_family_subscription_info.modal.note|noescape}</th>
@@ -126,6 +140,9 @@
                     </thead>
                     <tbody>
                     <tr n:foreach="$subscriptionData['activeFamilyRequests'] as $request">
+                        <td>
+                            {$request->subscription_type->user_label}
+                        </td>
                         <td>
                             {if $request->status == \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_CREATED}
                                 <span class="label label-info">{_family.frontend.family_requests_statuses.status_created}</span>
@@ -138,16 +155,18 @@
                             {/if}
                         </td>
                         <td>
-                            <input readonly dir="rtl" class="form-control" id="request{$request->id}"
-                                   name="request{$request->id}"
-                                   value="{plink //:Family:Requests:default $request->code}"
-                                   title="{plink //:Family:Requests:default $request->code}" style="cursor: text;">
-                        </td>
-                        <td>
                             {if $request->status == \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_CREATED}
-                                <button class="clip btn btn-default" data-clipboard-target="#request{$request->id}">
-                                    <i class="fa fa-copy"></i> {_family.components.master_family_subscription_info.modal.copy_to_clipboard}
-                                </button>
+                                <div class="input-group">
+                                    <input readonly dir="rtl" class="form-control" id="request{$request->id}"
+                                           name="request{$request->id}"
+                                           value="{plink //:Family:Requests:default $request->code}"
+                                           title="{plink //:Family:Requests:default $request->code}" style="cursor: text;" />
+                                    <span class="input-group-btn">
+                                        <button class="clip btn btn-default" data-clipboard-target="#request{$request->id}">
+                                            <i class="fa fa-copy"></i>
+                                        </button>
+                                    </span>
+                                </div>
                             {elseif $request->status == \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_ACCEPTED}
                                 {_family.frontend.family_requests_statuses.status_accepted} {$request->accepted_at|localizedDate,true}
                                 <br>
@@ -206,6 +225,7 @@
                     <table class="table table-striped table-responsive">
                         <thead>
                             <tr>
+                                <th>{_family.components.master_family_subscription_info.modal.subscription_type}</th>
                                 <th>{_family.components.master_family_subscription_info.modal.status}</th>
                                 <th colspan="2">{_family.components.master_family_subscription_info.modal.activation_link}</th>
                                 <th>{_family.components.master_family_subscription_info.modal.slave_account|noescape}</th>
@@ -214,6 +234,9 @@
                         </thead>
                         <tbody>
                         <tr n:foreach="$subscriptionData['canceledFamilyRequests'] as $request">
+                            <td>
+                                {$request->subscription_type->name}
+                            </td>
                             <td>
                                 <span class="label label-default">{_family.frontend.family_requests_statuses.status_canceled}</span>
                             </td>

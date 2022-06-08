@@ -40,6 +40,52 @@ trait SeedFamilySubscriptionTypesTrait
 
         $this->familySubscriptionTypesRepository->add($masterSubscriptionType, $slaveSubscriptionType, 'copy', $familySubscriptionsCount);
 
+
         return [$masterSubscriptionType, $slaveSubscriptionType];
+    }
+
+    public function seedFamilyCustomizableSubscriptionType()
+    {
+        $slavePrintSubscriptionType = $this->subscriptionTypeBuilder
+            ->createNew()
+            ->setName('print_slave')
+            ->setCode('print_slave')
+            ->setUserLabel('')
+            ->setActive(true)
+            ->setPrice(0)
+            ->setLength(0)
+            ->setExtensionMethod(ExtendFamilyExtension::METHOD_CODE)
+            ->setContentAccessOption('print')
+            ->save();
+
+        $slaveWebSubscriptionType = $this->subscriptionTypeBuilder
+            ->createNew()
+            ->setName('print_slave')
+            ->setCode('print_slave')
+            ->setUserLabel('')
+            ->setActive(true)
+            ->setPrice(0)
+            ->setLength(0)
+            ->setExtensionMethod(ExtendFamilyExtension::METHOD_CODE)
+            ->setContentAccessOption('web')
+            ->save();
+
+        $masterSubscriptionType = $this->subscriptionTypeBuilder
+            ->createNew()
+            ->setName('customizable_parent')
+            ->setCode('slave_subscription')
+            ->setUserLabel('')
+            ->setActive(true)
+            ->setPrice(0)
+            ->addSubscriptionTypeItem('Print', 0, 20, ['family_slave_subscription_type_id' => $slavePrintSubscriptionType])
+            ->addSubscriptionTypeItem('Web', 0, 20, ['family_slave_subscription_type_id' => $slaveWebSubscriptionType])
+            ->setLength(0)
+            ->setExtensionMethod(ExtendFamilyExtension::METHOD_CODE)
+            ->setContentAccessOption('no_content')
+            ->save();
+
+        $this->familySubscriptionTypesRepository->add($masterSubscriptionType, null, 'copy', 0);
+
+        return [$masterSubscriptionType, $slavePrintSubscriptionType, $slaveWebSubscriptionType];
     }
 }

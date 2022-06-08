@@ -16,6 +16,7 @@ use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Crm\UsersModule\Auth\UserManager;
 use League\Event\Emitter;
 use Nette\Database\Table\ActiveRow;
+use Nette\Utils\DateTime;
 
 class FamilyRequestsTest extends BaseTestCase
 {
@@ -183,6 +184,54 @@ class FamilyRequestsTest extends BaseTestCase
         $familyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($subscription)
             ->where(['status' => FamilyRequestsRepository::STATUS_CREATED])->fetchAll();
         $this->assertCount(0, $familyRequests);
+    }
+
+    public function testWithCustomizableMasterSubscription()
+    {
+        [$masterSubscriptionType, $printSlaveSubscriptionType, $webSlaveSubscriptionType] = $this->seedFamilyCustomizableSubscriptionType();
+
+        $masterUser = $this->createUser('master@example.com');
+
+        $paymentItemContainer = new PaymentItemContainer();
+        $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
+            $webSlaveSubscriptionType->id,
+            $webSlaveSubscriptionType->name,
+            10,
+            20,
+            2
+        ));
+        $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
+            $printSlaveSubscriptionType->id,
+            $printSlaveSubscriptionType->name,
+            5,
+            20,
+            3
+        ));
+
+        $payment = $this->paymentsRepository->add(
+            $masterSubscriptionType,
+            $this->paymentGateway,
+            $masterUser,
+            $paymentItemContainer,
+            null,
+            1,
+            new DateTime()
+        );
+
+        $this->paymentsRepository->update($payment, ['paid_at' => new DateTime()]);
+        $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID);
+
+        $payment = $this->paymentsRepository->find($payment->id);
+        $subscription = $payment->subscription;
+
+        $requests = $this->familyRequests->createFromSubscription($payment->subscription);
+        $this->assertCount(5, $requests);
+
+        $familyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($subscription)
+            ->where(['status' => FamilyRequestsRepository::STATUS_CREATED]);
+
+        $this->assertSame(3, (clone $familyRequests)->where(['subscription_type_id' => $printSlaveSubscriptionType->id])->count('*'));
+        $this->assertSame(2, (clone $familyRequests)->where(['subscription_type_id' => $webSlaveSubscriptionType->id])->count('*'));
     }
 
     private function createUser($email)

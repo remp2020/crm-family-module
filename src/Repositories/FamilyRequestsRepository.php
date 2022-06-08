@@ -83,6 +83,9 @@ class FamilyRequestsRepository extends Repository
         ]);
     }
 
+    /**
+     * @deprecated Recommended to use userAlreadyHasSubscriptionFromMasterWithSubscriptionType()
+     */
     public function userAlreadyHasSubscriptionFrom(ActiveRow $masterSubscription, ActiveRow $user)
     {
         return $this->getTable()->where([
@@ -90,6 +93,19 @@ class FamilyRequestsRepository extends Repository
             'slave_user_id' => $user->id,
             'status' => self::STATUS_ACCEPTED
         ])->count('*') > 0;
+    }
+
+    public function userAlreadyHasSubscriptionFromMasterWithSubscriptionType(
+        ActiveRow $masterSubscription,
+        ActiveRow $user,
+        ActiveRow $subscriptionType
+    ): bool {
+        return $this->getTable()->where([
+                'master_subscription_id' => $masterSubscription->id,
+                'slave_user_id' => $user->id,
+                'subscription_type_id' => $subscriptionType->id,
+                'status' => self::STATUS_ACCEPTED
+            ])->count('*') > 0;
     }
 
     final public function slaveUserFamilyRequests(ActiveRow $user)

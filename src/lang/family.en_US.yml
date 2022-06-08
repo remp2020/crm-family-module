@@ -87,6 +87,7 @@ components:
                 wrong_status: 'Child subscription activation failed - activation code expired or used. Reload the page.'
             note: "Name of user <br><span class=\"note-info\">(used for your orientation)</span>"
             note_placeholder: Name of user
+        add_button: Add parent subscription
 
     slave_family_subscription_info:
         title: 'Child subscriptions'
@@ -101,3 +102,37 @@ components:
             is_paid: Paid
         child:
             title: Child subscription of company subscription types
+
+admin:
+    form:
+        request:
+            name: "New payment of family subscription for:"
+            subscription_type:
+                label: Subscription type
+            payment_gateway:
+                label: Payment gateway
+                required: Payment gateway is required
+            subscription_start_at:
+                label: Beginning of subscription
+                placeholder: e.g. 14.2.2022
+                required: Beginning of subscription is required
+                not_past: Beginning of subscription has to be in the future
+                description: "Necessary to fill only when you need to start subscription in the future. If the payment is confirmed later than the selected date, subscription will have start time of the confirmation."
+            subscription_end_at:
+                label: End of subscription
+                placeholder: e.g. 14.2.2022
+                required: End of subscription is required
+                not_past: End of subscription has to be in the future
+                description: "Necessary to fill only when you need to set end of subscription to specific date in the future explictly."
+            items: Items
+            item:
+                label: Item
+            price:
+                label: Unit price
+                required: Item's unit price is required
+                number: Item's unit price has to be positive numeric value
+            count:
+                label: Count
+                total: Total count of items has not to be null
+                number: Total count of items has to be positive numeric value
+            send: Add

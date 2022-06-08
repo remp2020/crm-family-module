@@ -45,6 +45,12 @@ services:
 	- Crm\FamilyModule\Seeders\SubscriptionExtensionMethodsSeeder
 	- Crm\FamilyModule\Seeders\SubscriptionTypeNamesSeeder
 
+	# forms
+	- Crm\FamilyModule\Forms\RequestFormFactory
+
+	# presenters
+	- Crm\FamilyModule\Presenters\RequestsAdminPresenter
+
 	- Crm\FamilyModule\Models\Extension\ExtendFamilyExtension
 	extensionMethodFactory:
 		setup:
