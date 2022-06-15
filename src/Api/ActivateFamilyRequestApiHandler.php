@@ -145,6 +145,17 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
                     'code' => 'family_request_expired',
                 ]);
                 return $response;
+            case DonateSubscription::ERROR_REQUEST_WRONG_STATUS:
+                $this->userActionsLogRepository->add(
+                    $user->id,
+                    'family.register.error.request-wrong-state',
+                    ['user_id' => $user->id, 'request' => $requestApi->code]
+                );
+                $response = new JsonApiResponse(Response::S409_CONFLICT, [
+                    'message' => "Family request code [$requestApi->code] has wrong status: {$familyRequest->status}",
+                    'code' => 'family_request_wrong_status',
+                ]);
+                return $response;
             default:
                 Debugger::log(
                     "Unknown error status [$connectResult] from family request activation of code [$requestApi->code].",

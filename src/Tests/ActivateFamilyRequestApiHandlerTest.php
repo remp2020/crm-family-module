@@ -89,7 +89,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
         [ , , $slaveUserWithoutAccepted, $familyRequests, ] = $this->prepareFamilyRequests();
 
         // select first unused code
-        $testFamilyRequest = reset($familyRequests);
+        $testFamilyRequest = next($familyRequests);
 
         // call & test API
         $this->handler->setRawPayload(json_encode(['code' => $testFamilyRequest->code]));
@@ -208,6 +208,20 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
         $payload = $response->getPayload();
         $this->assertEquals(Response::S400_BAD_REQUEST, $response->getCode());
         $this->assertEquals('family_request_self_use_forbidden', $payload['code']);
+    }
+
+    public function testActivationOfAlreadyActivatedRequest()
+    {
+        [$masterUser, , , , $acceptedFamilyRequest] = $this->prepareFamilyRequests();
+
+        $this->handler->setRawPayload(json_encode(['code' => $acceptedFamilyRequest->code]));
+        $this->handler->setAuthorization($this->getTestAuthorization($masterUser));
+        $response = $this->handler->handle([]); // TODO: fix params
+        $this->assertEquals(JsonApiResponse::class, get_class($response));
+        $this->assertEquals(Response::S409_CONFLICT, $response->getCode());
+
+        $payload = $response->getPayload();
+        $this->assertEquals('family_request_wrong_status', $payload['code']);
     }
 
     private function prepareFamilyRequests(): array

@@ -84,6 +84,7 @@ components:
             stop_confirm: "Naozaj chcete zastaviť dcérske predplatné pre %email%?"
             error:
                 not_registered: 'E-mail nie je zaregistrovaný <i class="fa fa-question-circle" style="margin: auto;" data-toggle="tooltip" title="V prípade, že konto so zadanou e-mailovou adresou ešte neexistuje, je potrebné ho vytvoriť cez aktivačný odkaz"></i>'
+                wrong_status: 'Nepodarilo sa aktivovať dcérske predplatné - aktivačný kód je expirovaný alebo použitý. Znovu načítajte stránku.'
             note: "Meno používateľa <br><span class=\"note-info\">(slúži pre vašu orientáciu)</span>"
             note_placeholder: Meno používateľa
 

@@ -93,8 +93,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
     {
         $user = $this->usersRepository->getByEmail($this->presenter->getParameter('email'));
         if (!$user) {
-            $presenter = $this->getPresenter();
-            $presenter->sendJson([
+            $this->getPresenter()->sendJson([
                 'status' => 'error',
                 'message' => $this->translator->translate('family.components.master_family_subscription_info.modal.error.not_registered'),
             ]);
@@ -105,7 +104,14 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
             return;
         }
 
-        $this->donateSubscription->connectFamilyUser($user, $familyRequest);
+        $donateResponse = $this->donateSubscription->connectFamilyUser($user, $familyRequest);
+        if (is_string($donateResponse) && $donateResponse === DonateSubscription::ERROR_REQUEST_WRONG_STATUS) {
+            $this->getPresenter()->sendJson([
+                'status' => 'error',
+                'message' => $this->translator->translate('family.components.master_family_subscription_info.modal.error.wrong_status'),
+            ]);
+        }
+
         $this->redirect('this');
     }
 

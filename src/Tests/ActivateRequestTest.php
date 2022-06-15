@@ -89,6 +89,34 @@ class ActivateRequestTest extends BaseTestCase
         $this->assertEquals(DonateSubscription::ERROR_MASTER_SUBSCRIPTION_EXPIRED, $this->donateSubscription->connectFamilyUser($slaveUser1, $request));
     }
 
+    public function testActivateAlreadyActivatedRequest()
+    {
+        [$masterSubscriptionType, ] = $this->seedFamilySubscriptionTypes();
+
+        $masterUser = $this->userWithRegDate('master@example.com');
+        $slaveUser1 = $this->userWithRegDate('slave1@example.com');
+
+        // Generate master subscription for previous month + handler generates family requests
+        $subscriptions = $this->subscriptionGenerator->generate(new SubscriptionsParams(
+            $masterSubscriptionType,
+            $masterUser,
+            'family',
+            new DateTime('now'),
+            new DateTime('now + 1 day'),
+            true
+        ), 1);
+
+        // Grab one of the requests (there should be 5 of them)
+        $requests = $this->familyRequestsRepository->masterSubscriptionUnusedFamilyRequests($subscriptions[0])->fetchAll();
+        $request = current($requests);
+
+        // Update state to wrong one
+        $this->familyRequestsRepository->cancelCreatedRequests($masterUser);
+        $request = $this->familyRequestsRepository->find($request->id);
+
+        $this->assertEquals(DonateSubscription::ERROR_REQUEST_WRONG_STATUS, $this->donateSubscription->connectFamilyUser($slaveUser1, $request));
+    }
+
     private function userWithRegDate($email, $regDateString = '2020-01-01 01:00:00')
     {
         $user = $this->userManager->addNewUser($email, false, 'unknown', null, false);

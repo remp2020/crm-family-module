@@ -21,6 +21,7 @@ class DonateSubscription
     public const ERROR_IN_USE = 'error-in-use'; // TODO: remp/crm/#1360 rename this constant; name isn't self explanatory (eg. ERROR_ONE_PER_USER)
     public const ERROR_SELF_USE = 'error-self-use';
     public const ERROR_MASTER_SUBSCRIPTION_EXPIRED = 'master-subscription-expired';
+    public const ERROR_REQUEST_WRONG_STATUS = 'error-request-wrong-status';
 
     private $subscriptionsRepository;
 
@@ -67,6 +68,10 @@ class DonateSubscription
 
         if ($masterSubscription->end_time <= $this->getNow() || ($familyRequest->expires_at && $familyRequest->expires_at <= $this->getNow())) {
             return self::ERROR_MASTER_SUBSCRIPTION_EXPIRED;
+        }
+
+        if ($familyRequest->status !== FamilyRequestsRepository::STATUS_CREATED) {
+            return self::ERROR_REQUEST_WRONG_STATUS;
         }
 
         $slaveSubscription = null;
