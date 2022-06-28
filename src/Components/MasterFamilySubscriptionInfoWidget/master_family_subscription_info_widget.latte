@@ -73,7 +73,7 @@
                         {$subscription->subscription_type->user_label}
                     {/if}
                     <br>
-                    <small>{$subscription->start_time|userDate} - {$subscription->end_time|userDate}</small>
+                    <small>{$subscription->start_time|localizedDate} - {$subscription->end_time|localizedDate}</small>
                 </td>
                 <td style="white-space: nowrap;">
                     <span data-toggle="tooltip" data-placement="top"
@@ -111,7 +111,7 @@
                 </h1>
                 {$subscriptionData['familyType']->slave_subscription_type|typeContent|noescape}
                 <br>
-                <b>{$subscription->start_time|userDate,true} - {$subscription->end_time|userDate,true}</b>
+                <b>{$subscription->start_time|localizedDate,true} - {$subscription->end_time|localizedDate,true}</b>
             </div>
             <div class="modal-body">
                 <table class="table table-striped table-responsive">
@@ -149,7 +149,7 @@
                                     <i class="fa fa-copy"></i> {_family.components.master_family_subscription_info.modal.copy_to_clipboard}
                                 </button>
                             {elseif $request->status == \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_ACCEPTED}
-                                {_family.frontend.family_requests_statuses.status_accepted} {$request->accepted_at|userDate,true}
+                                {_family.frontend.family_requests_statuses.status_accepted} {$request->accepted_at|localizedDate,true}
                                 <br>
                             {/if}
                         </td>
@@ -224,7 +224,7 @@
                                        title="{plink //:Family:Requests:default $request->code}" style="cursor: text;">
                             </td>
                             <td>
-                                {_family.frontend.family_requests_statuses.status_canceled} {$request->canceled_at|userDate,true}
+                                {_family.frontend.family_requests_statuses.status_canceled} {$request->canceled_at|localizedDate,true}
                             </td>
                             <td>
                                 {if $request->slave_user_id}
