@@ -10,7 +10,7 @@ use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Crm\UsersModule\Repository\UsersRepository;
-use Kdyby\Translation\ITranslator;
+use Nette\Localization\Translator;
 
 class MasterFamilySubscriptionInfoWidget extends BaseWidget
 {
@@ -34,7 +34,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
         FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
         UsersRepository $usersRepository,
         DonateSubscription $donateSubscription,
-        ITranslator $translator,
+        Translator $translator,
         SubscriptionsRepository $subscriptionsRepository
     ) {
         parent::__construct($widgetManager);

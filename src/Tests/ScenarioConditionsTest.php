@@ -2,6 +2,7 @@
 
 namespace Crm\FamilyModule\Tests;
 
+use Contributte\Translation\Translator;
 use Crm\ApplicationModule\Criteria\ScenariosCriteriaStorage;
 use Crm\FamilyModule\Events\NewSubscriptionHandler;
 use Crm\FamilyModule\FamilyModule;
@@ -19,7 +20,6 @@ use Crm\SubscriptionsModule\Generator\SubscriptionsGenerator;
 use Crm\SubscriptionsModule\Generator\SubscriptionsParams;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Crm\UsersModule\Auth\UserManager;
-use Kdyby\Translation\Translator;
 use League\Event\Emitter;
 use Nette\Utils\DateTime;
 

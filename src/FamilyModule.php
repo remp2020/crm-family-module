@@ -2,6 +2,7 @@
 
 namespace Crm\FamilyModule;
 
+use Contributte\Translation\Translator;
 use Crm\ApiModule\Api\ApiRoutersContainerInterface;
 use Crm\ApiModule\Router\ApiIdentifier;
 use Crm\ApiModule\Router\ApiRoute;
@@ -15,7 +16,6 @@ use Crm\FamilyModule\Models\Scenarios\IsFamilySlaveCriteria;
 use Crm\FamilyModule\Seeders\FamilySeeder;
 use Crm\FamilyModule\Seeders\SubscriptionExtensionMethodsSeeder;
 use Crm\FamilyModule\Seeders\SubscriptionTypeNamesSeeder;
-use Kdyby\Translation\Translator;
 use League\Event\Emitter;
 use Nette\DI\Container;
 use Symfony\Component\Console\Output\OutputInterface;
