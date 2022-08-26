@@ -3,8 +3,8 @@
 namespace Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget;
 
 use Crm\AdminModule\Presenters\AdminPresenter;
-use Crm\ApplicationModule\Widget\BaseWidget;
-use Crm\ApplicationModule\Widget\WidgetManager;
+use Crm\ApplicationModule\Widget\BaseLazyWidget;
+use Crm\ApplicationModule\Widget\LazyWidgetManager;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
@@ -12,7 +12,7 @@ use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Crm\UsersModule\Repository\UsersRepository;
 use Nette\Localization\Translator;
 
-class MasterFamilySubscriptionInfoWidget extends BaseWidget
+class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
 {
     private $templateName = 'master_family_subscription_info_widget.latte';
 
@@ -29,7 +29,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
     private $subscriptionsRepository;
 
     public function __construct(
-        WidgetManager $widgetManager,
+        LazyWidgetManager $lazyWidgetManager,
         FamilyRequestsRepository $familyRequestsRepository,
         FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
         UsersRepository $usersRepository,
@@ -37,7 +37,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseWidget
         Translator $translator,
         SubscriptionsRepository $subscriptionsRepository
     ) {
-        parent::__construct($widgetManager);
+        parent::__construct($lazyWidgetManager);
 
         $this->familyRequestsRepository = $familyRequestsRepository;
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;

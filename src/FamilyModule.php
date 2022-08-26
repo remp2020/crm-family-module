@@ -9,7 +9,7 @@ use Crm\ApiModule\Router\ApiRoute;
 use Crm\ApplicationModule\Criteria\ScenariosCriteriaStorage;
 use Crm\ApplicationModule\CrmModule;
 use Crm\ApplicationModule\SeederManager;
-use Crm\ApplicationModule\Widget\WidgetManagerInterface;
+use Crm\ApplicationModule\Widget\LazyWidgetManagerInterface;
 use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Models\Scenarios\IsFamilyMasterCriteria;
 use Crm\FamilyModule\Models\Scenarios\IsFamilySlaveCriteria;
@@ -70,31 +70,31 @@ class FamilyModule extends CrmModule
         );
     }
 
-    public function registerWidgets(WidgetManagerInterface $widgetManager)
+    public function registerLazyWidgets(LazyWidgetManagerInterface $widgetManager)
     {
         $widgetManager->registerWidget(
             'admin.user.abusive.additional',
-            $this->getInstance(\Crm\FamilyModule\Components\UsersAbusiveAdditionalWidget\UsersAbusiveAdditionalWidget::class)
+            \Crm\FamilyModule\Components\UsersAbusiveAdditionalWidget\UsersAbusiveAdditionalWidget::class
         );
 
         $widgetManager->registerWidget(
             'dashboard.simplewidget.additional',
-            $this->getInstance(\Crm\FamilyModule\Components\FamilyRequestsDashboardWidget\FamilyRequestsDashboardWidget::class)
+            \Crm\FamilyModule\Components\FamilyRequestsDashboardWidget\FamilyRequestsDashboardWidget::class
         );
 
         $widgetManager->registerWidget(
             'admin.user.detail.center',
-            $this->getInstance(\Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget\MasterFamilySubscriptionInfoWidget::class)
+            \Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget\MasterFamilySubscriptionInfoWidget::class
         );
 
         $widgetManager->registerWidget(
             'admin.user.detail.center',
-            $this->getInstance(\Crm\FamilyModule\Components\SlaveFamilySubscriptionInfoWidget\SlaveFamilySubscriptionInfoWidget::class)
+            \Crm\FamilyModule\Components\SlaveFamilySubscriptionInfoWidget\SlaveFamilySubscriptionInfoWidget::class
         );
 
         $widgetManager->registerWidget(
             'subscription_types_admin.show.right',
-            $this->getInstance(\Crm\FamilyModule\Components\FamilySubscriptionTypeDetailsWidget\FamilySubscriptionTypeDetailsWidget::class),
+            \Crm\FamilyModule\Components\FamilySubscriptionTypeDetailsWidget\FamilySubscriptionTypeDetailsWidget::class,
             200
         );
     }

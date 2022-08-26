@@ -2,14 +2,14 @@
 
 namespace Crm\FamilyModule\Components\UsersAbusiveAdditionalWidget;
 
-use Crm\ApplicationModule\Widget\BaseWidget;
-use Crm\ApplicationModule\Widget\WidgetManager;
+use Crm\ApplicationModule\Widget\BaseLazyWidget;
+use Crm\ApplicationModule\Widget\LazyWidgetManager;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
 
-class UsersAbusiveAdditionalWidget extends BaseWidget
+class UsersAbusiveAdditionalWidget extends BaseLazyWidget
 {
     private $templateName = 'users_abusive_additional_widget.latte';
 
@@ -18,11 +18,11 @@ class UsersAbusiveAdditionalWidget extends BaseWidget
     private $familySubscriptionTypesRepository;
 
     public function __construct(
-        WidgetManager $widgetManager,
+        LazyWidgetManager $lazyWidgetManager,
         FamilyRequestsRepository $familyRequestsRepository,
         FamilySubscriptionTypesRepository $familySubscriptionTypesRepository
     ) {
-        parent::__construct($widgetManager);
+        parent::__construct($lazyWidgetManager);
         $this->familyRequestsRepository = $familyRequestsRepository;
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
     }

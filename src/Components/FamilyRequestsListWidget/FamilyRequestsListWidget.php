@@ -2,8 +2,8 @@
 
 namespace Crm\FamilyModule\Components\FamilyRequestsListWidget;
 
-use Crm\ApplicationModule\Widget\BaseWidget;
-use Crm\ApplicationModule\Widget\WidgetManager;
+use Crm\ApplicationModule\Widget\BaseLazyWidget;
+use Crm\ApplicationModule\Widget\LazyWidgetManager;
 use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Models\MissingFamilySubscriptionTypeException;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
@@ -12,7 +12,7 @@ use Nette\Localization\Translator;
 use Nette\Security\User;
 use Tracy\Debugger;
 
-class FamilyRequestsListWidget extends BaseWidget
+class FamilyRequestsListWidget extends BaseLazyWidget
 {
     private $templateName = 'family_requests_list_widget.latte';
 
@@ -27,14 +27,14 @@ class FamilyRequestsListWidget extends BaseWidget
     private $translator;
 
     public function __construct(
-        WidgetManager $widgetManager,
+        LazyWidgetManager $lazyWidgetManager,
         User $user,
         FamilyRequests $familyRequests,
         FamilyRequestsRepository $familyRequestsRepository,
         SubscriptionsRepository $subscriptionsRepository,
         Translator $translator
     ) {
-        parent::__construct($widgetManager);
+        parent::__construct($lazyWidgetManager);
         $this->familyRequests = $familyRequests;
         $this->familyRequestsRepository = $familyRequestsRepository;
         $this->subscriptionsRepository = $subscriptionsRepository;

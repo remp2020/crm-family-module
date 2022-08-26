@@ -3,12 +3,12 @@
 
 namespace Crm\FamilyModule\Components\SlaveFamilySubscriptionInfoWidget;
 
-use Crm\ApplicationModule\Widget\BaseWidget;
-use Crm\ApplicationModule\Widget\WidgetManager;
+use Crm\ApplicationModule\Widget\BaseLazyWidget;
+use Crm\ApplicationModule\Widget\LazyWidgetManager;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\UsersModule\Repository\UsersRepository;
 
-class SlaveFamilySubscriptionInfoWidget extends BaseWidget
+class SlaveFamilySubscriptionInfoWidget extends BaseLazyWidget
 {
     private $templateName = 'slave_family_subscription_info_widget.latte';
 
@@ -17,11 +17,11 @@ class SlaveFamilySubscriptionInfoWidget extends BaseWidget
     private $usersRepository;
 
     public function __construct(
-        WidgetManager $widgetManager,
+        LazyWidgetManager $lazyWidgetManager,
         FamilyRequestsRepository $familyRequestsRepository,
         UsersRepository $usersRepository
     ) {
-        parent::__construct($widgetManager);
+        parent::__construct($lazyWidgetManager);
 
         $this->familyRequestsRepository = $familyRequestsRepository;
         $this->usersRepository = $usersRepository;

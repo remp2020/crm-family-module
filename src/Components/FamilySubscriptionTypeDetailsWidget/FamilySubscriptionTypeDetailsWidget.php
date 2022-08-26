@@ -2,22 +2,22 @@
 
 namespace Crm\FamilyModule\Components\FamilySubscriptionTypeDetailsWidget;
 
-use Crm\ApplicationModule\Widget\BaseWidget;
-use Crm\ApplicationModule\Widget\WidgetManager;
+use Crm\ApplicationModule\Widget\BaseLazyWidget;
+use Crm\ApplicationModule\Widget\LazyWidgetManager;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Nette\Database\Table\ActiveRow;
 
-class FamilySubscriptionTypeDetailsWidget extends BaseWidget
+class FamilySubscriptionTypeDetailsWidget extends BaseLazyWidget
 {
     private $templateName = 'family_subscription_type_details_widget.latte';
 
     private $familySubscriptionTypesRepository;
 
     public function __construct(
-        WidgetManager $widgetManager,
+        LazyWidgetManager $lazyWidgetManager,
         FamilySubscriptionTypesRepository $familySubscriptionTypesRepository
     ) {
-        parent::__construct($widgetManager);
+        parent::__construct($lazyWidgetManager);
 
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
     }

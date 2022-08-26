@@ -2,21 +2,21 @@
 
 namespace Crm\FamilyModule\Components\FamilyRequestsDashboardWidget;
 
-use Crm\ApplicationModule\Widget\BaseWidget;
-use Crm\ApplicationModule\Widget\WidgetManager;
+use Crm\ApplicationModule\Widget\BaseLazyWidget;
+use Crm\ApplicationModule\Widget\LazyWidgetManager;
 use Crm\FamilyModule\Models\FamilyRequests;
 
-class FamilyRequestsDashboardWidget extends BaseWidget
+class FamilyRequestsDashboardWidget extends BaseLazyWidget
 {
     private $templateName = 'family_requests_dashboard_widget.latte';
 
     private $familyRequests;
 
     public function __construct(
-        WidgetManager $widgetManager,
+        LazyWidgetManager $lazyWidgetManager,
         FamilyRequests $familyRequests
     ) {
-        parent::__construct($widgetManager);
+        parent::__construct($lazyWidgetManager);
 
         $this->familyRequests = $familyRequests;
     }
