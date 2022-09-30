@@ -129,7 +129,7 @@ admin:
             item:
                 label: Položka
             price:
-                label: Jednotková cena
+                label: Jednotková cena s DPH
                 required: Jednotková cena položky musí byť vyplnená
                 number: Jednotková cena položky musí byť kladná číselná hodnota
             count:
@@ -137,3 +137,5 @@ admin:
                 total: Celkový počet položiek nemože byť nulový
                 number: Celkový počet položiek musí byť kladná číselná hodnota
             send: Pridaj
+            note:
+                payment_without_vat: Platba bez DPH? Kontaktujte účtovné oddelenie.

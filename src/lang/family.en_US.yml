@@ -128,7 +128,7 @@ admin:
             item:
                 label: Item
             price:
-                label: Unit price
+                label: Unit price with VAT
                 required: Item's unit price is required
                 number: Item's unit price has to be positive numeric value
             count:
@@ -136,3 +136,5 @@ admin:
                 total: Total count of items has not to be null
                 number: Total count of items has to be positive numeric value
             send: Add
+            note:
+                payment_without_vat: Payment without VAT? Contact accounting department.

@@ -1,6 +1,12 @@
 {block #content}
 
 <div class="row">
+    <div class="col-md-12">
+        <a href="{plink :Users:UsersAdmin:Show $user->id}"><i class="fa fa-angle-left"></i> {_users.admin.edit.back_to_detail}</a>
+    </div>
+</div>
+
+<div class="row">
     <div class="col-md-8 col-md-offset-2">
         <div class="page-header">
             <h2>
@@ -78,10 +84,12 @@
                                     </div>
                                 {/formContainer}
                             {/foreach}
+                            <div class="col-md-offset-2 col-md-3 text-muted">{_family.admin.form.request.note.payment_without_vat}</div>
                         {/formContainer}
                 </fieldset>
                 {/foreach}
             </div>
+            <br>
 
             <div class="form-group">
                 <div class="control-label col-md-2">
