@@ -16,42 +16,25 @@ use Nette\Application\UI\Form;
 use Nette\Forms\Controls\TextInput;
 use Nette\Localization\Translator;
 use Nette\Utils\DateTime;
+use Tracy\Debugger;
 
 class RequestFormFactory
 {
     private const MANUAL_SUBSCRIPTION_START = 'start_at';
     private const MANUAL_SUBSCRIPTION_START_END = 'start_end_at';
 
-    private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository;
-
-    private SubscriptionTypesRepository $subscriptionTypesRepository;
-
-    private SubscriptionTypeItemMetaRepository $subscriptionTypeItemMetaRepository;
-
-    private PaymentGatewaysRepository $paymentGatewaysRepository;
-
-    private PaymentsRepository $paymentsRepository;
-
-    private Translator $translator;
-
-    private $user;
+    private ActiveRow $user;
 
     public $onSave;
 
     public function __construct(
-        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
-        SubscriptionTypesRepository $subscriptionTypesRepository,
-        SubscriptionTypeItemMetaRepository $subscriptionTypeItemMetaRepository,
-        PaymentGatewaysRepository $paymentGatewaysRepository,
-        PaymentsRepository $paymentsRepository,
-        Translator $translator
+        private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
+        private SubscriptionTypesRepository $subscriptionTypesRepository,
+        private SubscriptionTypeItemMetaRepository $subscriptionTypeItemMetaRepository,
+        private PaymentGatewaysRepository $paymentGatewaysRepository,
+        private PaymentsRepository $paymentsRepository,
+        private Translator $translator
     ) {
-        $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
-        $this->subscriptionTypesRepository = $subscriptionTypesRepository;
-        $this->subscriptionTypeItemMetaRepository = $subscriptionTypeItemMetaRepository;
-        $this->paymentGatewaysRepository = $paymentGatewaysRepository;
-        $this->paymentsRepository = $paymentsRepository;
-        $this->translator = $translator;
     }
 
     public function create(ActiveRow $user): Form
@@ -213,13 +196,26 @@ class RequestFormFactory
                     throw new \Exception("No slave subscription type found with ID: {$subscriptionTypeItemMeta->value}");
                 }
 
+                // load meta from subscription type item & merge with new information
+                $slaveSubscriptionTypeItems = $slaveSubscriptionType->related('subscription_type_items')->fetchAll();
+                if (count($slaveSubscriptionTypeItems) > 1) {
+                    throw new \Exception("There should be only one subscription type item for " .
+                    "child subscription type [ID: {$slaveSubscriptionType->id}] of configurable family/company subscription [ID: {$subscriptionType->id}]. " .
+                    "Otherwise number of payment items won't match number of configurable subscription type items.");
+                }
+                $slaveSubscriptionTypeItem = reset($slaveSubscriptionTypeItems);
+                $metas = array_merge(
+                    $this->subscriptionTypeItemMetaRepository->findBySubscriptionTypeItem($slaveSubscriptionTypeItem)->fetchPairs('key', 'value'),
+                    ['subscription_type_item_id' => $subscriptionTypeItem->id]
+                );
+
                 $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
                     $slaveSubscriptionType->id,
                     $subscriptionTypeItem->name,
                     $values[$subscriptionType->id][$id]['price'],
                     $subscriptionTypeItem->vat,
                     $values[$subscriptionType->id][$id]['count'],
-                    ['subscription_type_item_id' => $subscriptionTypeItem->id]
+                    $metas
                 ));
             }
         }
