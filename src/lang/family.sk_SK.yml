@@ -88,7 +88,7 @@ components:
                 wrong_status: 'Nepodarilo sa aktivovať dcérske predplatné - aktivačný kód je expirovaný alebo použitý. Znovu načítajte stránku.'
             note: "Meno používateľa <br><span class=\"note-info\">(slúži pre vašu orientáciu)</span>"
             note_placeholder: Meno používateľa
-        add_button: Pridaj rodičovské predplatné
+        add_button: Pridaj firemné konfigurovateľné predplatné
 
     slave_family_subscription_info:
         title: 'Dcérske predplatné'
