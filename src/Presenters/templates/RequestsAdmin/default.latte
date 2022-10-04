@@ -7,7 +7,7 @@
 </div>
 
 <div class="row">
-    <div class="col-md-8 col-md-offset-2">
+    <div class="col-md-10 col-md-offset-1">
         <div class="page-header">
             <h2>
                 {_family.admin.form.request.name} <small>{$user->public_name}</small>
@@ -16,88 +16,86 @@
     </div>
 </div>
 
-<div class="row">
-    <fieldset class="col-md-8 col-md-offset-2">
-        {form requestForm, class => 'form-horizontal'}
+<div class="container fluid" style="padding: 0;">
+    {form requestForm, class => 'form-horizontal'}
+        <fieldset class="col-md-10" style="padding: 0;">
             <div n:if="$form->getErrors()" n:inner-foreach="$form->getErrors() as $error" class="alert alert-danger" role="alert">
                 {$error}<br>
             </div>
             <div class="form-group">
-                <div class="control-label col-md-3">
+                <div class="control-label col-md-4 col-sm-4">
                     {label subscription_type_id /}
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-8 col-sm-8">
                     {input subscription_type_id, class => 'form-control'}
                 </div>
             </div>
 
             <div class="form-group">
-                <div class="control-label col-md-3">
+                <div class="control-label col-md-4 col-sm-4">
                     {label payment_gateway_id /}
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-8 col-sm-8">
                     {input payment_gateway_id, class => 'form-control'}
                 </div>
             </div>
 
             <div class="form-group">
-                <div class="control-label col-md-3">
+                <div class="control-label col-md-4 col-sm-4">
                     {label manual_subscription /}
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-8 col-sm-8">
                     {input manual_subscription, class => 'form-control'}
                 </div>
             </div>
 
             <div id="subscription-start-at" class="form-group" hidden>
-                <div class="control-label col-md-2">
+                <div class="control-label col-md-4 col-sm-4">
                     {label subscription_start_at /}
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-8 col-sm-8">
                     {input subscription_start_at}
                     <span class="help-block">{_family.admin.form.request.subscription_start_at.description}</span>
                 </div>
             </div>
 
             <div id="subscription-end-at" class="form-group" hidden>
-                <div class="control-label col-md-2">
+                <div class="control-label col-md-4 col-sm-4">
                     {label subscription_end_at /}
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-8 col-sm-8">
                     {input subscription_end_at}
                     <span class="help-block">{_family.admin.form.request.subscription_end_at.description}</span>
                 </div>
             </div>
+        </fieldset>
 
-            <div>
-                <legend><span data-tag="iterator"></span>{_family.admin.form.request.items}</legend>
-                {foreach $subscriptionTypes as $subscriptionType}
-                {var $masterSubscriptionType = $subscriptionType->ref('subscription_types', 'master_subscription_type_id')}
-                <fieldset id="container-{$masterSubscriptionType->id}" hidden>
-                        {formContainer $masterSubscriptionType->id}
-                            {foreach $masterSubscriptionType->related('subscription_type_items') as $item}
-                                {formContainer $item->id}
-                                    <div class="form-group">
-                                        <div class="control-label col-md-3"><label for="count">{$item->name}</label></div>
-                                        <div class="col-md-1">{input count, class => 'form-control'}</div>
-                                        <div class="col-md-2">{input price, class => 'form-control'}</div>
-                                    </div>
-                                {/formContainer}
-                            {/foreach}
-                            <div class="col-md-offset-2 col-md-3 text-muted">{_family.admin.form.request.note.payment_without_vat}</div>
+        <!-- Items for every master subscription type -->
+        {foreach $subscriptionTypes as $subscriptionType}
+        {var $masterSubscriptionType = $subscriptionType->ref('subscription_types', 'master_subscription_type_id')}
+        <fieldset id="container-{$masterSubscriptionType->id}" class="col-md-10" style="padding: 0;" hidden>
+            <legend>{_family.admin.form.request.items}</legend>
+                {formContainer $masterSubscriptionType->id}
+                    {foreach $masterSubscriptionType->related('subscription_type_items') as $item}
+                        {formContainer $item->id}
+                            <div class="form-group">
+                                <div class="control-label col-md-4 col-sm-5 col-xs-12"><label for="count">{$item->name}</label></div>
+                                <div class="col-md-2 col-sm-2 col-xs-5">{input count, class => 'form-control'}</div>
+                                <div class="col-lg-3 col-md-4 col-sm-4 col-xs-7">{input price, class => 'form-control'}</div>
+                            </div>
                         {/formContainer}
-                </fieldset>
-                {/foreach}
-            </div>
-            <br>
+                    {/foreach}
+                    <div class="col-md-6 col-md-offset-4 col-sm-7 col-sm-offset-5 col-xs-12 text-muted">{_family.admin.form.request.note.payment_without_vat}</div>
+                {/formContainer}
+        </fieldset>
+        {/foreach}
 
+        <div class="col-md-10">
             <div class="form-group">
-                <div class="control-label col-md-3">
-                </div>
-                <div class="col-md-4">
+                <div class="col-md-2 col-md-offset-4 col-sm-offset-5" style="margin-top: 2em;">
                     {input send, class => 'btn btn-primary'}
                 </div>
             </div>
-        {/form}
-    </div>
+        </div>
+    {/form}
 </div>
