@@ -3,6 +3,7 @@
 namespace Crm\FamilyModule\Forms;
 
 use Crm\ApplicationModule\ActiveRow;
+use Crm\ApplicationModule\Helpers\PriceHelper;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\InvoicesModule\Gateways\ProformaInvoice;
 use Crm\PaymentsModule\Gateways\BankTransfer;
@@ -32,6 +33,7 @@ class RequestFormFactory
         private SubscriptionTypeItemMetaRepository $subscriptionTypeItemMetaRepository,
         private PaymentGatewaysRepository $paymentGatewaysRepository,
         private PaymentsRepository $paymentsRepository,
+        private PriceHelper $priceHelper,
         private Translator $translator
     ) {
     }
@@ -127,6 +129,14 @@ class RequestFormFactory
                     ->addRule(Form::MIN, 'family.admin.form.request.price.number', 0)
                     ->addConditionOn($formItems[$id][$item->id]['count'], Form::NOT_EQUAL, 0)
                     ->setRequired('family.admin.form.request.price.required');
+
+                if ($item->amount > 0) {
+                    $amount = $this->priceHelper->getFormattedPrice($item->amount);
+                    $formItems[$id][$item->id]['price']
+                        ->setDefaultValue($amount)
+                        ->setHtmlAttribute('placeholder', $amount)
+                    ;
+                }
             }
         }
 
