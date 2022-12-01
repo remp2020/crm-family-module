@@ -131,7 +131,7 @@ class RequestFormFactory
                     ->setRequired('family.admin.form.request.price.required');
 
                 if ($item->amount > 0) {
-                    $amount = $this->priceHelper->getFormattedPrice($item->amount);
+                    $amount = $this->priceHelper->getFormattedPrice(value: $item->amount, withoutCurrencySymbol: true);
                     $formItems[$id][$item->id]['price']
                         ->setDefaultValue($amount)
                         ->setHtmlAttribute('placeholder', $amount)
