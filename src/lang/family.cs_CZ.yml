@@ -73,6 +73,7 @@ components:
             total_tooltip: 'Počet vygenerovaných přístupů'
             canceled_tooltip: 'Počet zrušených přístupů: %number%'
         modal:
+            subscription_type: Typ
             status: Stav
             activation_link: Aktivační odkaz
             slave_account: 'Dceřiné konto <i class="fa fa-question-circle" style="margin: auto;" data-toggle="tooltip" title="V případě, že účet se zadanou e-mailovou adresou ještě neexistuje, je třeba jej vytvořit přes aktivační odkaz."></i>'
