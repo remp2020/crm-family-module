@@ -90,7 +90,7 @@
                         <div class="col-md-2 col-sm-2 col-xs-5" style="padding-left: 2em">{_family.admin.form.request.count.label}</div>
                         <div class="col-md-3 col-sm-4 col-xs-7" style="padding-left: 2em">{_family.admin.form.request.price.label}</div>
                     </div>
-                    {foreach $masterSubscriptionType->related('subscription_type_items') as $item}
+                    {foreach $masterSubscriptionType->related('subscription_type_items')->where('deleted_at', null) as $item}
                         {formContainer $item->id}
                             <div class="form-group">
                                 <div class="col-md-4 col-sm-5 col-xs-12 item-name">{input name, class => 'form-control'}</div>

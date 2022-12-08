@@ -14,6 +14,7 @@ use Crm\PaymentsModule\Repository\PaymentGatewaysRepository;
 use Crm\PaymentsModule\Repository\PaymentsRepository;
 use Crm\SubscriptionsModule\PaymentItem\SubscriptionTypePaymentItem;
 use Crm\SubscriptionsModule\Repository\SubscriptionTypeItemMetaRepository;
+use Crm\SubscriptionsModule\Repository\SubscriptionTypeItemsRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionTypesRepository;
 use Crm\UsersModule\DataProvider\AddressFormDataProviderInterface;
 use Nette\Application\UI\Form;
@@ -33,6 +34,7 @@ class RequestFormFactory
     public function __construct(
         private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
         private SubscriptionTypesRepository $subscriptionTypesRepository,
+        private SubscriptionTypeItemsRepository $subscriptionTypeItemsRepository,
         private SubscriptionTypeItemMetaRepository $subscriptionTypeItemMetaRepository,
         private PaymentGatewaysRepository $paymentGatewaysRepository,
         private PaymentsRepository $paymentsRepository,
@@ -116,10 +118,11 @@ class RequestFormFactory
 
         $formItems = [];
         foreach ($customSubscriptionTypes as $id => $customSubscriptionType) {
+            /** @var ActiveRow $masterCustomSubscriptionType */
             $masterCustomSubscriptionType = $customSubscriptionType->ref('subscription_types', 'master_subscription_type_id');
             $container = $form->addContainer($masterCustomSubscriptionType->id);
 
-            foreach ($masterCustomSubscriptionType->related('subscription_type_items') as $item) {
+            foreach ($this->subscriptionTypeItemsRepository->getItemsForSubscriptionType($masterCustomSubscriptionType) as $item) {
                 $formItems[$id][$item->id] = $container->addContainer($item->id);
 
                 $formItems[$id][$item->id]->addInteger('count', 'family.admin.form.request.count.label')
@@ -212,7 +215,7 @@ class RequestFormFactory
         $user = $this->user;
         $paymentItemContainer = new PaymentItemContainer();
 
-        foreach ($subscriptionType->related('subscription_type_items') as $id => $subscriptionTypeItem) {
+        foreach ($this->subscriptionTypeItemsRepository->getItemsForSubscriptionType($subscriptionType) as $id => $subscriptionTypeItem) {
             if (isset($values[$subscriptionType->id][$id]['count']) && $values[$subscriptionType->id][$id]['count'] > 0) {
                 $subscriptionTypeItemMeta = $this->subscriptionTypeItemMetaRepository
                     ->findBySubscriptionTypeItemAndKey($subscriptionTypeItem, 'family_slave_subscription_type_id')
@@ -227,17 +230,14 @@ class RequestFormFactory
                 }
 
                 // load meta from subscription type item & merge with new information
-                $slaveSubscriptionTypeItems = $slaveSubscriptionType->related('subscription_type_items')->fetchAll();
+                $slaveSubscriptionTypeItems = $this->subscriptionTypeItemsRepository->getItemsForSubscriptionType($slaveSubscriptionType)->fetchAll();
                 if (count($slaveSubscriptionTypeItems) > 1) {
                     throw new \Exception("There should be only one subscription type item for " .
                     "child subscription type [ID: {$slaveSubscriptionType->id}] of configurable family/company subscription [ID: {$subscriptionType->id}]. " .
                     "Otherwise number of payment items won't match number of configurable subscription type items.");
                 }
                 $slaveSubscriptionTypeItem = reset($slaveSubscriptionTypeItems);
-                $metas = array_merge(
-                    $this->subscriptionTypeItemMetaRepository->findBySubscriptionTypeItem($slaveSubscriptionTypeItem)->fetchPairs('key', 'value'),
-                    ['subscription_type_item_id' => $subscriptionTypeItem->id]
-                );
+                $metas = $this->subscriptionTypeItemMetaRepository->findBySubscriptionTypeItem($slaveSubscriptionTypeItem)->fetchPairs('key', 'value');
 
                 $subscriptionTypePaymentItem = new SubscriptionTypePaymentItem(
                     $slaveSubscriptionType->id,
@@ -245,7 +245,8 @@ class RequestFormFactory
                     $values[$subscriptionType->id][$id]['price'],
                     $subscriptionTypeItem->vat,
                     $values[$subscriptionType->id][$id]['count'],
-                    $metas
+                    $metas,
+                    $subscriptionTypeItem->id
                 );
                 if ($values['no_vat'] === true) {
                     $subscriptionTypePaymentItem->forcePrice(
@@ -283,7 +284,7 @@ class RequestFormFactory
         }
 
         $totalCount = 0;
-        foreach ($subscriptionType->related('subscription_type_items') as $id => $item) {
+        foreach ($this->subscriptionTypeItemsRepository->getItemsForSubscriptionType($subscriptionType) as $id => $item) {
             $totalCount += $values[$subscriptionType->id][$id]['count'];
         }
 
