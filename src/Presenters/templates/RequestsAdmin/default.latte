@@ -85,15 +85,31 @@
                             </div>
                         {/formContainer}
                     {/foreach}
-                    <div class="col-md-6 col-md-offset-4 col-sm-7 col-sm-offset-5 col-xs-12 text-muted">{_family.admin.form.request.note.payment_without_vat}</div>
                 {/formContainer}
         </fieldset>
         {/foreach}
 
+        <fieldset id="container-vat" class="col-md-10">
+        <legend>{_family.admin.form.request.vat}</legend>
+
         <div class="col-md-10">
             <div class="form-group">
-                <div class="col-md-2 col-md-offset-4 col-sm-offset-5" style="margin-top: 2em;">
-                    {input send, class => 'btn btn-primary'}
+                <div class="row">
+                    <div class="col-md-7 col-md-offset-5 checkbox" style="padding: 0;">
+                        {input no_vat}
+                        <span class="help-block">{_family.admin.form.request.no_vat.description}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </fieldset>
+
+        <div class="col-md-10">
+            <div>
+                <div class="row">
+                    <div class="col-md-2 col-md-offset-4 col-sm-offset-5">
+                        {input send, class => 'btn btn-primary'}
+                    </div>
                 </div>
             </div>
         </div>

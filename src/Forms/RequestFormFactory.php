@@ -130,6 +130,9 @@ class RequestFormFactory
             }
         }
 
+        $form->addCheckbox('no_vat', 'family.admin.form.request.no_vat.label')
+            ->setOption('description', 'family.admin.form.request.no_vat.description');
+
         $form->addSubmit('send', 'family.admin.form.request.send')
             ->getControlPrototype()
             ->setName('button')
@@ -208,14 +211,21 @@ class RequestFormFactory
                     ['subscription_type_item_id' => $subscriptionTypeItem->id]
                 );
 
-                $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
+                $subscriptionTypePaymentItem = new SubscriptionTypePaymentItem(
                     $slaveSubscriptionType->id,
                     $subscriptionTypeItem->name,
                     $values[$subscriptionType->id][$id]['price'],
                     $subscriptionTypeItem->vat,
                     $values[$subscriptionType->id][$id]['count'],
                     $metas
-                ));
+                );
+                if ($values['no_vat'] === true) {
+                    $subscriptionTypePaymentItem->forcePrice(
+                        $subscriptionTypePaymentItem->unitPriceWithoutVAT()
+                    );
+                    $subscriptionTypePaymentItem->forceVat(0);
+                }
+                $paymentItemContainer->addItem($subscriptionTypePaymentItem);
             }
         }
 

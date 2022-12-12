@@ -135,6 +135,8 @@ admin:
                 label: Count
                 total: Total count of items has not to be null
                 number: Total count of items has to be positive numeric value
+            vat: VAT
+            no_vat:
+                label: Use 0% VAT
+                description: Deducts VAT from all items. Both the advance and the tax invoice will be without VAT. It is supposed to be used only for foreign companies with a valid VAT number or companies purchasing from outside the EU.
             send: Add
-            note:
-                payment_without_vat: Payment without VAT? Contact accounting department.

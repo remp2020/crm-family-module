@@ -136,6 +136,8 @@ admin:
                 label: Počet
                 total: Celkový počet položek nemůže být nulový
                 number: Celkový počet položek musí být kladná číselná hodnota
+            vat: DPH
+            no_vat:
+                label: Nákup bez DPH
+                description: Odečte od všech položek DPH. Zálohová i daňová faktura budou bez DPH. Používá se pouze pro zahraniční firmy s platným DIČ nebo firmy nakupující z mimo EU.
             send: Pridej
-            note:
-                payment_without_vat: Platba bez DPH? Kontaktujte účetní oddělení.
