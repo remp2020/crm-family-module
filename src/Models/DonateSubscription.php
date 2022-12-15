@@ -6,6 +6,8 @@ use Crm\ApplicationModule\NowTrait;
 use Crm\FamilyModule\FamilyModule;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
+use Crm\PaymentsModule\Repository\PaymentMetaRepository;
+use Crm\PaymentsModule\Repository\PaymentsRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionMetaRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionTypesMetaRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
@@ -33,18 +35,26 @@ class DonateSubscription
 
     private $familySubscriptionTypesRepository;
 
+    private $paymentsRepository;
+
+    private $paymentMetaRepository;
+
     public function __construct(
         SubscriptionsRepository $subscriptionsRepository,
         SubscriptionMetaRepository $subscriptionMetaRepository,
         SubscriptionTypesMetaRepository $subscriptionTypesMetaRepository,
         FamilyRequestsRepository $familyRequestsRepository,
-        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository
+        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
+        PaymentsRepository $paymentsRepository,
+        PaymentMetaRepository $paymentMetaRepository
     ) {
         $this->subscriptionsRepository = $subscriptionsRepository;
         $this->subscriptionTypesMetaRepository = $subscriptionTypesMetaRepository;
         $this->familyRequestsRepository = $familyRequestsRepository;
         $this->subscriptionMetaRepository = $subscriptionMetaRepository;
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
+        $this->paymentsRepository = $paymentsRepository;
+        $this->paymentMetaRepository = $paymentMetaRepository;
     }
 
     public function connectFamilyUser(ActiveRow $slaveUser, ActiveRow $familyRequest)
@@ -145,7 +155,15 @@ class DonateSubscription
         // If there is already some future family subscription, activate one of its (unused) requests as well
         $nextSubscription = $this->getNextFamilySubscription($masterSubscription);
         if ($nextSubscription) {
-            $this->activateNextFamilySubscriptionRequest($nextSubscription, $slaveUser);
+            $activateNextFamilySubscription = true;
+            if ($payment = $this->paymentsRepository->subscriptionPayment($nextSubscription)) {
+                $keepRequestsUnactivated = $this->paymentMetaRepository->findByPaymentAndKey($payment, FamilyRequests::KEEP_REQUESTS_UNACTIVATED_PAYMENT_META);
+                $activateNextFamilySubscription = (!$keepRequestsUnactivated || !$keepRequestsUnactivated->value);
+            }
+
+            if ($activateNextFamilySubscription) {
+                $this->activateNextFamilySubscriptionRequest($nextSubscription, $slaveUser);
+            }
         }
 
         return $familyRequest;

@@ -17,6 +17,8 @@ class FamilyRequests
 {
     public const NEXT_FAMILY_SUBSCRIPTION_META = 'next_family_subscription_id';
 
+    public const KEEP_REQUESTS_UNACTIVATED_PAYMENT_META = 'keep_requests_unactivated';
+
     private CacheRepository $cacheRepository;
 
     private FamilyRequestsRepository $familyRequestsRepository;

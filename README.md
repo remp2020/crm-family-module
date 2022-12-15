@@ -74,6 +74,8 @@ services:
 			- setSubscriptionsTimeGap('7 days')
 ```
 
+You can also prevent copying activated family requests at all, by adding meta `keep_requests_unactivated=1` to payment meta table.
+
 
 ### Dynamic count of child subscriptions
 

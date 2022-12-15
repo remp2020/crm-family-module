@@ -8,6 +8,7 @@ use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Models\MissingFamilySubscriptionTypeException;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
+use Crm\PaymentsModule\Repository\PaymentMetaRepository;
 use Crm\PaymentsModule\Repository\PaymentsRepository;
 use Crm\PaymentsModule\Repository\RecurrentPaymentsRepository;
 use Crm\SubscriptionsModule\Events\NewSubscriptionEvent;
@@ -38,6 +39,8 @@ class NewSubscriptionHandler extends AbstractListener
 
     private $subscriptionsTimeGap;
 
+    private $paymentMetaRepository;
+
     public function __construct(
         SubscriptionsRepository $subscriptionsRepository,
         SubscriptionMetaRepository $subscriptionMetaRepository,
@@ -46,7 +49,8 @@ class NewSubscriptionHandler extends AbstractListener
         RecurrentPaymentsRepository $recurrentPaymentsRepository,
         DonateSubscription $donateSubscription,
         FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
-        FamilyRequestsRepository $familyRequestsRepository
+        FamilyRequestsRepository $familyRequestsRepository,
+        PaymentMetaRepository $paymentMetaRepository
     ) {
         $this->familyRequests = $familyRequests;
         $this->paymentsRepository = $paymentsRepository;
@@ -56,6 +60,7 @@ class NewSubscriptionHandler extends AbstractListener
         $this->subscriptionMetaRepository = $subscriptionMetaRepository;
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
         $this->familyRequestsRepository = $familyRequestsRepository;
+        $this->paymentMetaRepository = $paymentMetaRepository;
     }
 
     public function setSubscriptionsTimeGap(string $gap): void
@@ -78,7 +83,16 @@ class NewSubscriptionHandler extends AbstractListener
             $previousFamilySubscription = $this->getPreviousFamilyPaymentSubscription($subscription);
             if ($previousFamilySubscription && $this->hasEnoughRequests($subscription, $previousFamilySubscription)) {
                 $this->linkNextFamilySubscription($subscription, $previousFamilySubscription);
-                $this->activateChildSubscriptions($subscription, $previousFamilySubscription, $requests);
+
+                $activateChildSubscriptions = true;
+                if ($payment = $this->paymentsRepository->subscriptionPayment($subscription)) {
+                    $keepRequestsUnactivated = $this->paymentMetaRepository->findByPaymentAndKey($payment, FamilyRequests::KEEP_REQUESTS_UNACTIVATED_PAYMENT_META);
+                    $activateChildSubscriptions = (!$keepRequestsUnactivated || !$keepRequestsUnactivated->value);
+                }
+
+                if ($activateChildSubscriptions) {
+                    $this->activateChildSubscriptions($subscription, $previousFamilySubscription, $requests);
+                }
             }
         } catch (MissingFamilySubscriptionTypeException $exception) {
             // everything all right, we don't want to create family requests if meta is missing
