@@ -107,7 +107,7 @@ components:
 admin:
     form:
         request:
-            name: "Nová platba firemního předplatného pro:"
+            title: "Nová platba firemního předplatného pro:"
             subscription_type:
                 label: Typ předplatného
             payment_gateway:
@@ -128,6 +128,8 @@ admin:
             items: Položky
             item:
                 label: Položka
+            name:
+                label: 'Název <i class="fa fa-info-circle" data-toggle="tooltip" title="Zobrazí se na faktuře i v administraci."></i>'
             price:
                 label: Jednotková cena s DPH
                 required: Jednotková cena položky musí být vyplněna

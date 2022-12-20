@@ -137,6 +137,11 @@ class RequestFormFactory
                         ->setHtmlAttribute('placeholder', $amount)
                     ;
                 }
+
+                $formItems[$id][$item->id]->addText('name', 'family.admin.form.request.name.label')
+                    ->setHtmlAttribute('placeholder', 'family.admin.form.request.name.label')
+                    ->setDefaultValue($item->name)
+                    ->setRequired();
             }
         }
 
@@ -223,7 +228,7 @@ class RequestFormFactory
 
                 $subscriptionTypePaymentItem = new SubscriptionTypePaymentItem(
                     $slaveSubscriptionType->id,
-                    $subscriptionTypeItem->name,
+                    $values[$subscriptionType->id][$id]['name'],
                     $values[$subscriptionType->id][$id]['price'],
                     $subscriptionTypeItem->vat,
                     $values[$subscriptionType->id][$id]['count'],

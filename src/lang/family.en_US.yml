@@ -106,7 +106,7 @@ components:
 admin:
     form:
         request:
-            name: "New payment of family subscription for:"
+            title: "New payment of family subscription for:"
             subscription_type:
                 label: Subscription type
             payment_gateway:
@@ -127,6 +127,8 @@ admin:
             items: Items
             item:
                 label: Item
+            name:
+                label: 'Title <i class="fa fa-info-circle" data-toggle="tooltip" title="Will be displayed on the invoice and in the administration."></i>'
             price:
                 label: Unit price with VAT
                 required: Item's unit price is required
