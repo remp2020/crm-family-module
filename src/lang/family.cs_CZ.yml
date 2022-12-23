@@ -36,11 +36,11 @@ components:
     family_requests_dashboard_widget:
         title: 'Aktivní firemní/rodinné předplatné'
         active_parents:
-            label: Aktivní rodiče
+            label: Aktivní správcovské účty
             tooltip: 'Počet plateb za firemní/rodinné předplatné, jejichž předplatné je aktuálně aktivní.'
         child_created:
             label: Vygenerované dceřiné přístupy
-            tooltip: 'Počet přístupů vygenerovaných pro aktivní rodiče.'
+            tooltip: 'Počet přístupů vygenerovaných pro aktivní správcovské účty.'
         paid_subscribers_with_family_requests:
             label: 'Předplatitelé s platbou + firemní'
             tooltip: 'Počet předplatitelů s aktivním předplatným s platbou + počet firemních/rodinných přístupů. Jeden uživatel je jednou i když má více předplatných. Vygenerované firemní / rodinné nemusí být aktivovány.'
@@ -92,11 +92,11 @@ components:
 
     slave_family_subscription_info:
         title: 'Dceřiné předplatné'
-        master_account: Rodičovské konto
+        master_account: Správcovský účet
 
     family_subscription_type_details_widget:
         parent:
-            title: Detaily firemního rodičovského předplatného
+            title: Detaily firemního správcovského předplatného
             child_subscription: Dceřiné předplatné
             donation_method: Způsob vytvoření
             count: Počet
