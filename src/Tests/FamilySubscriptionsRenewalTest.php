@@ -10,17 +10,18 @@ use Crm\PaymentsModule\Events\PaymentChangeStatusEvent;
 use Crm\PaymentsModule\Events\PaymentStatusChangeHandler;
 use Crm\PaymentsModule\PaymentItem\PaymentItemContainer;
 use Crm\PaymentsModule\Repository\PaymentGatewaysRepository;
-use Crm\PaymentsModule\Repository\PaymentMetaRepository;
 use Crm\PaymentsModule\Repository\PaymentsRepository;
 use Crm\PaymentsModule\Repository\RecurrentPaymentsRepository;
 use Crm\SubscriptionsModule\Events\NewSubscriptionEvent;
 use Crm\SubscriptionsModule\Generator\SubscriptionsGenerator;
 use Crm\SubscriptionsModule\Generator\SubscriptionsParams;
+use Crm\SubscriptionsModule\PaymentItem\SubscriptionTypePaymentItem;
 use Crm\SubscriptionsModule\Repository\SubscriptionMetaRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Crm\UsersModule\Auth\UserManager;
 use Crm\UsersModule\Repository\UsersRepository;
 use League\Event\Emitter;
+use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
 
 class FamilySubscriptionsRenewalTest extends BaseTestCase
@@ -36,9 +37,6 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
 
     /** @var PaymentsRepository */
     private $paymentsRepository;
-
-    /** @var PaymentMetaRepository */
-    private $paymentMetaRepository;
 
     /** @var FamilyRequestsRepository */
     private $familyRequestsRepository;
@@ -73,7 +71,6 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
         $this->subscriptionsRepository = $this->inject(SubscriptionsRepository::class);
         $this->subscriptionGenerator = $this->inject(SubscriptionsGenerator::class);
         $this->paymentsRepository = $this->inject(PaymentsRepository::class);
-        $this->paymentMetaRepository = $this->inject(PaymentMetaRepository::class);
         $this->recurrentPaymentsRepository = $this->inject(RecurrentPaymentsRepository::class);
         $this->familyRequestsRepository = $this->inject(FamilyRequestsRepository::class);
         $this->subscriptionMetaRepository = $this->inject(SubscriptionMetaRepository::class);
@@ -160,7 +157,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
 
         // Create user, pay, donate subscriptions to slave users
         $masterUser = $this->userWithRegDate('master@example.com');
-        $payment = $this->makePayment($masterUser, $masterSubscriptionType, 'now - 30 days', 'now - 30 days');
+        $payment = $this->makePayment($masterUser, $masterSubscriptionType, 'now - 30 days', 'now - 30 days', new PaymentItemContainer());
 
         $subscription = $payment->subscription;
         $this->familyRequest->createFromSubscription($subscription);
@@ -187,13 +184,216 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
         $this->assertEquals(2, $this->subscriptionsRepository->userSubscriptions($slaveUser2)->count());
     }
 
-    private function makePayment($user, $subscriptionType, $paidAtString, $startSubscriptionAtString)
+    public function testFamilyRenewalWithMoreSubscriptionTypesAndWithCorrectCounts()
     {
+        [$masterSubscriptionType, $printSlaveSubscriptionType, $webSlaveSubscriptionType] = $this->seedFamilyCustomizableSubscriptionType();
+
+        $masterUser = $this->userWithRegDate('master@example.com');
+        $slaveUser1 = $this->userWithRegDate('slave1@example.com');
+        $slaveUser2 = $this->userWithRegDate('slave2@example.com');
+        $slaveUser3 = $this->userWithRegDate('slave3@example.com');
+        $slaveUser4 = $this->userWithRegDate('slave4@example.com');
+        $slaveUser5 = $this->userWithRegDate('slave5@example.com');
+
+        $paymentItemContainer = new PaymentItemContainer();
+        $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
+            $webSlaveSubscriptionType->id,
+            $webSlaveSubscriptionType->name,
+            10,
+            20,
+            3
+        ));
+        $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
+            $printSlaveSubscriptionType->id,
+            $printSlaveSubscriptionType->name,
+            5,
+            20,
+            2
+        ));
+
+        $payment = $this->makePayment(
+            $masterUser,
+            $masterSubscriptionType,
+            'now',
+            'now',
+            $paymentItemContainer
+        );
+
+        $previousSubscription = $payment->subscription;
+        $previousFamilyRequests = $this->familyRequestsRepository->masterSubscriptionUnusedFamilyRequests($previousSubscription)->fetchAll();
+        $this->assertCount(5, $previousFamilyRequests);
+
+        // Assign randomly subscriptions
+        $this->donateSubscription->connectFamilyUser($slaveUser4, current($previousFamilyRequests));
+        $this->donateSubscription->connectFamilyUser($slaveUser2, next($previousFamilyRequests));
+        $this->donateSubscription->connectFamilyUser($slaveUser1, next($previousFamilyRequests));
+        $this->donateSubscription->connectFamilyUser($slaveUser5, next($previousFamilyRequests));
+        $this->donateSubscription->connectFamilyUser($slaveUser3, next($previousFamilyRequests));
+
+        // family requests should be accepted
+        $previousFamilyRequests = $this->familyRequestsRepository->masterSubscriptionAcceptedFamilyRequests($previousSubscription)->fetchAll();
+        $this->assertCount(5, $previousFamilyRequests);
+
+        // create paymemt of family subscription with same
+        $nextPayment = $this->paymentsRepository->add(
+            $masterSubscriptionType,
+            $this->paymentGateway,
+            $masterUser,
+            $paymentItemContainer,
+            null,
+            1,
+            new DateTime()
+        );
+
+        $this->paymentsRepository->update($nextPayment, [
+            'paid_at' => new DateTime(),
+            'subscription_start_at' => $previousSubscription->end_time,
+        ]);
+        $this->paymentsRepository->updateStatus($nextPayment, PaymentsRepository::STATUS_PAID);
+
+        $nextPayment = $this->paymentsRepository->find($nextPayment->id);
+        $nextSubscription = $nextPayment->subscription;
+
+        // Check family subscriptions were connected
+        $nextFamilySubscriptionId = $this->subscriptionMetaRepository->getMeta($previousSubscription, FamilyRequests::NEXT_FAMILY_SUBSCRIPTION_META)->fetch();
+        $this->assertEquals($nextSubscription->id, $nextFamilySubscriptionId->value);
+
+        $previousSubscriptionPairs = $this->familyRequestsRepository->masterSubscriptionAcceptedFamilyRequests($previousSubscription)
+            ->fetchPairs('user_id', 'subscription_type_id');
+
+        $nextSubscriptionPairs = $this->familyRequestsRepository->masterSubscriptionAcceptedFamilyRequests($nextSubscription)
+            ->fetchPairs('user_id', 'subscription_type_id');
+
+        // users should have same subscription types as for previous request
+        $this->assertEquals($previousSubscriptionPairs, $nextSubscriptionPairs);
+    }
+
+    public function testFamilyRenewalWithMoreSubscriptionTypesAndWithIncorrectCounts()
+    {
+        [$masterSubscriptionType, $printSlaveSubscriptionType, $webSlaveSubscriptionType] = $this->seedFamilyCustomizableSubscriptionType();
+
+        $masterUser = $this->userWithRegDate('master@example.com');
+        $slaveUser1 = $this->userWithRegDate('slave1@example.com');
+        $slaveUser2 = $this->userWithRegDate('slave2@example.com');
+        $slaveUser3 = $this->userWithRegDate('slave3@example.com');
+        $slaveUser4 = $this->userWithRegDate('slave4@example.com');
+
+        $paymentItemContainer = new PaymentItemContainer();
+        $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
+            $webSlaveSubscriptionType->id,
+            $webSlaveSubscriptionType->name,
+            10,
+            20,
+            2
+        ));
+        $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
+            $printSlaveSubscriptionType->id,
+            $printSlaveSubscriptionType->name,
+            5,
+            20,
+            2
+        ));
+
+        $firstPayment = $this->makePayment(
+            $masterUser,
+            $masterSubscriptionType,
+            'now',
+            'now',
+            $paymentItemContainer
+        );
+
+        $firstSubscription = $firstPayment->subscription;
+        $firstFamilyRequests = $this->familyRequestsRepository->masterSubscriptionUnusedFamilyRequests($firstSubscription)->fetchAll();
+        $this->assertCount(4, $firstFamilyRequests);
+
+        // Assign randomly subscriptions
+        $this->donateSubscription->connectFamilyUser($slaveUser4, current($firstFamilyRequests));
+        $this->donateSubscription->connectFamilyUser($slaveUser3, next($firstFamilyRequests));
+        $this->donateSubscription->connectFamilyUser($slaveUser2, next($firstFamilyRequests));
+        $this->donateSubscription->connectFamilyUser($slaveUser1, next($firstFamilyRequests));
+
+        // Make next payment with bigger count of subscriptions; they should get activated
+        $paymentItemContainer = new PaymentItemContainer();
+        $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
+            $webSlaveSubscriptionType->id,
+            $webSlaveSubscriptionType->name,
+            10,
+            20,
+            3
+        ));
+        $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
+            $printSlaveSubscriptionType->id,
+            $printSlaveSubscriptionType->name,
+            5,
+            20,
+            3
+        ));
+        $secondPayment = $this->makePayment(
+            $masterUser,
+            $masterSubscriptionType,
+            'now',
+            $firstSubscription->end_time,
+            $paymentItemContainer
+        );
+
+        // Check family subscriptions were connected
+        $nextFamilySubscriptionId = $this->subscriptionMetaRepository->getMeta($firstSubscription, FamilyRequests::NEXT_FAMILY_SUBSCRIPTION_META)->fetch()?->value;
+        $this->assertEquals($secondPayment->subscription_id, $nextFamilySubscriptionId);
+
+        $secondSubscription = $secondPayment->subscription;
+        $secondFamilyRequests = $this->familyRequestsRepository->masterSubscriptionUnusedFamilyRequests($secondSubscription);
+
+        // three requests should be activated (copied from the first subscription), three should remain available
+        $this->assertCount(4, $this->familyRequestsRepository->masterSubscriptionAcceptedFamilyRequests($secondSubscription)->fetchAll());
+        $this->assertCount(2, $this->familyRequestsRepository->masterSubscriptionUnusedFamilyRequests($secondSubscription)->fetchAll());
+
+        // Make next payment with different count of subscriptions
+        $paymentItemContainer = new PaymentItemContainer();
+        $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
+            $webSlaveSubscriptionType->id,
+            $webSlaveSubscriptionType->name,
+            10,
+            20,
+            2
+        ));
+        $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
+            $printSlaveSubscriptionType->id,
+            $printSlaveSubscriptionType->name,
+            5,
+            20,
+            3
+        ));
+        $thirdPayment = $this->makePayment(
+            $masterUser,
+            $masterSubscriptionType,
+            'now',
+            $secondSubscription->end_time,
+            $paymentItemContainer
+        );
+
+        // Check family subscriptions weren't connected
+        $nextFamilySubscriptionId = $this->subscriptionMetaRepository->getMeta($secondSubscription, FamilyRequests::NEXT_FAMILY_SUBSCRIPTION_META)->fetch();
+        $this->assertNull($nextFamilySubscriptionId);
+
+        $thirdSubscription = $thirdPayment->subscription;
+        $thirdFamilyRequests = $this->familyRequestsRepository->masterSubscriptionUnusedFamilyRequests($thirdSubscription);
+
+        // all request should be in status created
+        $this->assertCount(5, $thirdFamilyRequests->where('status', FamilyRequestsRepository::STATUS_CREATED)->fetchAll());
+    }
+
+    private function makePayment(
+        ActiveRow $user,
+        ActiveRow $subscriptionType,
+        string $paidAtString,
+        string $startSubscriptionAtString,
+        PaymentItemContainer $paymentItemContainer
+    ) {
         $payment = $this->paymentsRepository->add(
             $subscriptionType,
             $this->paymentGateway,
             $user,
-            new PaymentItemContainer(),
+            $paymentItemContainer,
             null,
             1,
             new DateTime($startSubscriptionAtString)

@@ -147,12 +147,22 @@ class NewSubscriptionHandler extends AbstractListener
      */
     private function activateChildSubscriptions(ActiveRow $newSubscription, ActiveRow $previousSubscription, array $familyRequests): array
     {
-        $previousFamilyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($previousSubscription)->where('status', FamilyRequestsRepository::STATUS_ACCEPTED);
+        $familyRequestsByIds = [];
+        $familyRequestsSubscriptionTypesPairs = [];
+        foreach ($familyRequests as $familyRequest) {
+            $familyRequestsByIds[$familyRequest->id] = $familyRequest;
+            $familyRequestsSubscriptionTypesPairs[$familyRequest->id] = $familyRequest->subscription_type_id;
+        }
 
+        $previousFamilyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($previousSubscription)->where('status', FamilyRequestsRepository::STATUS_ACCEPTED);
         $donatedSubscriptions = [];
 
         foreach ($previousFamilyRequests as $previousFamilyRequest) {
-            $request = array_pop($familyRequests);
+            // get same subscription type as from previous request
+            $familyRequestId = array_search($previousFamilyRequest->subscription_type_id, $familyRequestsSubscriptionTypesPairs, true);
+            $request = $familyRequestsByIds[$familyRequestId];
+            unset($familyRequestsSubscriptionTypesPairs[$familyRequestId]);
+
             // There should be enough requests generated, but if some are missing, report warning
             if (!$request) {
                 Debugger::log("Not enough family requests when activating child subscriptions: subscription #{$newSubscription->id}, previous subscription {$previousSubscription->id}, request #{$request->id} generated", Debugger::WARNING);
@@ -187,11 +197,23 @@ class NewSubscriptionHandler extends AbstractListener
     private function hasEnoughRequests($newSubscription, $previousSubscription): bool
     {
         $newRequestsCount = $this->familyRequestsRepository->masterSubscriptionUnusedFamilyRequests($newSubscription)
-            ->count('*');
+            ->select('subscription_type_id, count(*) AS count')
+            ->group('subscription_type_id')
+            ->order('subscription_type_id')
+            ->fetchPairs('subscription_type_id', 'count');
 
         $previousRequestsCount = $this->familyRequestsRepository->masterSubscriptionAcceptedFamilyRequests($previousSubscription)
-            ->count('*');
+            ->select('subscription_type_id, count(*) AS count')
+            ->group('subscription_type_id')
+            ->order('subscription_type_id')
+            ->fetchPairs('subscription_type_id', 'count');
 
-        return $newRequestsCount >= $previousRequestsCount;
+        foreach ($newRequestsCount as $subscriptionTypeId => $count) {
+            if ($count < $previousRequestsCount[$subscriptionTypeId] ?? 0) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

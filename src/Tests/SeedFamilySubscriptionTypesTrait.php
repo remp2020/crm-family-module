@@ -44,7 +44,7 @@ trait SeedFamilySubscriptionTypesTrait
         return [$masterSubscriptionType, $slaveSubscriptionType];
     }
 
-    public function seedFamilyCustomizableSubscriptionType()
+    public function seedFamilyCustomizableSubscriptionType(int $daysLength = 31)
     {
         $slavePrintSubscriptionType = $this->subscriptionTypeBuilder
             ->createNew()
@@ -53,19 +53,19 @@ trait SeedFamilySubscriptionTypesTrait
             ->setUserLabel('')
             ->setActive(true)
             ->setPrice(0)
-            ->setLength(0)
+            ->setLength($daysLength)
             ->setExtensionMethod(ExtendFamilyExtension::METHOD_CODE)
             ->setContentAccessOption('print')
             ->save();
 
         $slaveWebSubscriptionType = $this->subscriptionTypeBuilder
             ->createNew()
-            ->setName('print_slave')
-            ->setCode('print_slave')
+            ->setName('web_slave')
+            ->setCode('web_slave')
             ->setUserLabel('')
             ->setActive(true)
             ->setPrice(0)
-            ->setLength(0)
+            ->setLength($daysLength)
             ->setExtensionMethod(ExtendFamilyExtension::METHOD_CODE)
             ->setContentAccessOption('web')
             ->save();
@@ -79,7 +79,7 @@ trait SeedFamilySubscriptionTypesTrait
             ->setPrice(0)
             ->addSubscriptionTypeItem('Print', 0, 20, ['family_slave_subscription_type_id' => $slavePrintSubscriptionType])
             ->addSubscriptionTypeItem('Web', 0, 20, ['family_slave_subscription_type_id' => $slaveWebSubscriptionType])
-            ->setLength(0)
+            ->setLength($daysLength)
             ->setExtensionMethod(ExtendFamilyExtension::METHOD_CODE)
             ->setContentAccessOption('no_content')
             ->save();
