@@ -2,6 +2,7 @@
 
 namespace Crm\FamilyModule\Tests;
 
+use Crm\ApiModule\Tests\ApiTestTrait;
 use Crm\FamilyModule\Api\ListFamilyRequestsApiHandler;
 use Crm\FamilyModule\Events\NewSubscriptionHandler;
 use Crm\FamilyModule\Models\DonateSubscription;
@@ -19,29 +20,18 @@ use Tomaj\NetteApi\Response\JsonApiResponse;
 
 class ListFamilyRequestsApiHandlerTest extends BaseTestCase
 {
+    use ApiTestTrait;
+
     private const COMPANY_SUBSCRIPTIONS_LENGTH = 31;
     private const COMPANY_SUBSCRIPTIONS_COUNT = 5;
 
-    /** @var AccessTokensRepository */
-    private $accessTokensRepository;
-
-    /** @var DonateSubscription */
-    private $donateSubscription;
-
-    /** @var Emitter */
-    private $emitter;
-
-    /** @var FamilyRequestsRepository */
-    private $familyRequestsRepository;
-
-    /** @var ListFamilyRequestsApiHandler */
-    private $handler;
-
-    /** @var SubscriptionsGenerator */
-    private $subscriptionGenerator;
-
-    /** @var UserManager */
-    private $userManager;
+    private AccessTokensRepository $accessTokensRepository;
+    private DonateSubscription $donateSubscription;
+    private Emitter $emitter;
+    private FamilyRequestsRepository $familyRequestsRepository;
+    private ListFamilyRequestsApiHandler $handler;
+    private SubscriptionsGenerator $subscriptionGenerator;
+    private UserManager $userManager;
 
     public function requiredRepositories(): array
     {
@@ -82,7 +72,7 @@ class ListFamilyRequestsApiHandlerTest extends BaseTestCase
 
         // call & test API
         $this->handler->setAuthorization($this->getTestAuthorization($masterUser));
-        $response = $this->handler->handle([]); // TODO: fix params
+        $response = $this->runApi($this->handler);
         $this->assertEquals(JsonApiResponse::class, get_class($response));
 
         $payload = $response->getPayload();
@@ -108,7 +98,7 @@ class ListFamilyRequestsApiHandlerTest extends BaseTestCase
 
         // call & test API (with non master user)
         $this->handler->setAuthorization($this->getTestAuthorization($slaveUser));
-        $response = $this->handler->handle([]); // TODO: fix params
+        $response = $this->runApi($this->handler);
         $this->assertEquals(JsonApiResponse::class, get_class($response));
 
         $payload = $response->getPayload();

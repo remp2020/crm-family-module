@@ -18,24 +18,13 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
 {
     use JsonValidationTrait;
 
-    private $contentAccessRepository;
-
-    private $donateSubscription;
-
-    private $familyRequestsRepository;
-
-    private $userActionsLogRepository;
-
     public function __construct(
-        ContentAccessRepository $contentAccessRepository,
-        DonateSubscription $donateSubscription,
-        FamilyRequestsRepository $familyRequestsRepository,
-        UserActionsLogRepository $userActionsLogRepository
+        private ContentAccessRepository $contentAccessRepository,
+        private DonateSubscription $donateSubscription,
+        private FamilyRequestsRepository $familyRequestsRepository,
+        private UserActionsLogRepository $userActionsLogRepository
     ) {
-        $this->contentAccessRepository = $contentAccessRepository;
-        $this->donateSubscription = $donateSubscription;
-        $this->familyRequestsRepository = $familyRequestsRepository;
-        $this->userActionsLogRepository = $userActionsLogRepository;
+        parent::__construct();
     }
 
     public function params(): array
@@ -46,17 +35,11 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
     public function handle(array $params): ResponseInterface
     {
         $authorization = $this->getAuthorization();
-        $data = $authorization->getAuthorizedData();
-        if (!isset($data['token'])) {
-            $response = new JsonApiResponse(Response::S403_FORBIDDEN, [
-                'message' => 'Cannot authorize user',
-                'code' => 'cannot_authorize_user',
-            ]);
-            return $response;
+        $users = $authorization->getAuthorizedUsers();
+        if (count($users) !== 1) {
+            throw new \Exception('Incorrect number of authorized users, expected 1 but got ' . count($users));
         }
-
-        $token = $data['token'];
-        $user = $token->user;
+        $user = reset($users);
 
         $requestValidationResult = $this->validateInput(
             __DIR__ . '/activate-family-request.schema.json',
