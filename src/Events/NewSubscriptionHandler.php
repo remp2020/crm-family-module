@@ -208,8 +208,8 @@ class NewSubscriptionHandler extends AbstractListener
             ->order('subscription_type_id')
             ->fetchPairs('subscription_type_id', 'count');
 
-        foreach ($newRequestsCount as $subscriptionTypeId => $count) {
-            if ($count < $previousRequestsCount[$subscriptionTypeId] ?? 0) {
+        foreach ($previousRequestsCount as $subscriptionTypeId => $previousCount) {
+            if ($previousCount > $newRequestsCount[$subscriptionTypeId] ?? 0) {
                 return false;
             }
         }
