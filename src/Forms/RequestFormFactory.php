@@ -3,7 +3,9 @@
 namespace Crm\FamilyModule\Forms;
 
 use Crm\ApplicationModule\ActiveRow;
+use Crm\ApplicationModule\DataProvider\DataProviderManager;
 use Crm\ApplicationModule\Helpers\PriceHelper;
+use Crm\FamilyModule\DataProviders\RequestFormDataProviderInterface;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\InvoicesModule\Gateways\ProformaInvoice;
 use Crm\PaymentsModule\Gateways\BankTransfer;
@@ -13,6 +15,7 @@ use Crm\PaymentsModule\Repository\PaymentsRepository;
 use Crm\SubscriptionsModule\PaymentItem\SubscriptionTypePaymentItem;
 use Crm\SubscriptionsModule\Repository\SubscriptionTypeItemMetaRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionTypesRepository;
+use Crm\UsersModule\DataProvider\AddressFormDataProviderInterface;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\TextInput;
 use Nette\Localization\Translator;
@@ -34,7 +37,8 @@ class RequestFormFactory
         private PaymentGatewaysRepository $paymentGatewaysRepository,
         private PaymentsRepository $paymentsRepository,
         private PriceHelper $priceHelper,
-        private Translator $translator
+        private Translator $translator,
+        private DataProviderManager $dataProviderManager,
     ) {
     }
 
@@ -147,6 +151,15 @@ class RequestFormFactory
 
         $form->addCheckbox('no_vat', 'family.admin.form.request.no_vat.label')
             ->setOption('description', 'family.admin.form.request.no_vat.description');
+
+        /** @var AddressFormDataProviderInterface $providers */
+        $providers = $this->dataProviderManager->getProviders('family.dataprovider.request_form', RequestFormDataProviderInterface::class);
+        foreach ($providers as $sorting => $provider) {
+            $form = $provider->provide([
+                'form' => $form,
+                'user' => $user,
+            ]);
+        }
 
         $form->addSubmit('send', 'family.admin.form.request.send')
             ->getControlPrototype()
