@@ -11,6 +11,7 @@ use Crm\PaymentsModule\Repository\PaymentsRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionMetaRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionTypesMetaRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
+use Crm\SubscriptionsModule\Subscription\StopSubscriptionHandler;
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
 use Tracy\Debugger;
@@ -25,36 +26,16 @@ class DonateSubscription
     public const ERROR_MASTER_SUBSCRIPTION_EXPIRED = 'master-subscription-expired';
     public const ERROR_REQUEST_WRONG_STATUS = 'error-request-wrong-status';
 
-    private $subscriptionsRepository;
-
-    private $subscriptionTypesMetaRepository;
-
-    private $familyRequestsRepository;
-
-    private $subscriptionMetaRepository;
-
-    private $familySubscriptionTypesRepository;
-
-    private $paymentsRepository;
-
-    private $paymentMetaRepository;
-
     public function __construct(
-        SubscriptionsRepository $subscriptionsRepository,
-        SubscriptionMetaRepository $subscriptionMetaRepository,
-        SubscriptionTypesMetaRepository $subscriptionTypesMetaRepository,
-        FamilyRequestsRepository $familyRequestsRepository,
-        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
-        PaymentsRepository $paymentsRepository,
-        PaymentMetaRepository $paymentMetaRepository
+        private SubscriptionsRepository $subscriptionsRepository,
+        private SubscriptionMetaRepository $subscriptionMetaRepository,
+        private SubscriptionTypesMetaRepository $subscriptionTypesMetaRepository,
+        private FamilyRequestsRepository $familyRequestsRepository,
+        private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
+        private PaymentsRepository $paymentsRepository,
+        private PaymentMetaRepository $paymentMetaRepository,
+        private StopSubscriptionHandler $stopSubscriptionHandler,
     ) {
-        $this->subscriptionsRepository = $subscriptionsRepository;
-        $this->subscriptionTypesMetaRepository = $subscriptionTypesMetaRepository;
-        $this->familyRequestsRepository = $familyRequestsRepository;
-        $this->subscriptionMetaRepository = $subscriptionMetaRepository;
-        $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
-        $this->paymentsRepository = $paymentsRepository;
-        $this->paymentMetaRepository = $paymentMetaRepository;
     }
 
     public function connectFamilyUser(ActiveRow $slaveUser, ActiveRow $familyRequest)
@@ -171,23 +152,23 @@ class DonateSubscription
 
     public function releaseFamilyRequest(ActiveRow $familyRequest)
     {
-        // do not cancel already cancelled family request (eg. second call on handler's URL)
+        // do not cancel already cancelled family request (e.g. second call on handler's URL)
         // otherwise multiple "substitute" child subscriptions will be generated
         if ($familyRequest->status !== FamilyRequestsRepository::STATUS_ACCEPTED) {
             return;
         }
 
-        $slaveSubscription = $familyRequest->slave_subscription;
-        // already stopped subscription
-        if ($slaveSubscription->end_time >= $this->getNow()) {
-            $this->subscriptionsRepository->update($slaveSubscription, [
-                'end_time' => $this->getNow(),
-            ]);
-        }
+        // first expire family request to avoid recursion caused by stopped subscription event handling
         $this->familyRequestsRepository->update($familyRequest, [
             'status' => FamilyRequestsRepository::STATUS_CANCELED,
             'canceled_at' => $this->getNow(),
         ]);
+
+        $slaveSubscription = $familyRequest->slave_subscription;
+        // already stopped subscription
+        if ($slaveSubscription->end_time >= $this->getNow()) {
+            $this->stopSubscriptionHandler->stopSubscription($slaveSubscription);
+        }
 
         $this->familyRequestsRepository->add(
             $familyRequest->master_subscription,
