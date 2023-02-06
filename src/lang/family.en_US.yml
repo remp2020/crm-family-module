@@ -132,10 +132,11 @@ admin:
             price:
                 label: Unit price with VAT
                 required: Item's unit price is required
+                total: Total price of items cannot be zero
                 number: Item's unit price has to be positive numeric value
             count:
                 label: Count
-                total: Total count of items has not to be null
+                total: Total count of items cannot be zero
                 number: Total count of items has to be positive numeric value
             vat: VAT
             no_vat:

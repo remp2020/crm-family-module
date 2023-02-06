@@ -284,12 +284,16 @@ class RequestFormFactory
         }
 
         $totalCount = 0;
+        $totalAmount = 0.0;
         foreach ($this->subscriptionTypeItemsRepository->getItemsForSubscriptionType($subscriptionType) as $id => $item) {
             $totalCount += $values[$subscriptionType->id][$id]['count'];
+            $totalAmount += (float) $values[$subscriptionType->id][$id]['price'] * $values[$subscriptionType->id][$id]['count'];
         }
-
         if ($totalCount === 0) {
             $form->addError('family.admin.form.request.count.total');
+        }
+        if ($totalAmount === 0.0) {
+            $form->addError('family.admin.form.request.price.total');
         }
     }
 }

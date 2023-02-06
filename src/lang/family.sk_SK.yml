@@ -133,6 +133,7 @@ admin:
             price:
                 label: Jednotková cena s DPH
                 required: Jednotková cena položky musí byť vyplnená
+                total: Celková cena položiek nemôže byť nulová
                 number: Jednotková cena položky musí byť kladná číselná hodnota
             count:
                 label: Počet
