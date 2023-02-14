@@ -2,6 +2,7 @@
 
 namespace Crm\FamilyModule\Tests;
 
+use Crm\SubscriptionsModule\Extension\ExtendActualExtension;
 use Crm\SubscriptionsModule\Generator\SubscriptionsGenerator;
 use Crm\SubscriptionsModule\Generator\SubscriptionsParams;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
@@ -130,7 +131,7 @@ class ExtendFamilyExtensionTest extends BaseTestCase
             ->setActive(true)
             ->setPrice(1)
             ->setLength(31)
-            ->setExtensionMethod('extend_actual')
+            ->setExtensionMethod(ExtendActualExtension::METHOD_CODE)
             ->setContentAccessOption('web', 'mobile')
             ->save();
     }
