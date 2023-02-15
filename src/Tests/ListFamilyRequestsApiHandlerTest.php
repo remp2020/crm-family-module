@@ -72,7 +72,7 @@ class ListFamilyRequestsApiHandlerTest extends BaseTestCase
 
         // call & test API
         $this->handler->setAuthorization($this->getTestAuthorization($masterUser));
-        $response = $this->runApi($this->handler);
+        $response = $this->runJsonApi($this->handler);
         $this->assertEquals(JsonApiResponse::class, get_class($response));
 
         $payload = $response->getPayload();
@@ -98,7 +98,7 @@ class ListFamilyRequestsApiHandlerTest extends BaseTestCase
 
         // call & test API (with non master user)
         $this->handler->setAuthorization($this->getTestAuthorization($slaveUser));
-        $response = $this->runApi($this->handler);
+        $response = $this->runJsonApi($this->handler);
         $this->assertEquals(JsonApiResponse::class, get_class($response));
 
         $payload = $response->getPayload();

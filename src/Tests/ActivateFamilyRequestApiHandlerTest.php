@@ -84,7 +84,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
         $this->handler->setDonateSubscriptionNow(new DateTime('2020-07-10'));
         $this->handler->setAuthorization($this->getTestAuthorization($slaveUserWithoutAccepted));
 
-        $response = $this->runApi($this->handler);
+        $response = $this->runJsonApi($this->handler);
 
         $this->assertEquals(JsonApiResponse::class, get_class($response));
         $this->assertEquals(Response::S201_CREATED, $response->getCode());
@@ -109,7 +109,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
 
         // call & test API
         $this->handler->setAuthorization($this->getTestAuthorization($slaveUserWithoutAccepted));
-        $response = $this->runApi($this->handler);
+        $response = $this->runJsonApi($this->handler);
         $this->assertEquals(JsonApiResponse::class, get_class($response));
 
         $payload = $response->getPayload();
@@ -124,7 +124,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
         // call & test API
         $this->handler->setRawPayload(json_encode(['code' => 'invalid_family_request_code']));
         $this->handler->setAuthorization($this->getTestAuthorization($slaveUserWithoutAccepted));
-        $response = $this->runApi($this->handler);
+        $response = $this->runJsonApi($this->handler);
         $this->assertEquals(JsonApiResponse::class, get_class($response));
 
         $payload = $response->getPayload();
@@ -148,7 +148,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
         $this->handler->setRawPayload(json_encode(['code' => $testFamilyRequest->code]));
         $this->handler->setDonateSubscriptionNow(new DateTime('2020-07-10'));
         $this->handler->setAuthorization($this->getTestAuthorization($slaveUserWithoutAccepted));
-        $response = $this->runApi($this->handler);
+        $response = $this->runJsonApi($this->handler);
         $this->assertEquals(JsonApiResponse::class, get_class($response));
 
         $payload = $response->getPayload();
@@ -167,7 +167,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
         $this->handler->setRawPayload(json_encode(['code' => $testFamilyRequest->code]));
         $this->handler->setDonateSubscriptionNow(new DateTime('2020-07-10'));
         $this->handler->setAuthorization($this->getTestAuthorization($slaveUserWithAccepted));
-        $response = $this->runApi($this->handler);
+        $response = $this->runJsonApi($this->handler);
         $this->assertEquals(JsonApiResponse::class, get_class($response));
 
         $payload = $response->getPayload();
@@ -192,7 +192,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
         // call & test API
         $this->handler->setRawPayload(json_encode(['code' => $testFamilyRequest->code]));
         $this->handler->setAuthorization($this->getTestAuthorization($masterUser));
-        $response = $this->runApi($this->handler);
+        $response = $this->runJsonApi($this->handler);
         $this->assertEquals(JsonApiResponse::class, get_class($response));
 
         $payload = $response->getPayload();
@@ -206,7 +206,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
 
         $this->handler->setRawPayload(json_encode(['code' => $acceptedFamilyRequest->code]));
         $this->handler->setAuthorization($this->getTestAuthorization($masterUser));
-        $response = $this->runApi($this->handler);
+        $response = $this->runJsonApi($this->handler);
         $this->assertEquals(JsonApiResponse::class, get_class($response));
         $this->assertEquals(Response::S409_CONFLICT, $response->getCode());
 
