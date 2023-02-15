@@ -7,6 +7,7 @@ use Crm\ApiModule\Api\JsonValidationTrait;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\SubscriptionsModule\Repository\ContentAccessRepository;
+use Crm\UsersModule\Auth\UsersApiAuthorizationInterface;
 use Crm\UsersModule\Repository\UserActionsLogRepository;
 use Nette\Database\Table\ActiveRow;
 use Nette\Http\Response;
@@ -35,6 +36,10 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
     public function handle(array $params): ResponseInterface
     {
         $authorization = $this->getAuthorization();
+        if (!$authorization instanceof UsersApiAuthorizationInterface) {
+            throw new \Exception("Invalid authorization used for the API, it needs to implement 'UsersApiAuthorizationInterface': " . get_class($authorization));
+        }
+
         $users = $authorization->getAuthorizedUsers();
         if (count($users) !== 1) {
             throw new \Exception('Incorrect number of authorized users, expected 1 but got ' . count($users));
