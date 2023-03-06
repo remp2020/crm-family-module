@@ -83,7 +83,7 @@ class DonateSubscription
 
             $subscriptionExtension = $this->subscriptionsRepository->getSubscriptionExtension($familyRequest->subscription_type, $slaveUser);
             $startTime = $subscriptionExtension->getDate();
-            $endTime = $startTime->modifyClone(sprintf('+%d days', $subscriptionMeta['family_subscription_days']));
+            $endTime = (clone $startTime)->modify(sprintf('+%d days', $subscriptionMeta['family_subscription_days']));
             $slaveSubscription = $this->subscriptionsRepository->add(
                 $familyRequest->subscription_type,
                 false,

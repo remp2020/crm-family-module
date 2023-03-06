@@ -165,7 +165,7 @@ class NewSubscriptionHandler extends AbstractListener
 
             // There should be enough requests generated, but if some are missing, report warning
             if (!$request) {
-                Debugger::log("Not enough family requests when activating child subscriptions: subscription #{$newSubscription->id}, previous subscription {$previousSubscription->id}, request #{$request->id} generated", Debugger::WARNING);
+                Debugger::log("Not enough family requests when activating child subscriptions: subscription #{$newSubscription->id}, previous subscription {$previousSubscription->id}, request #{$familyRequestId} generated", Debugger::WARNING);
                 return $donatedSubscriptions;
             }
 
