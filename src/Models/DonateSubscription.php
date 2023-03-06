@@ -51,7 +51,7 @@ class DonateSubscription
                 return self::ERROR_IN_USE;
             }
         }
-        if (isset($subscriptionMeta['family_subscription_type']) && in_array($subscriptionMeta['family_subscription_type'], ['days', 'fixed'])) {
+        if (isset($subscriptionMeta['family_subscription_type']) && in_array($subscriptionMeta['family_subscription_type'], ['days', 'fixed'], true)) {
             if ($masterSubscription->user_id === $slaveUser->id) {
                 return self::ERROR_SELF_USE;
             }
