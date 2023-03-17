@@ -9,26 +9,25 @@ use Crm\SubscriptionsModule\Extension\ExtensionInterface;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Nette\Database\Table\ActiveRow;
 
+/**
+ * Extends:
+ * - first subscription of company/family subscription type;
+ * - or starts immediately.
+ */
 class ExtendFamilyExtension implements ExtensionInterface
 {
     use NowTrait;
 
-    public const METHOD_CODE = 'extend_family';
+    final public const METHOD_CODE = 'extend_family';
     public const METHOD_NAME = 'Extend family';
 
-    private $familySubscriptionTypesRepository;
-
-    private $subscriptionsRepository;
-
     public function __construct(
-        SubscriptionsRepository $subscriptionsRepository,
-        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository
+        private SubscriptionsRepository $subscriptionsRepository,
+        private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository
     ) {
-        $this->subscriptionsRepository = $subscriptionsRepository;
-        $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
     }
 
-    public function getStartTime(ActiveRow $user, ActiveRow $subscriptionType)
+    public function getStartTime(ActiveRow $user, ActiveRow $subscriptionType): Extension
     {
         // load IDs of all family subscription types
         $familySubscriptionTypeIds = array_merge(
@@ -37,7 +36,7 @@ class ExtendFamilyExtension implements ExtensionInterface
         );
 
         $userFamilySubscription = $this->subscriptionsRepository->userSubscriptions($user->id)
-            ->where('end_time > NOW()')
+            ->where('end_time > ?', $this->getNow())
             ->where('subscription_type_id IN ?', $familySubscriptionTypeIds)
             ->fetch();
 
