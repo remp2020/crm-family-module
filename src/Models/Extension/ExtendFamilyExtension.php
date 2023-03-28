@@ -18,7 +18,7 @@ class ExtendFamilyExtension implements ExtensionInterface
 {
     use NowTrait;
 
-    final public const METHOD_CODE = 'extend_family';
+    public const METHOD_CODE = 'extend_family';
     public const METHOD_NAME = 'Extend family';
 
     public function __construct(
