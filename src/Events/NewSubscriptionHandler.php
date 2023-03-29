@@ -21,46 +21,19 @@ use Tracy\Debugger;
 
 class NewSubscriptionHandler extends AbstractListener
 {
-    private $familyRequests;
-
-    private $paymentsRepository;
-
-    private $recurrentPaymentsRepository;
-
-    private $donateSubscription;
-
-    private $subscriptionsRepository;
-
-    private $subscriptionMetaRepository;
-
-    private $familySubscriptionTypesRepository;
-
-    private $familyRequestsRepository;
-
-    private $subscriptionsTimeGap;
-
-    private $paymentMetaRepository;
+    private ?string $subscriptionsTimeGap = null;
 
     public function __construct(
-        SubscriptionsRepository $subscriptionsRepository,
-        SubscriptionMetaRepository $subscriptionMetaRepository,
-        FamilyRequests $familyRequests,
-        PaymentsRepository $paymentsRepository,
-        RecurrentPaymentsRepository $recurrentPaymentsRepository,
-        DonateSubscription $donateSubscription,
-        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
-        FamilyRequestsRepository $familyRequestsRepository,
-        PaymentMetaRepository $paymentMetaRepository
+        private SubscriptionsRepository $subscriptionsRepository,
+        private SubscriptionMetaRepository $subscriptionMetaRepository,
+        private FamilyRequests $familyRequests,
+        private PaymentsRepository $paymentsRepository,
+        private RecurrentPaymentsRepository $recurrentPaymentsRepository,
+        private DonateSubscription $donateSubscription,
+        private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
+        private FamilyRequestsRepository $familyRequestsRepository,
+        private PaymentMetaRepository $paymentMetaRepository
     ) {
-        $this->familyRequests = $familyRequests;
-        $this->paymentsRepository = $paymentsRepository;
-        $this->recurrentPaymentsRepository = $recurrentPaymentsRepository;
-        $this->donateSubscription = $donateSubscription;
-        $this->subscriptionsRepository = $subscriptionsRepository;
-        $this->subscriptionMetaRepository = $subscriptionMetaRepository;
-        $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
-        $this->familyRequestsRepository = $familyRequestsRepository;
-        $this->paymentMetaRepository = $paymentMetaRepository;
     }
 
     public function setSubscriptionsTimeGap(string $gap): void
@@ -136,7 +109,6 @@ class NewSubscriptionHandler extends AbstractListener
         return $previousFamilySubscription->fetch();
     }
 
-
     /**
      * @param ActiveRow $newSubscription
      * @param ActiveRow $previousSubscription
@@ -209,7 +181,7 @@ class NewSubscriptionHandler extends AbstractListener
             ->fetchPairs('subscription_type_id', 'count');
 
         foreach ($previousRequestsCount as $subscriptionTypeId => $previousCount) {
-            if ($previousCount > $newRequestsCount[$subscriptionTypeId] ?? 0) {
+            if ($previousCount > ($newRequestsCount[$subscriptionTypeId] ?? 0)) {
                 return false;
             }
         }
