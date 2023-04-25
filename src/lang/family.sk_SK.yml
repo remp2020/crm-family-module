@@ -125,6 +125,9 @@ admin:
                 required: Dátum konca predplatného je povinný
                 not_past: Dátum konca predplatného musí byť v budúcnosti.
                 description: "Potrebné vyplniť len v prípade, že potrebujeme určit koniec predplatného na konkrétny dátum v budúcnosti."
+            keep_requests_unactivated:
+                label: Neaktivovať dcérské predplatné automaticky
+                description: Po vygenerovaní rodičovského predplatného sa prechádzajúce dcérske predplatné nepredĺžia.
             items: Položky
             item:
                 label: Položka

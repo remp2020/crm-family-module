@@ -6,11 +6,13 @@ use Crm\ApplicationModule\ActiveRow;
 use Crm\ApplicationModule\DataProvider\DataProviderManager;
 use Crm\ApplicationModule\Helpers\PriceHelper;
 use Crm\FamilyModule\DataProviders\RequestFormDataProviderInterface;
+use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\InvoicesModule\Gateways\ProformaInvoice;
 use Crm\PaymentsModule\Gateways\BankTransfer;
 use Crm\PaymentsModule\PaymentItem\PaymentItemContainer;
 use Crm\PaymentsModule\Repository\PaymentGatewaysRepository;
+use Crm\PaymentsModule\Repository\PaymentMetaRepository;
 use Crm\PaymentsModule\Repository\PaymentsRepository;
 use Crm\SubscriptionsModule\PaymentItem\SubscriptionTypePaymentItem;
 use Crm\SubscriptionsModule\Repository\SubscriptionTypeItemMetaRepository;
@@ -38,6 +40,7 @@ class RequestFormFactory
         private SubscriptionTypeItemMetaRepository $subscriptionTypeItemMetaRepository,
         private PaymentGatewaysRepository $paymentGatewaysRepository,
         private PaymentsRepository $paymentsRepository,
+        private PaymentMetaRepository $paymentMetaRepository,
         private PriceHelper $priceHelper,
         private Translator $translator,
         private DataProviderManager $dataProviderManager,
@@ -115,6 +118,9 @@ class RequestFormFactory
         $subscriptionEndAt
             ->addConditionOn($manualSubscription, Form::EQUAL, self::MANUAL_SUBSCRIPTION_START_END)
             ->setRequired('family.admin.form.request.subscription_end_at.required');
+
+        $form->addCheckbox('keep_requests_unactivated', 'family.admin.form.request.keep_requests_unactivated.label')
+            ->setOption('description', 'family.admin.form.request.keep_requests_unactivated.description');
 
         $formItems = [];
         foreach ($customSubscriptionTypes as $id => $customSubscriptionType) {
@@ -262,7 +268,7 @@ class RequestFormFactory
             throw new \Exception("No payment item has been added for subscription type: {$subscriptionType->id}");
         }
 
-        $this->paymentsRepository->add(
+        $payment = $this->paymentsRepository->add(
             $subscriptionType,
             $paymentGateway,
             $user,
@@ -272,6 +278,10 @@ class RequestFormFactory
             $subscriptionStartAt,
             $subscriptionEndAt
         );
+
+        if (isset($values['keep_requests_unactivated']) && $values['keep_requests_unactivated']) {
+            $this->paymentMetaRepository->add($payment, FamilyRequests::KEEP_REQUESTS_UNACTIVATED_PAYMENT_META, 1);
+        }
 
         $this->onSave->__invoke($form, $user);
     }

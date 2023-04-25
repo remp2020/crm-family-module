@@ -124,6 +124,9 @@ admin:
                 required: End of subscription is required
                 not_past: End of subscription has to be in the future
                 description: "Necessary to fill only when you need to set end of subscription to specific date in the future explictly."
+            keep_requests_unactivated:
+                label: Keep requests unactivated
+                description: After the parent subscription is generated, passing child subscriptions are not renewed.
             items: Items
             item:
                 label: Item
