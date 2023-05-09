@@ -55,15 +55,14 @@ class NewSubscriptionHandler extends AbstractListener
             // Check if this has previous family subscription
             $previousFamilySubscription = $this->getPreviousFamilyPaymentSubscription($subscription);
             if ($previousFamilySubscription && $this->hasEnoughRequests($subscription, $previousFamilySubscription)) {
-                $this->linkNextFamilySubscription($subscription, $previousFamilySubscription);
-
-                $activateChildSubscriptions = true;
+                $linkPreviousSubscriptionAndActivateChildRequests = true;
                 if ($payment = $this->paymentsRepository->subscriptionPayment($subscription)) {
                     $keepRequestsUnactivated = $this->paymentMetaRepository->findByPaymentAndKey($payment, FamilyRequests::KEEP_REQUESTS_UNACTIVATED_PAYMENT_META);
-                    $activateChildSubscriptions = (!$keepRequestsUnactivated || !$keepRequestsUnactivated->value);
+                    $linkPreviousSubscriptionAndActivateChildRequests = (!$keepRequestsUnactivated || !$keepRequestsUnactivated->value);
                 }
 
-                if ($activateChildSubscriptions) {
+                if ($linkPreviousSubscriptionAndActivateChildRequests) {
+                    $this->linkNextFamilySubscription($subscription, $previousFamilySubscription);
                     $this->activateChildSubscriptions($subscription, $previousFamilySubscription, $requests);
                 }
             }

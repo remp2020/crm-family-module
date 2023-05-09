@@ -6,8 +6,6 @@ use Crm\ApplicationModule\NowTrait;
 use Crm\FamilyModule\FamilyModule;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
-use Crm\PaymentsModule\Repository\PaymentMetaRepository;
-use Crm\PaymentsModule\Repository\PaymentsRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionMetaRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionTypesMetaRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
@@ -32,8 +30,6 @@ class DonateSubscription
         private SubscriptionTypesMetaRepository $subscriptionTypesMetaRepository,
         private FamilyRequestsRepository $familyRequestsRepository,
         private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
-        private PaymentsRepository $paymentsRepository,
-        private PaymentMetaRepository $paymentMetaRepository,
         private StopSubscriptionHandler $stopSubscriptionHandler,
     ) {
     }
@@ -136,15 +132,7 @@ class DonateSubscription
         // If there is already some future family subscription, activate one of its (unused) requests as well
         $nextSubscription = $this->getNextFamilySubscription($masterSubscription);
         if ($nextSubscription) {
-            $activateNextFamilySubscription = true;
-            if ($payment = $this->paymentsRepository->subscriptionPayment($nextSubscription)) {
-                $keepRequestsUnactivated = $this->paymentMetaRepository->findByPaymentAndKey($payment, FamilyRequests::KEEP_REQUESTS_UNACTIVATED_PAYMENT_META);
-                $activateNextFamilySubscription = (!$keepRequestsUnactivated || !$keepRequestsUnactivated->value);
-            }
-
-            if ($activateNextFamilySubscription) {
-                $this->activateNextFamilySubscriptionRequest($nextSubscription, $slaveUser);
-            }
+            $this->activateNextFamilySubscriptionRequest($nextSubscription, $slaveUser);
         }
 
         return $familyRequest;
