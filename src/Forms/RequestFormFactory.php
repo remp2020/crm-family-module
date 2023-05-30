@@ -140,6 +140,7 @@ class RequestFormFactory
                     ->setHtmlAttribute('placeholder', 'family.admin.form.request.price.label')
                     ->addRule(Form::FLOAT, 'family.admin.form.request.price.number')
                     ->addRule(Form::MIN, 'family.admin.form.request.price.number', 0)
+                    ->addRule(Form::PATTERN, 'family.admin.form.request.price.invalid_format', '^\d{1,8}[\.,]?\d{0,2}$')
                     ->addConditionOn($formItems[$id][$item->id]['count'], Form::NOT_EQUAL, 0)
                     ->setRequired('family.admin.form.request.price.required');
 

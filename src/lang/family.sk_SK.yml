@@ -138,6 +138,7 @@ admin:
                 required: Jednotková cena položky musí byť vyplnená
                 total: Celková cena položiek nemôže byť nulová
                 number: Jednotková cena položky musí byť kladná číselná hodnota
+                invalid_format: Jednotková cena položky musí byť kladná číselná hodnota s max. 2 desatinnými miestami
             count:
                 label: Počet
                 total: Celkový počet položiek nemože byť nulový

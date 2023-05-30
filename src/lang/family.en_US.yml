@@ -137,6 +137,7 @@ admin:
                 required: Item's unit price is required
                 total: Total price of items cannot be zero
                 number: Item's unit price has to be positive numeric value
+                invalid_format: Item's unit price has to be positive numeric value with max. 2 decimal places
             count:
                 label: Count
                 total: Total count of items cannot be zero
