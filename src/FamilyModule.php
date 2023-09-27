@@ -16,7 +16,6 @@ use Crm\FamilyModule\Models\Scenarios\IsFamilySlaveCriteria;
 use Crm\FamilyModule\Seeders\FamilySeeder;
 use Crm\FamilyModule\Seeders\SubscriptionExtensionMethodsSeeder;
 use Crm\FamilyModule\Seeders\SubscriptionTypeNamesSeeder;
-use League\Event\Emitter;
 use Nette\DI\Container;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -54,19 +53,19 @@ class FamilyModule extends CrmModule
         );
     }
 
-    public function registerEventHandlers(Emitter $emitter)
+    public function registerLazyEventHandlers(\Crm\ApplicationModule\Event\LazyEventEmitter $emitter)
     {
         $emitter->addListener(
             \Crm\SubscriptionsModule\Events\NewSubscriptionEvent::class,
-            $this->getInstance(\Crm\FamilyModule\Events\NewSubscriptionHandler::class)
+            \Crm\FamilyModule\Events\NewSubscriptionHandler::class
         );
         $emitter->addListener(
             \Crm\SubscriptionsModule\Events\SubscriptionShortenedEvent::class,
-            $this->getInstance(\Crm\FamilyModule\Events\SubscriptionShortenedHandler::class)
+            \Crm\FamilyModule\Events\SubscriptionShortenedHandler::class
         );
         $emitter->addListener(
             \Crm\SubscriptionsModule\Events\SubscriptionUpdatedEvent::class,
-            $this->getInstance(\Crm\FamilyModule\Events\SubscriptionUpdatedHandler::class)
+            \Crm\FamilyModule\Events\SubscriptionUpdatedHandler::class
         );
     }
 
