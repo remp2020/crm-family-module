@@ -162,7 +162,7 @@ class RequestFormFactory
         $form->addCheckbox('no_vat', 'family.admin.form.request.no_vat.label')
             ->setOption('description', 'family.admin.form.request.no_vat.description');
 
-        /** @var AddressFormDataProviderInterface $providers */
+        /** @var AddressFormDataProviderInterface[] $providers */
         $providers = $this->dataProviderManager->getProviders('family.dataprovider.request_form', RequestFormDataProviderInterface::class);
         foreach ($providers as $sorting => $provider) {
             $form = $provider->provide([
