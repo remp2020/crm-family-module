@@ -2,6 +2,7 @@
 
 namespace Crm\FamilyModule\Tests;
 
+use Crm\ApplicationModule\Event\LazyEventEmitter;
 use Crm\FamilyModule\Events\NewSubscriptionHandler;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Models\FamilyRequests;
@@ -12,7 +13,6 @@ use Crm\SubscriptionsModule\Generator\SubscriptionsParams;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Crm\UsersModule\Auth\UserManager;
 use Crm\UsersModule\Repository\UsersRepository;
-use League\Event\Emitter;
 use Nette\Utils\DateTime;
 
 class ActivateRequestTest extends BaseTestCase
@@ -29,8 +29,8 @@ class ActivateRequestTest extends BaseTestCase
     /** @var FamilyRequestsRepository */
     private $familyRequestsRepository;
 
-    /** @var Emitter */
-    private $emitter;
+    /** @var LazyEventEmitter */
+    private $lazyEventEmitter;
 
     /** @var FamilyRequests */
     private $familyRequest;
@@ -44,7 +44,7 @@ class ActivateRequestTest extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->emitter = $this->inject(Emitter::class);
+        $this->lazyEventEmitter = $this->inject(LazyEventEmitter::class);
         $this->userManager = $this->inject(UserManager::class);
         $this->usersRepository = $this->inject(UsersRepository::class);
         $this->subscriptionsRepository = $this->inject(SubscriptionsRepository::class);
@@ -54,12 +54,15 @@ class ActivateRequestTest extends BaseTestCase
         $this->donateSubscription = $this->inject(DonateSubscription::class);
 
         // To create family requests and renew family subscriptions
-        $this->emitter->addListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
+        $this->lazyEventEmitter->addListener(
+            NewSubscriptionEvent::class,
+            $this->inject(NewSubscriptionHandler::class),
+        );
     }
 
     protected function tearDown(): void
     {
-        $this->emitter->removeListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
+        $this->lazyEventEmitter->removeAllListeners(NewSubscriptionEvent::class);
 
         parent::tearDown();
     }

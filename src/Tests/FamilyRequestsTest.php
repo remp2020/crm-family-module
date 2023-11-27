@@ -2,6 +2,7 @@
 
 namespace Crm\FamilyModule\Tests;
 
+use Crm\ApplicationModule\Event\LazyEventEmitter;
 use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Models\InvalidConfigurationException;
 use Crm\FamilyModule\Models\MissingFamilySubscriptionTypeException;
@@ -14,7 +15,6 @@ use Crm\PaymentsModule\Repository\PaymentsRepository;
 use Crm\SubscriptionsModule\PaymentItem\SubscriptionTypePaymentItem;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Crm\UsersModule\Auth\UserManager;
-use League\Event\Emitter;
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
 
@@ -51,14 +51,14 @@ class FamilyRequestsTest extends BaseTestCase
         $pgr = $this->getRepository(PaymentGatewaysRepository::class);
         $this->paymentGateway = $pgr->add('test', 'test', 10, true, true);
 
-        $emitter = $this->inject(Emitter::class);
+        $emitter = $this->inject(LazyEventEmitter::class);
         // To create subscriptions from payments, register listener
         $emitter->addListener(PaymentChangeStatusEvent::class, $this->inject(PaymentStatusChangeHandler::class));
     }
 
     protected function tearDown(): void
     {
-        $this->inject(Emitter::class)->removeListener(PaymentChangeStatusEvent::class, $this->inject(PaymentStatusChangeHandler::class));
+        $this->inject(LazyEventEmitter::class)->removeAllListeners(PaymentChangeStatusEvent::class);
 
         parent::tearDown();
     }

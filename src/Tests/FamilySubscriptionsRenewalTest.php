@@ -2,6 +2,7 @@
 
 namespace Crm\FamilyModule\Tests;
 
+use Crm\ApplicationModule\Event\LazyEventEmitter;
 use Crm\FamilyModule\Events\NewSubscriptionHandler;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Models\FamilyRequests;
@@ -20,7 +21,6 @@ use Crm\SubscriptionsModule\Repository\SubscriptionMetaRepository;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Crm\UsersModule\Auth\UserManager;
 use Crm\UsersModule\Repository\UsersRepository;
-use League\Event\Emitter;
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
 
@@ -44,8 +44,8 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
     /** @var PaymentGatewaysRepository */
     private $paymentGateway;
 
-    /** @var Emitter */
-    private $emitter;
+    /** @var LazyEventEmitter */
+    private $lazyEventEmitter;
 
     /** @var FamilyRequests */
     private $familyRequest;
@@ -65,7 +65,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->emitter = $this->inject(Emitter::class);
+        $this->lazyEventEmitter = $this->inject(LazyEventEmitter::class);
         $this->userManager = $this->inject(UserManager::class);
         $this->usersRepository = $this->inject(UsersRepository::class);
         $this->subscriptionsRepository = $this->inject(SubscriptionsRepository::class);
@@ -82,16 +82,16 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
         $this->paymentGateway = $pgr->add('test', 'test', 10, true, true);
 
         // To create subscriptions from payments, register listener
-        $this->emitter->addListener(PaymentChangeStatusEvent::class, $this->inject(PaymentStatusChangeHandler::class));
+        $this->lazyEventEmitter->addListener(PaymentChangeStatusEvent::class, $this->inject(PaymentStatusChangeHandler::class));
 
         // To create family requests and renew family subscriptions
-        $this->emitter->addListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
+        $this->lazyEventEmitter->addListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
     }
 
     protected function tearDown(): void
     {
-        $this->emitter->removeListener(PaymentChangeStatusEvent::class, $this->inject(PaymentStatusChangeHandler::class));
-        $this->emitter->removeListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
+        $this->lazyEventEmitter->removeAllListeners(PaymentChangeStatusEvent::class);
+        $this->lazyEventEmitter->removeAllListeners(NewSubscriptionEvent::class);
 
         parent::tearDown();
     }

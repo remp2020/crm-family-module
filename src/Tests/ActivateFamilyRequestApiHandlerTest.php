@@ -3,6 +3,7 @@
 namespace Crm\FamilyModule\Tests;
 
 use Crm\ApiModule\Tests\ApiTestTrait;
+use Crm\ApplicationModule\Event\LazyEventEmitter;
 use Crm\FamilyModule\Api\ActivateFamilyRequestApiHandler;
 use Crm\FamilyModule\Events\NewSubscriptionHandler;
 use Crm\FamilyModule\Models\DonateSubscription;
@@ -14,7 +15,6 @@ use Crm\SubscriptionsModule\Repository\SubscriptionMetaRepository;
 use Crm\UsersModule\Auth\UserManager;
 use Crm\UsersModule\Repository\AccessTokensRepository;
 use Crm\UsersModule\Tests\TestUserTokenAuthorization;
-use League\Event\Emitter;
 use Nette\Database\Table\ActiveRow;
 use Nette\Http\Response;
 use Nette\Utils\DateTime;
@@ -29,7 +29,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
 
     private AccessTokensRepository $accessTokensRepository;
     private DonateSubscription $donateSubscription;
-    private Emitter $emitter;
+    private LazyEventEmitter $lazyEventEmitter;
     private FamilyRequestsRepository $familyRequestsRepository;
     private SubscriptionsGenerator $subscriptionGenerator;
     private SubscriptionMetaRepository $subscriptionMetaRepository;
@@ -49,14 +49,17 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
 
         $this->accessTokensRepository = $this->getRepository(AccessTokensRepository::class);
         $this->donateSubscription = $this->inject(DonateSubscription::class);
-        $this->emitter = $this->inject(Emitter::class);
+        $this->lazyEventEmitter = $this->inject(LazyEventEmitter::class);
         $this->familyRequestsRepository = $this->inject(FamilyRequestsRepository::class);
         $this->subscriptionGenerator = $this->inject(SubscriptionsGenerator::class);
         $this->subscriptionMetaRepository = $this->getRepository(SubscriptionMetaRepository::class);
         $this->userManager = $this->inject(UserManager::class);
 
         // To create family requests and renew family subscriptions
-        $this->emitter->addListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
+        $this->lazyEventEmitter->addListener(
+            NewSubscriptionEvent::class,
+            $this->inject(NewSubscriptionHandler::class),
+        );
 
         // handler we want to test
         $this->handler = $this->inject(ActivateFamilyRequestApiHandler::class);
@@ -67,7 +70,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
         // reset NOW; it affects tests run after this class
         $this->donateSubscription->setNow(null);
 
-        $this->emitter->removeListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
+        $this->lazyEventEmitter->removeAllListeners(NewSubscriptionEvent::class);
 
         parent::tearDown();
     }

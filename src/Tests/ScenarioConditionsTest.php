@@ -20,7 +20,6 @@ use Crm\SubscriptionsModule\Generator\SubscriptionsGenerator;
 use Crm\SubscriptionsModule\Generator\SubscriptionsParams;
 use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
 use Crm\UsersModule\Auth\UserManager;
-use League\Event\Emitter;
 use Nette\Utils\DateTime;
 
 class ScenarioConditionsTest extends ScenariosBaseTestCase
@@ -73,7 +72,7 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->emitter = $this->inject(Emitter::class);
+
         $this->userManager = $this->inject(UserManager::class);
         $this->subscriptionGenerator = $this->inject(SubscriptionsGenerator::class);
 
@@ -89,12 +88,12 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
         $m->registerScenariosCriteria($this->scenariosCriteriaStorage);
 
         // To create family requests and renew family subscriptions
-        $this->emitter->addListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
+        $this->lazyEventEmitter->addListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
     }
 
     protected function tearDown(): void
     {
-        $this->emitter->removeListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
+        $this->lazyEventEmitter->removeAllListeners(NewSubscriptionEvent::class);
 
         parent::tearDown();
     }
