@@ -8,6 +8,7 @@ use Crm\ApiModule\Router\ApiIdentifier;
 use Crm\ApiModule\Router\ApiRoute;
 use Crm\ApplicationModule\Criteria\ScenariosCriteriaStorage;
 use Crm\ApplicationModule\CrmModule;
+use Crm\ApplicationModule\Event\EventsStorage;
 use Crm\ApplicationModule\SeederManager;
 use Crm\ApplicationModule\Widget\LazyWidgetManagerInterface;
 use Crm\FamilyModule\Models\FamilyRequests;
@@ -109,6 +110,11 @@ class FamilyModule extends CrmModule
     {
         $scenariosCriteriaStorage->register('subscription', 'is_family_master', $this->getInstance(IsFamilyMasterCriteria::class));
         $scenariosCriteriaStorage->register('subscription', 'is_family_slave', $this->getInstance(IsFamilySlaveCriteria::class));
+    }
+
+    public function registerEvents(EventsStorage $eventsStorage)
+    {
+        $eventsStorage->register('family_request_created', Events\FamilyRequestCreatedEvent::class, true);
     }
 
     public function cache(OutputInterface $output, array $tags = [])

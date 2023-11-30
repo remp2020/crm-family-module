@@ -3,6 +3,10 @@
 namespace Crm\FamilyModule\Repositories;
 
 use Crm\ApplicationModule\Repository;
+use Crm\FamilyModule\Events\FamilyRequestCreatedEvent;
+use League\Event\Emitter;
+use Nette\Caching\Storage;
+use Nette\Database\Explorer;
 use Nette\Database\Table\ActiveRow;
 use Nette\Database\Table\Selection;
 use Nette\Utils\DateTime;
@@ -16,6 +20,14 @@ class FamilyRequestsRepository extends Repository
 
     protected $tableName = 'family_requests';
 
+    public function __construct(
+        Explorer $database,
+        Storage $cacheStorage = null,
+        private Emitter $emitter
+    ) {
+        parent::__construct($database, $cacheStorage);
+    }
+
     public function add(
         ActiveRow $subscription,
         ActiveRow $subscriptionType,
@@ -23,7 +35,7 @@ class FamilyRequestsRepository extends Repository
         ?DateTime $expiresAt = null,
         ?string $note = null
     ) {
-        return $this->getTable()->insert([
+        $request = $this->getTable()->insert([
             'master_user_id' => $subscription->user_id,
             'subscription_type_id' => $subscriptionType,
             'master_subscription_id' => $subscription->id,
@@ -34,6 +46,9 @@ class FamilyRequestsRepository extends Repository
             'expires_at' => $expiresAt,
             'note' => $note,
         ]);
+
+        $this->emitter->emit(new FamilyRequestCreatedEvent($request));
+        return $request;
     }
 
     public function findByCode($code)
