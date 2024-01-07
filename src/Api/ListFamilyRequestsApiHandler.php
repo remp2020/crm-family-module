@@ -2,7 +2,7 @@
 
 namespace Crm\FamilyModule\Api;
 
-use Crm\ApiModule\Api\ApiHandler;
+use Crm\ApiModule\Models\Api\ApiHandler;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Nette\Http\Response;
 use Nette\Utils\DateTime;

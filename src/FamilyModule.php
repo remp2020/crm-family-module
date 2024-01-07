@@ -3,9 +3,9 @@
 namespace Crm\FamilyModule;
 
 use Contributte\Translation\Translator;
-use Crm\ApiModule\Api\ApiRoutersContainerInterface;
-use Crm\ApiModule\Router\ApiIdentifier;
-use Crm\ApiModule\Router\ApiRoute;
+use Crm\ApiModule\Models\Api\ApiRoutersContainerInterface;
+use Crm\ApiModule\Models\Router\ApiIdentifier;
+use Crm\ApiModule\Models\Router\ApiRoute;
 use Crm\ApplicationModule\Commands\CommandsContainerInterface;
 use Crm\ApplicationModule\Criteria\ScenariosCriteriaStorage;
 use Crm\ApplicationModule\CrmModule;

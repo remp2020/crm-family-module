@@ -2,8 +2,8 @@
 
 namespace Crm\FamilyModule\Api;
 
-use Crm\ApiModule\Api\ApiHandler;
-use Crm\ApiModule\Api\JsonValidationTrait;
+use Crm\ApiModule\Models\Api\ApiHandler;
+use Crm\ApiModule\Models\Api\JsonValidationTrait;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\SubscriptionsModule\Repository\ContentAccessRepository;
