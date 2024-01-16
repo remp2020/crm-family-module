@@ -10,6 +10,8 @@ use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
+use Crm\FamilyModule\Seeders\SubscriptionExtensionMethodsSeeder;
+use Crm\FamilyModule\Seeders\SubscriptionTypeNamesSeeder;
 use Crm\ScenariosModule\Repository\ElementsRepository;
 use Crm\ScenariosModule\Repository\ScenariosRepository;
 use Crm\ScenariosModule\Repository\TriggersRepository;
@@ -64,8 +66,8 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
     protected function requiredSeeders(): array
     {
         return array_merge(parent::requiredSeeders(), [
-            \Crm\FamilyModule\Seeders\SubscriptionExtensionMethodsSeeder::class,
-            \Crm\FamilyModule\Seeders\SubscriptionTypeNamesSeeder::class,
+            SubscriptionExtensionMethodsSeeder::class,
+            SubscriptionTypeNamesSeeder::class,
         ]);
     }
 

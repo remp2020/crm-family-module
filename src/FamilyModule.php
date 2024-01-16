@@ -9,14 +9,30 @@ use Crm\ApiModule\Router\ApiRoute;
 use Crm\ApplicationModule\Criteria\ScenariosCriteriaStorage;
 use Crm\ApplicationModule\CrmModule;
 use Crm\ApplicationModule\Event\EventsStorage;
+use Crm\ApplicationModule\Event\LazyEventEmitter;
 use Crm\ApplicationModule\SeederManager;
 use Crm\ApplicationModule\Widget\LazyWidgetManagerInterface;
+use Crm\FamilyModule\Api\ActivateFamilyRequestApiHandler;
+use Crm\FamilyModule\Api\ListFamilyRequestsApiHandler;
+use Crm\FamilyModule\Components\FamilyRequestsDashboardWidget\FamilyRequestsDashboardWidget;
+use Crm\FamilyModule\Components\FamilySubscriptionTypeDetailsWidget\FamilySubscriptionTypeDetailsWidget;
+use Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget\MasterFamilySubscriptionInfoWidget;
+use Crm\FamilyModule\Components\SlaveFamilySubscriptionInfoWidget\SlaveFamilySubscriptionInfoWidget;
+use Crm\FamilyModule\Components\UsersAbusiveAdditionalWidget\UsersAbusiveAdditionalWidget;
+use Crm\FamilyModule\Events\FamilyRequestCreatedEvent;
+use Crm\FamilyModule\Events\NewSubscriptionHandler;
+use Crm\FamilyModule\Events\SubscriptionShortenedHandler;
+use Crm\FamilyModule\Events\SubscriptionUpdatedHandler;
 use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Models\Scenarios\IsFamilyMasterCriteria;
 use Crm\FamilyModule\Models\Scenarios\IsFamilySlaveCriteria;
 use Crm\FamilyModule\Seeders\FamilySeeder;
 use Crm\FamilyModule\Seeders\SubscriptionExtensionMethodsSeeder;
 use Crm\FamilyModule\Seeders\SubscriptionTypeNamesSeeder;
+use Crm\SubscriptionsModule\Events\NewSubscriptionEvent;
+use Crm\SubscriptionsModule\Events\SubscriptionShortenedEvent;
+use Crm\SubscriptionsModule\Events\SubscriptionUpdatedEvent;
+use Crm\UsersModule\Auth\UserTokenAuthorization;
 use Nette\DI\Container;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -41,32 +57,32 @@ class FamilyModule extends CrmModule
         $apiRoutersContainer->attachRouter(
             new ApiRoute(
                 new ApiIdentifier('1', 'family', 'list'),
-                \Crm\FamilyModule\Api\ListFamilyRequestsApiHandler::class,
-                \Crm\UsersModule\Auth\UserTokenAuthorization::class
+                ListFamilyRequestsApiHandler::class,
+                UserTokenAuthorization::class
             )
         );
         $apiRoutersContainer->attachRouter(
             new ApiRoute(
                 new ApiIdentifier('1', 'family', 'activate'),
-                \Crm\FamilyModule\Api\ActivateFamilyRequestApiHandler::class,
-                \Crm\UsersModule\Auth\UserTokenAuthorization::class
+                ActivateFamilyRequestApiHandler::class,
+                UserTokenAuthorization::class
             )
         );
     }
 
-    public function registerLazyEventHandlers(\Crm\ApplicationModule\Event\LazyEventEmitter $emitter)
+    public function registerLazyEventHandlers(LazyEventEmitter $emitter)
     {
         $emitter->addListener(
-            \Crm\SubscriptionsModule\Events\NewSubscriptionEvent::class,
-            \Crm\FamilyModule\Events\NewSubscriptionHandler::class
+            NewSubscriptionEvent::class,
+            NewSubscriptionHandler::class
         );
         $emitter->addListener(
-            \Crm\SubscriptionsModule\Events\SubscriptionShortenedEvent::class,
-            \Crm\FamilyModule\Events\SubscriptionShortenedHandler::class
+            SubscriptionShortenedEvent::class,
+            SubscriptionShortenedHandler::class
         );
         $emitter->addListener(
-            \Crm\SubscriptionsModule\Events\SubscriptionUpdatedEvent::class,
-            \Crm\FamilyModule\Events\SubscriptionUpdatedHandler::class
+            SubscriptionUpdatedEvent::class,
+            SubscriptionUpdatedHandler::class
         );
     }
 
@@ -74,27 +90,27 @@ class FamilyModule extends CrmModule
     {
         $widgetManager->registerWidget(
             'admin.user.abusive.additional',
-            \Crm\FamilyModule\Components\UsersAbusiveAdditionalWidget\UsersAbusiveAdditionalWidget::class
+            UsersAbusiveAdditionalWidget::class
         );
 
         $widgetManager->registerWidget(
             'dashboard.simplewidget.additional',
-            \Crm\FamilyModule\Components\FamilyRequestsDashboardWidget\FamilyRequestsDashboardWidget::class
+            FamilyRequestsDashboardWidget::class
         );
 
         $widgetManager->registerWidget(
             'admin.user.detail.center',
-            \Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget\MasterFamilySubscriptionInfoWidget::class
+            MasterFamilySubscriptionInfoWidget::class
         );
 
         $widgetManager->registerWidget(
             'admin.user.detail.center',
-            \Crm\FamilyModule\Components\SlaveFamilySubscriptionInfoWidget\SlaveFamilySubscriptionInfoWidget::class
+            SlaveFamilySubscriptionInfoWidget::class
         );
 
         $widgetManager->registerWidget(
             'subscription_types_admin.show.right',
-            \Crm\FamilyModule\Components\FamilySubscriptionTypeDetailsWidget\FamilySubscriptionTypeDetailsWidget::class,
+            FamilySubscriptionTypeDetailsWidget::class,
             200
         );
     }
@@ -114,7 +130,7 @@ class FamilyModule extends CrmModule
 
     public function registerEvents(EventsStorage $eventsStorage)
     {
-        $eventsStorage->register('family_request_created', Events\FamilyRequestCreatedEvent::class, true);
+        $eventsStorage->register('family_request_created', FamilyRequestCreatedEvent::class, true);
     }
 
     public function cache(OutputInterface $output, array $tags = [])

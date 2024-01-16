@@ -151,7 +151,7 @@ class FamilyRequests
             return $this->cacheRepository->loadAndUpdate(
                 'active_family_owners_count',
                 $callable,
-                \Nette\Utils\DateTime::from('-1 hour'),
+                DateTime::from('-1 hour'),
                 $forceCacheUpdate
             );
         }
