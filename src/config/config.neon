@@ -44,6 +44,9 @@ services:
 	# forms
 	- Crm\FamilyModule\Forms\RequestFormFactory
 
+	# commands
+	- Crm\FamilyModule\Commands\GenerateFamilyRequestsCommand
+
 	# presenters
 	- Crm\FamilyModule\Presenters\RequestsAdminPresenter
 

@@ -6,6 +6,7 @@ use Contributte\Translation\Translator;
 use Crm\ApiModule\Api\ApiRoutersContainerInterface;
 use Crm\ApiModule\Router\ApiIdentifier;
 use Crm\ApiModule\Router\ApiRoute;
+use Crm\ApplicationModule\Commands\CommandsContainerInterface;
 use Crm\ApplicationModule\Criteria\ScenariosCriteriaStorage;
 use Crm\ApplicationModule\CrmModule;
 use Crm\ApplicationModule\Event\EventsStorage;
@@ -14,6 +15,7 @@ use Crm\ApplicationModule\SeederManager;
 use Crm\ApplicationModule\Widget\LazyWidgetManagerInterface;
 use Crm\FamilyModule\Api\ActivateFamilyRequestApiHandler;
 use Crm\FamilyModule\Api\ListFamilyRequestsApiHandler;
+use Crm\FamilyModule\Commands\GenerateFamilyRequestsCommand;
 use Crm\FamilyModule\Components\FamilyRequestsDashboardWidget\FamilyRequestsDashboardWidget;
 use Crm\FamilyModule\Components\FamilySubscriptionTypeDetailsWidget\FamilySubscriptionTypeDetailsWidget;
 use Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget\MasterFamilySubscriptionInfoWidget;
@@ -50,6 +52,11 @@ class FamilyModule extends CrmModule
         parent::__construct($container, $translator);
 
         $this->familyRequests = $familyRequests;
+    }
+
+    public function registerCommands(CommandsContainerInterface $commandsContainer)
+    {
+        $commandsContainer->registerCommand($this->getInstance(GenerateFamilyRequestsCommand::class));
     }
 
     public function registerApiCalls(ApiRoutersContainerInterface $apiRoutersContainer)
