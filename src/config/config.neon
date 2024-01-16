@@ -3,10 +3,6 @@ services:
 		setup:
 			- addModule(Crm\FamilyModule\FamilyModule())
 
-	filterLoader:
-		setup:
-			- register('maskEmail', [Crm\FamilyModule\Helpers\MaskEmailHelper(), process])
-
 	subscriptionsRepository:
 		setup:
 			- registerType(Crm\FamilyModule\FamilyModule::SUBSCRIPTION_TYPE_FAMILY)
