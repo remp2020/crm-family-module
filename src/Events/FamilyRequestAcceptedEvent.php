@@ -3,17 +3,17 @@ declare(strict_types=1);
 
 namespace Crm\FamilyModule\Events;
 
+use Crm\ApplicationModule\Models\Database\ActiveRow;
 use League\Event\AbstractEvent;
-use Nette\Database\Table\ActiveRow;
 
-class FamilyRequestCreatedEvent extends AbstractEvent implements FamilyRequestEventInterface
+class FamilyRequestAcceptedEvent extends AbstractEvent implements FamilyRequestEventInterface
 {
     public function __construct(
         private ActiveRow $familyRequest
     ) {
     }
 
-    public function getFamilyRequest(): ActiveRow
+    public function getFamilyRequest(): \Nette\Database\Table\ActiveRow
     {
         return $this->familyRequest;
     }

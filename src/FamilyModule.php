@@ -138,6 +138,7 @@ class FamilyModule extends CrmModule
     public function registerEvents(EventsStorage $eventsStorage)
     {
         $eventsStorage->register('family_request_created', FamilyRequestCreatedEvent::class, true);
+        $eventsStorage->register('family_request_accepted', Events\FamilyRequestAcceptedEvent::class, true);
     }
 
     public function cache(OutputInterface $output, array $tags = [])

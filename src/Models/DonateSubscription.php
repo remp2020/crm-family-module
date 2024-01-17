@@ -3,6 +3,7 @@
 namespace Crm\FamilyModule\Models;
 
 use Crm\ApplicationModule\Models\NowTrait;
+use Crm\FamilyModule\Events\FamilyRequestAcceptedEvent;
 use Crm\FamilyModule\FamilyModule;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
@@ -10,6 +11,7 @@ use Crm\SubscriptionsModule\Models\Subscription\StopSubscriptionHandler;
 use Crm\SubscriptionsModule\Repositories\SubscriptionMetaRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypesMetaRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
+use League\Event\Emitter;
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
 use Tracy\Debugger;
@@ -31,6 +33,7 @@ class DonateSubscription
         private FamilyRequestsRepository $familyRequestsRepository,
         private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
         private StopSubscriptionHandler $stopSubscriptionHandler,
+        private Emitter $emitter,
     ) {
     }
 
@@ -128,6 +131,9 @@ class DonateSubscription
             'accepted_at' => $this->getNow(),
             'updated_at' => $this->getNow(),
         ]);
+
+        $familyRequest = $this->familyRequestsRepository->find($familyRequest->id);
+        $this->emitter->emit(new FamilyRequestAcceptedEvent($familyRequest));
 
         // If there is already some future family subscription, activate one of its (unused) requests as well
         $nextSubscription = $this->getNextFamilySubscription($masterSubscription);

@@ -133,4 +133,10 @@ class FamilyRequestsRepository extends Repository
     {
         return $this->getTable()->where('slave_subscription_id', $subscription->id)->fetch();
     }
+
+    final public function findSlaveSubscriptionsWithContentAccess(ActiveRow $masterSubscription, string $contentAccess): Selection
+    {
+        return $this->masterSubscriptionFamilyRequests($masterSubscription)
+            ->where('subscription_type:subscription_type_content_access.content_access.name', $contentAccess);
+    }
 }

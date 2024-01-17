@@ -95,7 +95,10 @@
                 </td>
                 <td><a href="#" data-toggle="modal" data-target="#detail-modal-{$subscription->id}"
                        data-id={$subscription->id} class="btn btn-sm btn-primary" title="{_system.show}"><i
-                            class="fa fa-info-circle"></i> {_system.show}</a></td>
+                            class="fa fa-info-circle"></i> {_system.show}</a>
+
+                    {control simpleWidget 'family.master_subscription.actions', $subscription}
+                </td>
             </tr>
             </tbody>
         </table>
