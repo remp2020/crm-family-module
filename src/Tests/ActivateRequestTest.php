@@ -11,8 +11,8 @@ use Crm\SubscriptionsModule\Events\NewSubscriptionEvent;
 use Crm\SubscriptionsModule\Models\Generator\SubscriptionsGenerator;
 use Crm\SubscriptionsModule\Models\Generator\SubscriptionsParams;
 use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
-use Crm\UsersModule\Auth\UserManager;
-use Crm\UsersModule\Repository\UsersRepository;
+use Crm\UsersModule\Models\Auth\UserManager;
+use Crm\UsersModule\Repositories\UsersRepository;
 use Nette\Utils\DateTime;
 
 class ActivateRequestTest extends BaseTestCase

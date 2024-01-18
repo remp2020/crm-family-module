@@ -34,7 +34,7 @@ use Crm\FamilyModule\Seeders\SubscriptionTypeNamesSeeder;
 use Crm\SubscriptionsModule\Events\NewSubscriptionEvent;
 use Crm\SubscriptionsModule\Events\SubscriptionShortenedEvent;
 use Crm\SubscriptionsModule\Events\SubscriptionUpdatedEvent;
-use Crm\UsersModule\Auth\UserTokenAuthorization;
+use Crm\UsersModule\Models\Auth\UserTokenAuthorization;
 use Nette\DI\Container;
 use Symfony\Component\Console\Output\OutputInterface;
 

@@ -6,7 +6,7 @@ use Crm\SubscriptionsModule\Models\Extension\ExtendActualExtension;
 use Crm\SubscriptionsModule\Models\Generator\SubscriptionsGenerator;
 use Crm\SubscriptionsModule\Models\Generator\SubscriptionsParams;
 use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
-use Crm\UsersModule\Auth\UserManager;
+use Crm\UsersModule\Models\Auth\UserManager;
 use Nette\Utils\DateTime;
 
 class ExtendFamilyExtensionTest extends BaseTestCase

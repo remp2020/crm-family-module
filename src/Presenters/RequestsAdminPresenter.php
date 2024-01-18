@@ -5,7 +5,7 @@ namespace Crm\FamilyModule\Presenters;
 use Crm\AdminModule\Presenters\AdminPresenter;
 use Crm\FamilyModule\Forms\RequestFormFactory;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
-use Crm\UsersModule\Repository\UsersRepository;
+use Crm\UsersModule\Repositories\UsersRepository;
 use Nette\Application\BadRequestException;
 
 class RequestsAdminPresenter extends AdminPresenter

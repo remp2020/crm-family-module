@@ -6,7 +6,7 @@ namespace Crm\FamilyModule\Components\SlaveFamilySubscriptionInfoWidget;
 use Crm\ApplicationModule\Widget\BaseLazyWidget;
 use Crm\ApplicationModule\Widget\LazyWidgetManager;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
-use Crm\UsersModule\Repository\UsersRepository;
+use Crm\UsersModule\Repositories\UsersRepository;
 
 class SlaveFamilySubscriptionInfoWidget extends BaseLazyWidget
 {
