@@ -4,9 +4,9 @@ namespace Crm\FamilyModule\Models\Extension;
 
 use Crm\ApplicationModule\NowTrait;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
-use Crm\SubscriptionsModule\Extension\Extension;
-use Crm\SubscriptionsModule\Extension\ExtensionInterface;
-use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
+use Crm\SubscriptionsModule\Models\Extension\Extension;
+use Crm\SubscriptionsModule\Models\Extension\ExtensionInterface;
+use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
 use Nette\Database\Table\ActiveRow;
 
 /**

@@ -4,7 +4,7 @@ namespace Crm\FamilyModule\Seeders;
 
 use Crm\ApplicationModule\Seeders\ISeeder;
 use Crm\ApplicationModule\Snippet\Repository\SnippetsRepository;
-use Crm\SubscriptionsModule\Repository\SubscriptionTypeNamesRepository;
+use Crm\SubscriptionsModule\Repositories\SubscriptionTypeNamesRepository;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class FamilySeeder implements ISeeder

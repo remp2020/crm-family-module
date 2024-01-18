@@ -7,7 +7,7 @@ use Crm\ApplicationModule\Widget\LazyWidgetManager;
 use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Models\MissingFamilySubscriptionTypeException;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
-use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
+use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
 use Nette\Localization\Translator;
 use Nette\Security\User;
 use Tracy\Debugger;

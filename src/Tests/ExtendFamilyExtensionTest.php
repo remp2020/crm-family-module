@@ -2,10 +2,10 @@
 
 namespace Crm\FamilyModule\Tests;
 
-use Crm\SubscriptionsModule\Extension\ExtendActualExtension;
-use Crm\SubscriptionsModule\Generator\SubscriptionsGenerator;
-use Crm\SubscriptionsModule\Generator\SubscriptionsParams;
-use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
+use Crm\SubscriptionsModule\Models\Extension\ExtendActualExtension;
+use Crm\SubscriptionsModule\Models\Generator\SubscriptionsGenerator;
+use Crm\SubscriptionsModule\Models\Generator\SubscriptionsParams;
+use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
 use Crm\UsersModule\Auth\UserManager;
 use Nette\Utils\DateTime;
 

@@ -6,7 +6,7 @@ use Crm\ApplicationModule\NowTrait;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Events\SubscriptionUpdatedEvent;
-use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
+use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
 use League\Event\AbstractListener;
 use League\Event\EventInterface;
 

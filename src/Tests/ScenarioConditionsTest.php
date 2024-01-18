@@ -16,11 +16,11 @@ use Crm\ScenariosModule\Repositories\ElementsRepository;
 use Crm\ScenariosModule\Repositories\ScenariosRepository;
 use Crm\ScenariosModule\Repositories\TriggersRepository;
 use Crm\ScenariosModule\Tests\BaseTestCase as ScenariosBaseTestCase;
-use Crm\SubscriptionsModule\Builder\SubscriptionTypeBuilder;
 use Crm\SubscriptionsModule\Events\NewSubscriptionEvent;
-use Crm\SubscriptionsModule\Generator\SubscriptionsGenerator;
-use Crm\SubscriptionsModule\Generator\SubscriptionsParams;
-use Crm\SubscriptionsModule\Repository\SubscriptionsRepository;
+use Crm\SubscriptionsModule\Models\Builder\SubscriptionTypeBuilder;
+use Crm\SubscriptionsModule\Models\Generator\SubscriptionsGenerator;
+use Crm\SubscriptionsModule\Models\Generator\SubscriptionsParams;
+use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
 use Crm\UsersModule\Auth\UserManager;
 use Nette\Utils\DateTime;
 

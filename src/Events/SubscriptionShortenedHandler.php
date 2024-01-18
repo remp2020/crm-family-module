@@ -7,7 +7,7 @@ use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Events\SubscriptionShortenedEvent;
-use Crm\SubscriptionsModule\Subscription\StopSubscriptionHandler;
+use Crm\SubscriptionsModule\Models\Subscription\StopSubscriptionHandler;
 use League\Event\AbstractListener;
 use League\Event\EventInterface;
 

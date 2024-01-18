@@ -6,7 +6,7 @@ use Crm\ApiModule\Models\Api\ApiHandler;
 use Crm\ApiModule\Models\Api\JsonValidationTrait;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
-use Crm\SubscriptionsModule\Repository\ContentAccessRepository;
+use Crm\SubscriptionsModule\Repositories\ContentAccessRepository;
 use Crm\UsersModule\Auth\UsersApiAuthorizationInterface;
 use Crm\UsersModule\Repository\UserActionsLogRepository;
 use Nette\Database\Table\ActiveRow;

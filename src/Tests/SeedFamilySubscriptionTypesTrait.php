@@ -4,7 +4,7 @@ namespace Crm\FamilyModule\Tests;
 
 use Crm\FamilyModule\Models\Extension\ExtendFamilyExtension;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
-use Crm\SubscriptionsModule\Builder\SubscriptionTypeBuilder;
+use Crm\SubscriptionsModule\Models\Builder\SubscriptionTypeBuilder;
 
 /**
  * @property SubscriptionTypeBuilder $subscriptionTypeBuilder

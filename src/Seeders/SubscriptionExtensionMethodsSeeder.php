@@ -4,7 +4,7 @@ namespace Crm\FamilyModule\Seeders;
 
 use Crm\ApplicationModule\Seeders\ISeeder;
 use Crm\FamilyModule\Models\Extension\ExtendFamilyExtension;
-use Crm\SubscriptionsModule\Repository\SubscriptionExtensionMethodsRepository;
+use Crm\SubscriptionsModule\Repositories\SubscriptionExtensionMethodsRepository;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class SubscriptionExtensionMethodsSeeder implements ISeeder

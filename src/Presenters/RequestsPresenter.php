@@ -8,7 +8,7 @@ use Crm\ApplicationModule\Presenters\FrontendPresenter;
 use Crm\FamilyModule\DataProviders\EmailFormDataProviderInterface;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
-use Crm\SubscriptionsModule\Subscription\ActualUserSubscription;
+use Crm\SubscriptionsModule\Models\Subscription\ActualUserSubscription;
 use Crm\UsersModule\Auth\Authorizator;
 use Crm\UsersModule\Auth\InvalidEmailException;
 use Crm\UsersModule\Auth\UserManager;
