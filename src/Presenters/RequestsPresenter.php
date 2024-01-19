@@ -2,8 +2,8 @@
 
 namespace Crm\FamilyModule\Presenters;
 
-use Crm\ApplicationModule\DataProvider\DataProviderManager;
 use Crm\ApplicationModule\Helpers\MaskEmailHelper;
+use Crm\ApplicationModule\Models\DataProvider\DataProviderManager;
 use Crm\ApplicationModule\Presenters\FrontendPresenter;
 use Crm\FamilyModule\DataProviders\EmailFormDataProviderInterface;
 use Crm\FamilyModule\Models\DonateSubscription;

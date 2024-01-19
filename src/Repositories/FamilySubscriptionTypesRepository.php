@@ -2,7 +2,7 @@
 
 namespace Crm\FamilyModule\Repositories;
 
-use Crm\ApplicationModule\Repository;
+use Crm\ApplicationModule\Models\Database\Repository;
 use Nette\Database\Table\ActiveRow;
 
 class FamilySubscriptionTypesRepository extends Repository

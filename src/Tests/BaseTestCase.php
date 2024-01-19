@@ -2,7 +2,7 @@
 
 namespace Crm\FamilyModule\Tests;
 
-use Crm\ApplicationModule\Cache\CacheRepository;
+use Crm\ApplicationModule\Repositories\CacheRepository;
 use Crm\ApplicationModule\Tests\DatabaseTestCase;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;

@@ -3,7 +3,7 @@
 namespace Crm\FamilyModule\Tests;
 
 use Crm\ApiModule\Tests\ApiTestTrait;
-use Crm\ApplicationModule\Event\LazyEventEmitter;
+use Crm\ApplicationModule\Models\Event\LazyEventEmitter;
 use Crm\FamilyModule\Api\ListFamilyRequestsApiHandler;
 use Crm\FamilyModule\Events\NewSubscriptionHandler;
 use Crm\FamilyModule\Models\DonateSubscription;

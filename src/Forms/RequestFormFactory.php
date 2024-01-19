@@ -2,9 +2,9 @@
 
 namespace Crm\FamilyModule\Forms;
 
-use Crm\ApplicationModule\ActiveRow;
-use Crm\ApplicationModule\DataProvider\DataProviderManager;
 use Crm\ApplicationModule\Helpers\PriceHelper;
+use Crm\ApplicationModule\Models\DataProvider\DataProviderManager;
+use Crm\ApplicationModule\Models\Database\ActiveRow;
 use Crm\FamilyModule\DataProviders\RequestFormDataProviderInterface;
 use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;

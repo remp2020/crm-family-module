@@ -2,7 +2,7 @@
 
 namespace Crm\FamilyModule\Tests;
 
-use Crm\ApplicationModule\Event\LazyEventEmitter;
+use Crm\ApplicationModule\Models\Event\LazyEventEmitter;
 use Crm\FamilyModule\Events\NewSubscriptionHandler;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Models\FamilyRequests;

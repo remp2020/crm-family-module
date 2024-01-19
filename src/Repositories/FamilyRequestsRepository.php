@@ -2,7 +2,7 @@
 
 namespace Crm\FamilyModule\Repositories;
 
-use Crm\ApplicationModule\Repository;
+use Crm\ApplicationModule\Models\Database\Repository;
 use Crm\FamilyModule\Events\FamilyRequestCreatedEvent;
 use League\Event\Emitter;
 use Nette\Caching\Storage;

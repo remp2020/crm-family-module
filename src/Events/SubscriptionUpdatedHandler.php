@@ -2,7 +2,7 @@
 
 namespace Crm\FamilyModule\Events;
 
-use Crm\ApplicationModule\NowTrait;
+use Crm\ApplicationModule\Models\NowTrait;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Events\SubscriptionUpdatedEvent;

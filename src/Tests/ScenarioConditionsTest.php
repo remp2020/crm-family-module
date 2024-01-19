@@ -3,7 +3,7 @@
 namespace Crm\FamilyModule\Tests;
 
 use Contributte\Translation\Translator;
-use Crm\ApplicationModule\Criteria\ScenariosCriteriaStorage;
+use Crm\ApplicationModule\Models\Criteria\ScenariosCriteriaStorage;
 use Crm\FamilyModule\Events\NewSubscriptionHandler;
 use Crm\FamilyModule\FamilyModule;
 use Crm\FamilyModule\Models\DonateSubscription;

@@ -2,8 +2,8 @@
 
 namespace Crm\FamilyModule\Seeders;
 
+use Crm\ApplicationModule\Repositories\SnippetsRepository;
 use Crm\ApplicationModule\Seeders\ISeeder;
-use Crm\ApplicationModule\Snippet\Repository\SnippetsRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypeNamesRepository;
 use Symfony\Component\Console\Output\OutputInterface;
 

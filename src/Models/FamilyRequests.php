@@ -2,8 +2,8 @@
 
 namespace Crm\FamilyModule\Models;
 
-use Crm\ApplicationModule\Cache\CacheRepository;
-use Crm\ApplicationModule\Selection;
+use Crm\ApplicationModule\Models\Database\Selection;
+use Crm\ApplicationModule\Repositories\CacheRepository;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\PaymentsModule\Repositories\PaymentMetaRepository;

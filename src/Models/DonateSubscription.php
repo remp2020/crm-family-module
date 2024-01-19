@@ -2,7 +2,7 @@
 
 namespace Crm\FamilyModule\Models;
 
-use Crm\ApplicationModule\NowTrait;
+use Crm\ApplicationModule\Models\NowTrait;
 use Crm\FamilyModule\FamilyModule;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;

@@ -2,8 +2,8 @@
 
 namespace Crm\FamilyModule\Components\FamilyRequestsDashboardWidget;
 
-use Crm\ApplicationModule\Widget\BaseLazyWidget;
-use Crm\ApplicationModule\Widget\LazyWidgetManager;
+use Crm\ApplicationModule\Models\Widget\BaseLazyWidget;
+use Crm\ApplicationModule\Models\Widget\LazyWidgetManager;
 use Crm\FamilyModule\Models\FamilyRequests;
 
 class FamilyRequestsDashboardWidget extends BaseLazyWidget

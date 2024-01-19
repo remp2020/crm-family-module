@@ -2,7 +2,7 @@
 
 namespace Crm\FamilyModule\Models\Extension;
 
-use Crm\ApplicationModule\NowTrait;
+use Crm\ApplicationModule\Models\NowTrait;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Models\Extension\Extension;
 use Crm\SubscriptionsModule\Models\Extension\ExtensionInterface;
