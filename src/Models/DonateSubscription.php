@@ -70,7 +70,7 @@ class DonateSubscription
                 $slaveUser,
                 FamilyModule::SUBSCRIPTION_TYPE_FAMILY,
                 $masterSubscription->start_time,
-                $masterSubscription->end_time
+                $masterSubscription->end_time,
             );
         } elseif (isset($subscriptionMeta['family_subscription_type']) && $subscriptionMeta['family_subscription_type'] === 'days') {
             if (!isset($subscriptionMeta['family_subscription_days'])) {
