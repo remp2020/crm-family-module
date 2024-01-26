@@ -18,7 +18,6 @@ use Crm\SubscriptionsModule\Models\PaymentItem\SubscriptionTypePaymentItem;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypeItemMetaRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypeItemsRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypesRepository;
-use Crm\UsersModule\DataProviders\AddressFormDataProviderInterface;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\TextInput;
 use Nette\Localization\Translator;
@@ -136,20 +135,31 @@ class RequestFormFactory
                     ->setHtmlAttribute('placeholder', 'family.admin.form.request.count.label')
                     ->setDefaultValue(0);
 
-                $formItems[$id][$item->id]->addText('price', 'family.admin.form.request.price.label')
+                /** @var RequestFormDataProviderInterface[] $providers */
+                $providers = $this->dataProviderManager->getProviders(
+                    'family.dataprovider.request_form',
+                    RequestFormDataProviderInterface::class
+                );
+                $subscriptionTypeItemPriceOptions = [sprintf('%.2f', $item->amount) => $this->priceHelper->getFormattedPrice(
+                    value: $item->amount,
+                    withoutCurrencySymbol: true
+                )];
+                foreach ($providers as $sorting => $provider) {
+                    $options = $provider->provideSubscriptionTypeItemPriceOptions($item);
+                    foreach ($options as $priceValue => $priceLabel) {
+                        $subscriptionTypeItemPriceOptions[sprintf('%.2f', $priceValue)] = $priceLabel;
+                    }
+                }
+
+                $formItems[$id][$item->id]->addSelect('price', 'family.admin.form.request.price.label', $subscriptionTypeItemPriceOptions)
                     ->setHtmlAttribute('placeholder', 'family.admin.form.request.price.label')
-                    ->addRule(Form::FLOAT, 'family.admin.form.request.price.number')
                     ->addRule(Form::MIN, 'family.admin.form.request.price.number', 0)
                     ->addRule(Form::PATTERN, 'family.admin.form.request.price.invalid_format', '^\d{1,8}[\.,]?\d{0,2}$')
-                    ->addConditionOn($formItems[$id][$item->id]['count'], Form::NOT_EQUAL, 0)
-                    ->setRequired('family.admin.form.request.price.required');
+                    ->setPrompt('0');
 
                 if ($item->amount > 0) {
-                    $amount = $this->priceHelper->getFormattedPrice(value: $item->amount, withoutCurrencySymbol: true);
                     $formItems[$id][$item->id]['price']
-                        ->setDefaultValue($amount)
-                        ->setHtmlAttribute('placeholder', $amount)
-                    ;
+                        ->setDefaultValue(sprintf('%.2f', $item->amount));
                 }
 
                 $formItems[$id][$item->id]->addText('name', 'family.admin.form.request.name.label')
@@ -162,7 +172,7 @@ class RequestFormFactory
         $form->addCheckbox('no_vat', 'family.admin.form.request.no_vat.label')
             ->setOption('description', 'family.admin.form.request.no_vat.description');
 
-        /** @var AddressFormDataProviderInterface[] $providers */
+        /** @var RequestFormDataProviderInterface[] $providers */
         $providers = $this->dataProviderManager->getProviders('family.dataprovider.request_form', RequestFormDataProviderInterface::class);
         foreach ($providers as $sorting => $provider) {
             $form = $provider->provide([
@@ -222,8 +232,8 @@ class RequestFormFactory
         $user = $this->user;
         $paymentItemContainer = new PaymentItemContainer();
 
-        foreach ($this->subscriptionTypeItemsRepository->getItemsForSubscriptionType($subscriptionType) as $id => $subscriptionTypeItem) {
-            if (isset($values[$subscriptionType->id][$id]['count']) && $values[$subscriptionType->id][$id]['count'] > 0) {
+        foreach ($this->subscriptionTypeItemsRepository->getItemsForSubscriptionType($subscriptionType) as $itemId => $subscriptionTypeItem) {
+            if (isset($values[$subscriptionType->id][$itemId]['count']) && $values[$subscriptionType->id][$itemId]['count'] > 0) {
                 $subscriptionTypeItemMeta = $this->subscriptionTypeItemMetaRepository
                     ->findBySubscriptionTypeItemAndKey($subscriptionTypeItem, 'family_slave_subscription_type_id')
                     ->fetch();
@@ -246,12 +256,14 @@ class RequestFormFactory
                 $slaveSubscriptionTypeItem = reset($slaveSubscriptionTypeItems);
                 $metas = $this->subscriptionTypeItemMetaRepository->findBySubscriptionTypeItem($slaveSubscriptionTypeItem)->fetchPairs('key', 'value');
 
+                $subscriptionTypeItemPrice = (float) str_replace(',', '.', $form[$subscriptionType->id][$itemId]['price']->getRawValue());
+
                 $subscriptionTypePaymentItem = new SubscriptionTypePaymentItem(
                     $slaveSubscriptionType->id,
-                    $values[$subscriptionType->id][$id]['name'],
-                    $values[$subscriptionType->id][$id]['price'],
+                    $values[$subscriptionType->id][$itemId]['name'],
+                    $subscriptionTypeItemPrice,
                     $subscriptionTypeItem->vat,
-                    $values[$subscriptionType->id][$id]['count'],
+                    $values[$subscriptionType->id][$itemId]['count'],
                     $metas,
                     $subscriptionTypeItem->id
                 );
@@ -297,9 +309,12 @@ class RequestFormFactory
         $totalCount = 0;
         $totalAmount = 0.0;
         foreach ($this->subscriptionTypeItemsRepository->getItemsForSubscriptionType($subscriptionType) as $id => $item) {
+            $subscriptionTypeItemPrice = $form->getComponent($subscriptionType->id)[$id]['price']->getRawValue();
+
             $totalCount += $values[$subscriptionType->id][$id]['count'];
-            $totalAmount += (float) $values[$subscriptionType->id][$id]['price'] * $values[$subscriptionType->id][$id]['count'];
+            $totalAmount += (float) $subscriptionTypeItemPrice * $values[$subscriptionType->id][$id]['count'];
         }
+
         if ($totalCount === 0) {
             $form->addError('family.admin.form.request.count.total');
         }
