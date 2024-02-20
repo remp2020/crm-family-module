@@ -27,7 +27,7 @@ class ExtendFamilyExtension implements ExtensionInterface
     ) {
     }
 
-    public function getStartTime(ActiveRow $user, ActiveRow $subscriptionType): Extension
+    public function getStartTime(ActiveRow $user, ActiveRow $subscriptionType, ?ActiveRow $address = null): Extension
     {
         // load IDs of all family subscription types
         $familySubscriptionTypeIds = array_merge(
