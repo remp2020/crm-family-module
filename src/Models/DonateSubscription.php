@@ -144,7 +144,7 @@ class DonateSubscription
         return $familyRequest;
     }
 
-    public function releaseFamilyRequest(ActiveRow $familyRequest)
+    public function releaseFamilyRequest(ActiveRow $familyRequest, bool $isAdmin = false)
     {
         // do not cancel already cancelled family request (e.g. second call on handler's URL)
         // otherwise multiple "substitute" child subscriptions will be generated
@@ -161,7 +161,7 @@ class DonateSubscription
         $slaveSubscription = $familyRequest->slave_subscription;
         // already stopped subscription
         if ($slaveSubscription->end_time >= $this->getNow()) {
-            $this->stopSubscriptionHandler->stopSubscription($slaveSubscription);
+            $this->stopSubscriptionHandler->stopSubscription($slaveSubscription, $isAdmin);
         }
 
         $this->familyRequestsRepository->add(

@@ -128,7 +128,9 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
         if (!$familyRequest) {
             return;
         }
-        $this->donateSubscription->releaseFamilyRequest($familyRequest);
+
+        $isAdmin = $this->getPresenter() instanceof AdminPresenter;
+        $this->donateSubscription->releaseFamilyRequest($familyRequest, $isAdmin);
 
         $this->redirect('this');
     }
