@@ -56,6 +56,14 @@ class FamilySubscriptionTypesRepository extends Repository
         return $this->getTable()->where('slave_subscription_type_id', $subscriptionType->id)->count('*') > 0;
     }
 
+    final public function isFamilySubscriptionType(ActiveRow $subscriptionType): bool
+    {
+        return $this->getTable()->whereOr([
+            'master_subscription_type_id' => $subscriptionType->id,
+            'slave_subscription_type_id' => $subscriptionType->id,
+        ])->count('*') > 0;
+    }
+
     final public function getCustomizableSubscriptionTypes(): array
     {
         return $this->getTable()->where(['slave_subscription_type_id' => null])

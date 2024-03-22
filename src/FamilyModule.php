@@ -21,6 +21,7 @@ use Crm\FamilyModule\Components\FamilySubscriptionTypeDetailsWidget\FamilySubscr
 use Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget\MasterFamilySubscriptionInfoWidget;
 use Crm\FamilyModule\Components\SlaveFamilySubscriptionInfoWidget\SlaveFamilySubscriptionInfoWidget;
 use Crm\FamilyModule\Components\UsersAbusiveAdditionalWidget\UsersAbusiveAdditionalWidget;
+use Crm\FamilyModule\Events\BeforeCreateRenewalPaymentEventHandler;
 use Crm\FamilyModule\Events\FamilyRequestCreatedEvent;
 use Crm\FamilyModule\Events\NewSubscriptionHandler;
 use Crm\FamilyModule\Events\SubscriptionShortenedHandler;
@@ -31,6 +32,7 @@ use Crm\FamilyModule\Models\Scenarios\IsFamilySlaveCriteria;
 use Crm\FamilyModule\Seeders\FamilySeeder;
 use Crm\FamilyModule\Seeders\SubscriptionExtensionMethodsSeeder;
 use Crm\FamilyModule\Seeders\SubscriptionTypeNamesSeeder;
+use Crm\PaymentsModule\Events\BeforeCreateRenewalPaymentEvent;
 use Crm\SubscriptionsModule\Events\NewSubscriptionEvent;
 use Crm\SubscriptionsModule\Events\SubscriptionShortenedEvent;
 use Crm\SubscriptionsModule\Events\SubscriptionUpdatedEvent;
@@ -90,6 +92,10 @@ class FamilyModule extends CrmModule
         $emitter->addListener(
             SubscriptionUpdatedEvent::class,
             SubscriptionUpdatedHandler::class
+        );
+        $emitter->addListener(
+            BeforeCreateRenewalPaymentEvent::class,
+            BeforeCreateRenewalPaymentEventHandler::class,
         );
     }
 
