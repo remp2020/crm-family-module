@@ -40,7 +40,7 @@ class RequestsAdminPresenter extends AdminPresenter
 
         $customFamilySubscriptionTypes = $this->familySubscriptionTypesRepository->getCustomizableSubscriptionTypes();
 
-        $this->template->user = $user;
+        $this->template->dbUser = $user;
         $this->template->subscriptionTypes = $customFamilySubscriptionTypes;
     }
 
