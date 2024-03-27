@@ -11,7 +11,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <a href="{plink :Users:UsersAdmin:Show $dbUser->id}"><i class="fa fa-angle-left"></i> {_users.admin.edit.back_to_detail}</a>
+        <a href="{plink :Users:UsersAdmin:Show $userRow->id}"><i class="fa fa-angle-left"></i> {_users.admin.edit.back_to_detail}</a>
     </div>
 </div>
 
@@ -19,7 +19,7 @@
     <div class="col-md-10 col-md-offset-1">
         <div class="page-header">
             <h2 n:block="title">
-                {_family.admin.form.request.title} <small>{$dbUser->public_name}</small>
+                {_family.admin.form.request.title} <small>{$userRow->public_name}</small>
             </h2>
         </div>
     </div>
