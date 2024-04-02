@@ -136,7 +136,7 @@ class FamilyRequestsRepository extends Repository
 
     final public function findSlaveSubscriptionsWithContentAccess(ActiveRow $masterSubscription, string $contentAccess): Selection
     {
-        return $this->masterSubscriptionFamilyRequests($masterSubscription)
+        return $this->masterSubscriptionActiveFamilyRequests($masterSubscription)
             ->where('subscription_type:subscription_type_content_access.content_access.name', $contentAccess);
     }
 }
