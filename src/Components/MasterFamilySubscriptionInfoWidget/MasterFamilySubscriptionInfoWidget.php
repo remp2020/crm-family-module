@@ -3,48 +3,37 @@
 namespace Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget;
 
 use Crm\AdminModule\Presenters\AdminPresenter;
+use Crm\ApplicationModule\Models\Snippet\SnippetRenderer;
 use Crm\ApplicationModule\Models\Widget\BaseLazyWidget;
 use Crm\ApplicationModule\Models\Widget\LazyWidgetManager;
+use Crm\ApplicationModule\Repositories\SnippetsRepository;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
 use Crm\UsersModule\Repositories\UsersRepository;
+use Nette\Application\LinkGenerator;
 use Nette\Localization\Translator;
 
 class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
 {
-    private $templateName = 'master_family_subscription_info_widget.latte';
+    private string $templateName = 'master_family_subscription_info_widget.latte';
 
-    private $familyRequestsRepository;
-
-    private $familySubscriptionTypesRepository;
-
-    private $usersRepository;
-
-    private $donateSubscription;
-
-    private $translator;
-
-    private $subscriptionsRepository;
+    private ?string $activationEmailSnippetIdentifier = null;
 
     public function __construct(
         LazyWidgetManager $lazyWidgetManager,
-        FamilyRequestsRepository $familyRequestsRepository,
-        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
-        UsersRepository $usersRepository,
-        DonateSubscription $donateSubscription,
-        Translator $translator,
-        SubscriptionsRepository $subscriptionsRepository
+        private readonly FamilyRequestsRepository $familyRequestsRepository,
+        private readonly FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
+        private readonly UsersRepository $usersRepository,
+        private readonly DonateSubscription $donateSubscription,
+        private readonly Translator $translator,
+        private readonly SubscriptionsRepository $subscriptionsRepository,
+        private readonly SnippetsRepository $snippetsRepository,
+        private readonly SnippetRenderer $snippetRenderer,
+        private readonly LinkGenerator $linkGenerator,
     ) {
         parent::__construct($lazyWidgetManager);
-
-        $this->familyRequestsRepository = $familyRequestsRepository;
-        $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
-        $this->usersRepository = $usersRepository;
-        $this->donateSubscription = $donateSubscription;
-        $this->translator = $translator;
-        $this->subscriptionsRepository = $subscriptionsRepository;
     }
 
     public function identifier()
@@ -100,9 +89,31 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
     {
         $user = $this->usersRepository->getByEmail($this->presenter->getParameter('email'));
         if (!$user) {
+            $message = $this->translator->translate('family.components.master_family_subscription_info.modal.error.not_registered');
+
+            $snippet = $this->snippetsRepository->loadByIdentifier($this->activationEmailSnippetIdentifier);
+            if ($snippet) {
+                $renderedSnippet = $this->snippetRenderer->render([
+                    $this->activationEmailSnippetIdentifier,
+                    'link' => $this->linkGenerator->link('Family:Requests:default', ['id' => $this->presenter->getParameter('familyRequestCode')])
+                ]);
+
+                // convert line breaks for usage in mailto link (https://www.rfc-editor.org/rfc/rfc2368#page-3)
+                $text = str_replace('%0A', '%0D%0A', rawurlencode($renderedSnippet));
+
+                $message = $this->translator->translate(
+                    'family.components.master_family_subscription_info.modal.error.not_registered_send_link',
+                    [
+                        'email' => $this->presenter->getParameter('email'),
+                        'subject' => rawurlencode($snippet->title),
+                        'text' => $text,
+                    ]
+                );
+            }
+
             $this->getPresenter()->sendJson([
                 'status' => 'error',
-                'message' => $this->translator->translate('family.components.master_family_subscription_info.modal.error.not_registered'),
+                'message' => $message,
             ]);
         }
 
@@ -152,5 +163,10 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
         ]);
 
         $this->redirect('this');
+    }
+
+    public function setActivationEmailSnippet(string $snippetIdentifier): void
+    {
+        $this->activationEmailSnippetIdentifier = $snippetIdentifier;
     }
 }

@@ -84,6 +84,7 @@ components:
             stop_confirm: "Are you sure you want to stop child subscription for %email%?"
             error:
                 not_registered: 'E-mail is not registered <i class="fa fa-question-circle" style="margin: auto;" data-toggle="tooltip" title="If there is no account with entered e-mail address, it is necessary to create it via the activation link"></i>'
+                not_registered_send_link: 'E-mail is not registered.<br> <a href="mailto:%email%?subject=%subject%&body=%text%" style="text-decoration: underline;">Send activation link by e-mail.</a>'
                 wrong_status: 'Child subscription activation failed - activation code expired or used. Reload the page.'
             note: "Name of user <br><span class=\"note-info\">(used for your orientation)</span>"
             note_placeholder: Name of user
