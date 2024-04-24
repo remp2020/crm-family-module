@@ -143,8 +143,7 @@ class FamilyRequests
     {
         $callable = function () {
             return $this->activeFamilyOwners()
-                ->group('user_id')
-                ->count();
+                ->count("DISTINCT(subscriptions.user_id)");
         };
 
         if ($allowCached) {
@@ -167,7 +166,8 @@ class FamilyRequests
         $callable = function () {
             return $this->familyRequestsRepository->getTable()
                 ->where('master_subscription_id IN (?)', $this->activeFamilyOwners())
-                ->count();
+                ->where('status IN (?)', [FamilyRequestsRepository::STATUS_CREATED, FamilyRequestsRepository::STATUS_ACCEPTED])
+                ->count("*");
         };
 
         if ($allowCached) {
@@ -190,7 +190,7 @@ class FamilyRequests
         $callable = function () {
             // get paying subscribers
             // but remove parent subscriptions without access to content
-            // company/family children are not within this number; they don't have payment linked to subscription
+            // company/family children are included in paying subscribers
             $paidSubscribers = $this->paymentsRepository->paidSubscribers();
             $masterSubscriptionTypes = $this->familySubscriptionTypesRepository->masterSubscriptionTypes();
             if (!empty($masterSubscriptionTypes)) {
@@ -198,10 +198,13 @@ class FamilyRequests
             }
             $paidSubscribersCount = $paidSubscribers->count('DISTINCT(subscriptions.user_id)');
 
-            // get family requests (company/family children)
-            $familyRequestsCount = $this->activeFamilyRequestsCount();
+            // include unused children subscriptions; these are already paid
+            $unusedRequests = $this->familyRequestsRepository->getTable()
+                ->where('status', FamilyRequestsRepository::STATUS_CREATED)
+                ->where('master_subscription_id IN (?)', $this->activeFamilyOwners())
+                ->count('*');
 
-            return ($paidSubscribersCount + $familyRequestsCount);
+            return ($paidSubscribersCount + $unusedRequests);
         };
 
         if ($allowCached) {

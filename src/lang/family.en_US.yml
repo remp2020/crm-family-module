@@ -37,13 +37,13 @@ components:
         title: 'Active company/family subscriptions'
         active_parents:
             label: Active parents
-            tooltip: 'The number of payments for company/family subscriptions that are currently active.'
+            tooltip: 'The number of users with currently active master company/family subscription.'
         child_created:
             label: Generated family requests
             tooltip: 'The number of subscriptions generated for active parents.'
         paid_subscribers_with_family_requests:
-            label: 'Paying subscribers + company'
-            tooltip: "Number of active subscribers with payment + number of company/family accesses. One user is once even if he has multiple subscriptions. Generated company/family doesn't need to be activated."
+            label: 'Paying subscribers + unused company'
+            tooltip: "Number of active subscribers with paid subscription + number of unused company/family accesses. One user is counted once even if he has multiple subscriptions."
 
     users_abusive_additional:
         master_account: Master account

@@ -37,13 +37,13 @@ components:
         title: 'Aktivní firemní/rodinné předplatné'
         active_parents:
             label: Aktivní správcovské účty
-            tooltip: 'Počet plateb za firemní/rodinné předplatné, jejichž předplatné je aktuálně aktivní.'
+            tooltip: 'Počet uživatelů s aktivním správcovským firemním/rodinným předplatným.'
         child_created:
             label: Vygenerované dceřiné přístupy
             tooltip: 'Počet přístupů vygenerovaných pro aktivní správcovské účty.'
         paid_subscribers_with_family_requests:
-            label: 'Předplatitelé s platbou + firemní'
-            tooltip: 'Počet předplatitelů s aktivním předplatným s platbou + počet firemních/rodinných přístupů. Jeden uživatel je jednou i když má více předplatných. Vygenerované firemní / rodinné nemusí být aktivovány.'
+            label: 'S placeným předplatným + neaktivované dceřiné'
+            tooltip: 'Počet předplatitelů s aktivním placeným předplatným + počet neaktivovaných firemních/rodinných přístupů. Jeden uživatel je započítan jednou i když má více předplatných.'
 
     users_abusive_additional:
         master_account: Master konto
