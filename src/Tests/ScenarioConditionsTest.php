@@ -21,6 +21,7 @@ use Crm\SubscriptionsModule\Models\Builder\SubscriptionTypeBuilder;
 use Crm\SubscriptionsModule\Models\Generator\SubscriptionsGenerator;
 use Crm\SubscriptionsModule\Models\Generator\SubscriptionsParams;
 use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
+use Crm\SubscriptionsModule\SubscriptionsModule;
 use Crm\UsersModule\Models\Auth\UserManager;
 use Nette\Utils\DateTime;
 
@@ -88,6 +89,9 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
         $this->scenariosCriteriaStorage = $this->inject(ScenariosCriteriaStorage::class);
         $m = new FamilyModule($this->container, $this->inject(Translator::class), $this->inject(FamilyRequests::class));
         $m->registerScenariosCriteria($this->scenariosCriteriaStorage);
+
+        $subscriptionsModule = new SubscriptionsModule($this->container, $this->inject(Translator::class), $this->inject(SubscriptionsRepository::class));
+        $subscriptionsModule->registerScenariosCriteria($this->scenariosCriteriaStorage);
 
         // To create family requests and renew family subscriptions
         $this->lazyEventEmitter->addListener(NewSubscriptionEvent::class, $this->inject(NewSubscriptionHandler::class));
