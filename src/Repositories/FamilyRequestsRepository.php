@@ -33,7 +33,7 @@ class FamilyRequestsRepository extends Repository
         ActiveRow $subscriptionType,
         $status = self::STATUS_CREATED,
         ?DateTime $expiresAt = null,
-        ?string $note = null
+        ?string $note = null,
     ) {
         $request = $this->getTable()->insert([
             'master_user_id' => $subscription->user_id,
@@ -51,7 +51,7 @@ class FamilyRequestsRepository extends Repository
         return $request;
     }
 
-    public function findByCode($code)
+    public function findByCode(string $code)
     {
         return $this->getTable()->where(['code' => $code])->limit(1)->fetch();
     }
@@ -59,6 +59,13 @@ class FamilyRequestsRepository extends Repository
     public function userFamilyRequest(ActiveRow $user)
     {
         return $this->getTable()->where(['master_user_id' => $user->id]);
+    }
+
+    public function assignSlaveUserToFamilyRequest(ActiveRow $request, ActiveRow $user): int
+    {
+        return $this->getTable()->where(['id' => $request->id])->update([
+            'slave_user_id' => $user->id
+        ]);
     }
 
     public function masterSubscriptionFamilyRequests(ActiveRow $subscription): Selection

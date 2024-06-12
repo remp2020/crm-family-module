@@ -44,6 +44,8 @@ services:
 
 	# forms
 	- Crm\FamilyModule\Forms\RequestFormFactory
+	- Crm\FamilyModule\Forms\EmailFormFactory
+	- Crm\FamilyModule\Forms\SignInFormFactory
 
 	# commands
 	- Crm\FamilyModule\Commands\GenerateFamilyRequestsCommand

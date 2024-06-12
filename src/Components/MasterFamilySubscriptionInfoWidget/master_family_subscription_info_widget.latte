@@ -142,7 +142,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr n:foreach="$subscriptionData['activeFamilyRequests'] as $request">
+                    <tr n:if="!empty($subscriptionData['activeFamilyRequests'])" n:foreach="$subscriptionData['activeFamilyRequests'] as $request">
                         <td>
                             {$request->subscription_type->user_label}
                         </td>
@@ -218,6 +218,11 @@
                                 <i class="fa fa-check icon" style="color: green"></i>
                                 <i class="fa fa-times icon" style="color: red"></i>
                             </div>
+                        </td>
+                    </tr>
+                    <tr n:else>
+                        <td colspan="6">
+                            <p class="text-center">{_family.components.master_family_subscription_info.modal.no_active_requests}</p>
                         </td>
                     </tr>
                     </tbody>

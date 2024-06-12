@@ -6,6 +6,8 @@ use Crm\ApplicationModule\Helpers\MaskEmailHelper;
 use Crm\ApplicationModule\Models\DataProvider\DataProviderManager;
 use Crm\ApplicationModule\Presenters\FrontendPresenter;
 use Crm\FamilyModule\DataProviders\EmailFormDataProviderInterface;
+use Crm\FamilyModule\Forms\EmailFormFactory;
+use Crm\FamilyModule\Forms\SignInFormFactory;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\SubscriptionsModule\Models\Subscription\ActualUserSubscription;
@@ -14,45 +16,39 @@ use Crm\UsersModule\Models\Auth\InvalidEmailException;
 use Crm\UsersModule\Models\Auth\UserManager;
 use Crm\UsersModule\Repositories\UserActionsLogRepository;
 use Nette\Application\UI\Form;
+use Nette\DI\Attributes\Inject;
 use Nette\Security\AuthenticationException;
 use Nette\Utils\DateTime;
 use Tomaj\Form\Renderer\BootstrapInlineRenderer;
-use Tomaj\Form\Renderer\BootstrapRenderer;
 
 class RequestsPresenter extends FrontendPresenter
 {
-    private $familyRequestsRepository;
+    #[Inject]
+    public FamilyRequestsRepository $familyRequestsRepository;
 
-    private $userManager;
+    #[Inject]
+    public UserManager $userManager;
 
-    private $authorizator;
+    #[Inject]
+    public Authorizator $authorizator;
 
-    private $donateSubscription;
+    #[Inject]
+    public DonateSubscription $donateSubscription;
 
-    private $actualUserSubscription;
+    #[Inject]
+    public ActualUserSubscription $actualUserSubscription;
 
-    private $userActionsLogRepository;
+    #[Inject]
+    public UserActionsLogRepository $userActionsLogRepository;
 
-    private $dataProviderManager;
+    #[Inject]
+    public DataProviderManager $dataProviderManager;
 
-    public function __construct(
-        FamilyRequestsRepository $familyRequestsRepository,
-        UserManager $userManager,
-        Authorizator $authorizator,
-        DonateSubscription $donateSubscription,
-        ActualUserSubscription $actualUserSubscription,
-        UserActionsLogRepository $userActionsLogRepository,
-        DataProviderManager $dataProviderManager
-    ) {
-        parent::__construct();
-        $this->familyRequestsRepository = $familyRequestsRepository;
-        $this->userManager = $userManager;
-        $this->authorizator = $authorizator;
-        $this->donateSubscription = $donateSubscription;
-        $this->actualUserSubscription = $actualUserSubscription;
-        $this->userActionsLogRepository = $userActionsLogRepository;
-        $this->dataProviderManager = $dataProviderManager;
-    }
+    #[Inject]
+    public EmailFormFactory $emailFormFactory;
+
+    #[Inject]
+    public SignInFormFactory $signInFormFactory;
 
     public function renderDefault($id)
     {
@@ -185,22 +181,9 @@ class RequestsPresenter extends FrontendPresenter
 
     protected function createComponentEmailForm()
     {
-        $form = new Form();
-        $form->setTranslator($this->translator);
-        $form->setRenderer(new BootstrapRenderer());
-        $form->addText('email', 'family.frontend.new.form.email')
-            ->setHtmlAttribute('autofocus')
-            ->setRequired('family.frontend.new.form.email_required')
-            ->setHtmlAttribute('placeholder', 'family.frontend.new.form.email_placeholder');
-
-        /** @var EmailFormDataProviderInterface[] $providers */
-        $providers = $this->dataProviderManager->getProviders('family.dataprovider.email_form', EmailFormDataProviderInterface::class);
-        foreach ($providers as $sorting => $provider) {
-            $form = $provider->provide(['form' => $form]);
-        }
-
+        $form = $this->emailFormFactory->create();
         $form->addHidden('request', $this->params['id']);
-        $form->addSubmit('submit', 'family.frontend.new.form.submit');
+
         $form->onSuccess[] = function (Form $form) {
             if ($this->userManager->loadUserByEmail($form->getValues()['email'])) {
                 $this->redirect('signIn', $form->getValues()['request'], $form->getValues()['email']);
@@ -240,23 +223,8 @@ class RequestsPresenter extends FrontendPresenter
 
     protected function createComponentSignInForm()
     {
-        $form = new Form();
-        $form->setTranslator($this->translator);
-        $form->setRenderer(new BootstrapRenderer());
+        $form = $this->signInFormFactory->create($this->params['email']);
         $form->addHidden('request', $this->params['id']);
-        $form->addText('username', 'family.frontend.new.form.email')
-            ->setHtmlType('email')
-            ->setHtmlAttribute('autofocus')
-            ->setRequired('family.frontend.new.form.email_required')
-            ->setHtmlAttribute('placeholder', 'family.frontend.new.form.email_placeholder');
-
-        $form->addPassword('password', 'family.frontend.signin.form.password')
-            ->setRequired('family.frontend.signin.form.password_required')
-            ->setHtmlAttribute('placeholder', 'family.frontend.signin.form.password_placeholder');
-
-        $form->addSubmit('send', 'family.frontend.signin.form.submit');
-
-        $form->setDefaults(['username' => $this->params['email']]);
 
         $form->onSuccess[] = function (Form $form) {
             try {

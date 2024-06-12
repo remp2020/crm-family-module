@@ -88,6 +88,7 @@ components:
                 wrong_status: 'Child subscription activation failed - activation code expired or used. Reload the page.'
             note: "Name of user <br><span class=\"note-info\">(used for your orientation)</span>"
             note_placeholder: Name of user
+            no_active_requests: No active child subscriptions
         add_button: Add configurable parent subscription
 
     slave_family_subscription_info:
