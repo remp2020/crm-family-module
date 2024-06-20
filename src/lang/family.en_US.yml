@@ -149,3 +149,8 @@ admin:
                 label: Use 0% VAT
                 description: Deducts VAT from all items. Both the advance and the tax invoice will be without VAT. It is supposed to be used only for foreign companies with a valid VAT number or companies purchasing from outside the EU.
             send: Add
+
+measurements:
+    active_paid_accesses:
+        title: 'Paying subscribers + unused company'
+        description: 'Number of active subscribers with paid subscription + number of unused company/family accesses. One user is counted once even if he has multiple subscriptions.'

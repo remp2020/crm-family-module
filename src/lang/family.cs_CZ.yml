@@ -150,3 +150,8 @@ admin:
                 label: Nákup bez DPH
                 description: Odečte od všech položek DPH. Zálohová i daňová faktura budou bez DPH. Používá se pouze pro zahraniční firmy s platným DIČ nebo firmy nakupující z mimo EU.
             send: Pridej
+
+measurements:
+    active_paid_accesses:
+        title: 'S placeným předplatným + neaktivované dceřiné'
+        description: 'Počet předplatitelů s aktivním placeným předplatným + počet neaktivovaných firemních/rodinných přístupů. Jeden uživatel je započítan jednou i když má více předplatných.'

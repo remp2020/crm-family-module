@@ -41,6 +41,7 @@ services:
 	- Crm\FamilyModule\Seeders\FamilySeeder
 	- Crm\FamilyModule\Seeders\SubscriptionExtensionMethodsSeeder
 	- Crm\FamilyModule\Seeders\SubscriptionTypeNamesSeeder
+	- Crm\FamilyModule\Seeders\MeasurementsSeeder
 
 	# forms
 	- Crm\FamilyModule\Forms\RequestFormFactory
@@ -58,3 +59,7 @@ services:
 		setup:
 			# register subscription extension method for family subscription types
 			- registerExtension(Crm\FamilyModule\Models\Extension\ExtendFamilyExtension::METHOD_CODE, Crm\FamilyModule\Models\Extension\ExtendFamilyExtension)
+
+	measurementManager:
+		setup:
+			- register(Crm\FamilyModule\Measurements\ActivePaidAccessesMeasurement())

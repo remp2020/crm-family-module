@@ -150,3 +150,8 @@ admin:
                 label: Nákup bez DPH
                 description: Odpočíta od všetkých položiek DPH. Zálohová aj daňová faktúra budú bez DPH. Používa sa len pre zahraničné firmy s platným IČ DPH alebo firmy nakupujúce z mimo EU.
             send: Pridaj
+
+measurements:
+    active_paid_accesses:
+        title: 'S plateným predplatným + neaktivované dcérske'
+        description: 'Počet predplatiteľov s aktívnym plateným predplatným + počet neaktivovaných firemných/rodinných prístupov. Jeden používateľ je započítaný jeden krát aj keď má viac predplatných.'
