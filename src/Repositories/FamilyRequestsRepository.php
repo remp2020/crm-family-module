@@ -51,7 +51,7 @@ class FamilyRequestsRepository extends Repository
         return $request;
     }
 
-    public function findByCode(string $code)
+    public function findByCode(string $code): ?ActiveRow
     {
         return $this->getTable()->where(['code' => $code])->limit(1)->fetch();
     }

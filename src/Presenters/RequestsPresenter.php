@@ -15,8 +15,10 @@ use Crm\UsersModule\Models\Auth\Authorizator;
 use Crm\UsersModule\Models\Auth\InvalidEmailException;
 use Crm\UsersModule\Models\Auth\UserManager;
 use Crm\UsersModule\Repositories\UserActionsLogRepository;
+use Nette\Application\BadRequestException;
 use Nette\Application\UI\Form;
 use Nette\DI\Attributes\Inject;
+use Nette\Database\Table\ActiveRow;
 use Nette\Security\AuthenticationException;
 use Nette\Utils\DateTime;
 use Tomaj\Form\Renderer\BootstrapInlineRenderer;
@@ -55,6 +57,9 @@ class RequestsPresenter extends FrontendPresenter
         if ($this->getUser()->isLoggedIn()) {
             $this->redirect('logged', $id);
         }
+        if (!$id) {
+            throw new BadRequestException();
+        }
         $request = $this->familyRequest($id);
         $this->template->request = $request;
     }
@@ -78,6 +83,9 @@ class RequestsPresenter extends FrontendPresenter
     public function renderLogged($id)
     {
         $this->onlyLoggedIn();
+        if (!$id) {
+            throw new BadRequestException();
+        }
         $request = $this->familyRequest($id);
         $this->template->request = $request;
     }
@@ -87,12 +95,15 @@ class RequestsPresenter extends FrontendPresenter
         if ($this->getUser()->isLoggedIn()) {
             $this->redirect('logged', $id);
         }
+        if (!$id) {
+            throw new BadRequestException();
+        }
         $request = $this->familyRequest($id);
         $this->template->request = $request;
         $this->template->email = $email;
     }
 
-    private function familyRequest($id)
+    private function familyRequest(string $id): ActiveRow
     {
         $familyRequest = $this->familyRequestsRepository->findByCode($id);
 
@@ -120,6 +131,9 @@ class RequestsPresenter extends FrontendPresenter
 
     public function renderAccepted($id)
     {
+        if (!$id) {
+            throw new BadRequestException();
+        }
         $familyRequest = $this->familyRequestsRepository->findByCode($id);
         if (!$familyRequest || $familyRequest->status != FamilyRequestsRepository::STATUS_ACCEPTED) {
             $this->redirect('error');
