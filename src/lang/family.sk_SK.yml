@@ -149,6 +149,10 @@ admin:
             no_vat:
                 label: Nákup bez DPH
                 description: Odpočíta od všetkých položiek DPH. Zálohová aj daňová faktúra budú bez DPH. Používa sa len pre zahraničné firmy s platným IČ DPH alebo firmy nakupujúce z mimo EU.
+            oss_payment_country:
+                label: Krajina platby
+                description: Krajina platby
+                conflict: "Krajina nespĺňa pravidlá One Stop Shop, pravdepodobne z dôvodu konfliktu adres."
             send: Pridaj
 
 measurements:

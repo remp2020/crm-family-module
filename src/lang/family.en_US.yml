@@ -148,6 +148,10 @@ admin:
             no_vat:
                 label: Use 0% VAT
                 description: Deducts VAT from all items. Both the advance and the tax invoice will be without VAT. It is supposed to be used only for foreign companies with a valid VAT number or companies purchasing from outside the EU.
+            oss_payment_country:
+                label: Payment country
+                description: Payment country
+                conflict: "The country does not meet the One Stop Shop rules, probably due to an address conflict."
             send: Add
 
 measurements:

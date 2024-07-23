@@ -113,16 +113,31 @@
         <fieldset id="container-vat" class="col-md-12">
         <legend>{_family.admin.form.request.vat}</legend>
 
-        <div class="col-md-10">
-            <div class="form-group">
-                <div class="row">
-                    <div class="col-md-7 col-md-offset-5 checkbox" style="padding: 0;">
-                        {input no_vat}
-                        <span class="help-block">{_family.admin.form.request.no_vat.description}</span>
+            <div class="col-md-10">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="col-md-7 col-md-offset-5 checkbox" style="padding: 0;">
+                            {input no_vat}
+                            <span class="help-block">{_family.admin.form.request.no_vat.description}</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+            {if $oneStopShopEnabled}
+            <div class="col-md-10">
+                <div class="form-group">
+                    <div class="row">
+                        <div class="control-label col-md-5 col-sm-5">
+                            {label payment_country_id /}
+                        </div>
+                        <div class="col-md-7 col-sm-7" style="padding: 0;">
+                            {input payment_country_id}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/if}
         </fieldset>
 
         <div class="col-md-12">

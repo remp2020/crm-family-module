@@ -5,27 +5,19 @@ namespace Crm\FamilyModule\Presenters;
 use Crm\AdminModule\Presenters\AdminPresenter;
 use Crm\FamilyModule\Forms\RequestFormFactory;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
+use Crm\PaymentsModule\Models\OneStopShop\OneStopShop;
 use Crm\UsersModule\Repositories\UsersRepository;
 use Nette\Application\BadRequestException;
 
 class RequestsAdminPresenter extends AdminPresenter
 {
-    private RequestFormFactory $requestFormFactory;
-
-    private UsersRepository $usersRepository;
-
-    private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository;
-
     public function __construct(
-        RequestFormFactory $requestFormFactory,
-        UsersRepository $usersRepository,
-        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository
+        private RequestFormFactory $requestFormFactory,
+        private UsersRepository $usersRepository,
+        private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
+        private OneStopShop $oneStopShop,
     ) {
         parent::__construct();
-
-        $this->requestFormFactory = $requestFormFactory;
-        $this->usersRepository = $usersRepository;
-        $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
     }
 
     /**
@@ -40,6 +32,7 @@ class RequestsAdminPresenter extends AdminPresenter
 
         $customFamilySubscriptionTypes = $this->familySubscriptionTypesRepository->getCustomizableSubscriptionTypes();
 
+        $this->template->oneStopShopEnabled = $this->oneStopShop->isEnabled();
         $this->template->userRow = $user;
         $this->template->subscriptionTypes = $customFamilySubscriptionTypes;
     }

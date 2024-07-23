@@ -10,6 +10,9 @@ use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\InvoicesModule\Gateways\ProformaInvoice;
 use Crm\PaymentsModule\Models\Gateways\BankTransfer;
+use Crm\PaymentsModule\Models\GeoIp\GeoIpException;
+use Crm\PaymentsModule\Models\OneStopShop\OneStopShop;
+use Crm\PaymentsModule\Models\OneStopShop\OneStopShopCountryConflictException;
 use Crm\PaymentsModule\Models\PaymentItem\PaymentItemContainer;
 use Crm\PaymentsModule\Repositories\PaymentGatewaysRepository;
 use Crm\PaymentsModule\Repositories\PaymentMetaRepository;
@@ -18,10 +21,12 @@ use Crm\SubscriptionsModule\Models\PaymentItem\SubscriptionTypePaymentItem;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypeItemMetaRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypeItemsRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypesRepository;
+use Crm\UsersModule\Repositories\CountriesRepository;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\TextInput;
 use Nette\Localization\Translator;
 use Nette\Utils\DateTime;
+use Tracy\Debugger;
 
 class RequestFormFactory
 {
@@ -43,6 +48,8 @@ class RequestFormFactory
         private PriceHelper $priceHelper,
         private Translator $translator,
         private DataProviderManager $dataProviderManager,
+        private OneStopShop $oneStopShop,
+        private CountriesRepository $countriesRepository,
     ) {
     }
 
@@ -172,6 +179,16 @@ class RequestFormFactory
         $form->addCheckbox('no_vat', 'family.admin.form.request.no_vat.label')
             ->setOption('description', 'family.admin.form.request.no_vat.description');
 
+        if ($this->oneStopShop->isEnabled()) {
+            $paymentCountry = $form->addSelect(
+                'payment_country_id',
+                $this->translator->translate('family.admin.form.request.oss_payment_country.description'),
+                $this->countriesRepository->getAllPairs(),
+            )->setRequired();
+            $paymentCountry->setDefaultValue($this->countriesRepository->defaultCountry()->id);
+            $paymentCountry->getControlPrototype()->setAttribute('class', 'select2');
+        }
+
         /** @var RequestFormDataProviderInterface[] $providers */
         $providers = $this->dataProviderManager->getProviders('family.dataprovider.request_form', RequestFormDataProviderInterface::class);
         foreach ($providers as $sorting => $provider) {
@@ -229,6 +246,8 @@ class RequestFormFactory
             throw new \Exception("No payment gateway found for id: {$values['payment_gateway_id']}");
         }
 
+        $selectedPaymentCountry = $this->countriesRepository->find($values['payment_country_id'] ?? null);
+
         $user = $this->user;
         $paymentItemContainer = new PaymentItemContainer();
 
@@ -281,15 +300,28 @@ class RequestFormFactory
             throw new \Exception("No payment item has been added for subscription type: {$subscriptionType->id}");
         }
 
+        $countryResolution = null;
+        try {
+            $countryResolution  = $this->oneStopShop->resolveCountry(
+                user: $user,
+                selectedCountryCode: $selectedPaymentCountry?->iso_code,
+                paymentItemContainer: $paymentItemContainer
+            );
+        } catch (OneStopShopCountryConflictException|GeoIpException $exception) {
+            Debugger::log("RequestFormFactory OSS GeoIpException: " . $exception->getMessage(), Debugger::ERROR);
+            $form->addError('family.admin.form.request.oss_payment_country.conflict');
+            return;
+        }
+
         $payment = $this->paymentsRepository->add(
-            $subscriptionType,
-            $paymentGateway,
-            $user,
-            $paymentItemContainer,
-            null,
-            null,
-            $subscriptionStartAt,
-            $subscriptionEndAt
+            subscriptionType: $subscriptionType,
+            paymentGateway: $paymentGateway,
+            user: $user,
+            paymentItemContainer: $paymentItemContainer,
+            subscriptionStartAt: $subscriptionStartAt,
+            subscriptionEndAt: $subscriptionEndAt,
+            paymentCountry: $countryResolution?->country,
+            paymentCountryResolutionReason: $countryResolution?->getReasonValue(),
         );
 
         if (isset($values['keep_requests_unactivated']) && $values['keep_requests_unactivated']) {
