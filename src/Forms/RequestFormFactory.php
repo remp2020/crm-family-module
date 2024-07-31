@@ -10,7 +10,6 @@ use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\InvoicesModule\Gateways\ProformaInvoice;
 use Crm\PaymentsModule\Models\Gateways\BankTransfer;
-use Crm\PaymentsModule\Models\GeoIp\GeoIpException;
 use Crm\PaymentsModule\Models\OneStopShop\OneStopShop;
 use Crm\PaymentsModule\Models\OneStopShop\OneStopShopCountryConflictException;
 use Crm\PaymentsModule\Models\PaymentItem\PaymentItemContainer;
@@ -307,8 +306,8 @@ class RequestFormFactory
                 selectedCountryCode: $selectedPaymentCountry?->iso_code,
                 paymentItemContainer: $paymentItemContainer
             );
-        } catch (OneStopShopCountryConflictException|GeoIpException $exception) {
-            Debugger::log("RequestFormFactory OSS GeoIpException: " . $exception->getMessage(), Debugger::ERROR);
+        } catch (OneStopShopCountryConflictException $exception) {
+            Debugger::log("RequestFormFactory OSS conflict: " . $exception->getMessage(), Debugger::ERROR);
             $form->addError('family.admin.form.request.oss_payment_country.conflict');
             return;
         }
