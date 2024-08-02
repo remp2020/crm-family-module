@@ -2,6 +2,7 @@
 
 namespace Crm\FamilyModule\Forms;
 
+use Crm\ApplicationModule\Forms\Controls\CountriesSelectItemsBuilder;
 use Crm\ApplicationModule\Helpers\PriceHelper;
 use Crm\ApplicationModule\Models\DataProvider\DataProviderManager;
 use Crm\ApplicationModule\Models\Database\ActiveRow;
@@ -37,18 +38,19 @@ class RequestFormFactory
     public $onSave;
 
     public function __construct(
-        private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
-        private SubscriptionTypesRepository $subscriptionTypesRepository,
-        private SubscriptionTypeItemsRepository $subscriptionTypeItemsRepository,
-        private SubscriptionTypeItemMetaRepository $subscriptionTypeItemMetaRepository,
-        private PaymentGatewaysRepository $paymentGatewaysRepository,
-        private PaymentsRepository $paymentsRepository,
-        private PaymentMetaRepository $paymentMetaRepository,
-        private PriceHelper $priceHelper,
-        private Translator $translator,
-        private DataProviderManager $dataProviderManager,
-        private OneStopShop $oneStopShop,
-        private CountriesRepository $countriesRepository,
+        private readonly FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
+        private readonly SubscriptionTypesRepository $subscriptionTypesRepository,
+        private readonly SubscriptionTypeItemsRepository $subscriptionTypeItemsRepository,
+        private readonly SubscriptionTypeItemMetaRepository $subscriptionTypeItemMetaRepository,
+        private readonly PaymentGatewaysRepository $paymentGatewaysRepository,
+        private readonly PaymentsRepository $paymentsRepository,
+        private readonly PaymentMetaRepository $paymentMetaRepository,
+        private readonly PriceHelper $priceHelper,
+        private readonly Translator $translator,
+        private readonly DataProviderManager $dataProviderManager,
+        private readonly OneStopShop $oneStopShop,
+        private readonly CountriesRepository $countriesRepository,
+        private readonly CountriesSelectItemsBuilder $countriesSelectItemsBuilder,
     ) {
     }
 
@@ -182,7 +184,7 @@ class RequestFormFactory
             $paymentCountry = $form->addSelect(
                 'payment_country_id',
                 $this->translator->translate('family.admin.form.request.oss_payment_country.description'),
-                $this->countriesRepository->getAllPairs(),
+                $this->countriesSelectItemsBuilder->getAllPairs(),
             )->setRequired();
             $paymentCountry->setDefaultValue($this->countriesRepository->defaultCountry()->id);
             $paymentCountry->getControlPrototype()->setAttribute('class', 'select2');
