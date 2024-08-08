@@ -51,6 +51,9 @@ services:
 	# commands
 	- Crm\FamilyModule\Commands\GenerateFamilyRequestsCommand
 
+	# data providers
+	- Crm\FamilyModule\DataProviders\RecurrentPaymentPaymentItemContainerDataProvider
+
 	# presenters
 	- Crm\FamilyModule\Presenters\RequestsAdminPresenter
 

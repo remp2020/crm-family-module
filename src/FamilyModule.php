@@ -10,6 +10,7 @@ use Crm\ApplicationModule\Application\CommandsContainerInterface;
 use Crm\ApplicationModule\Application\Managers\SeederManager;
 use Crm\ApplicationModule\CrmModule;
 use Crm\ApplicationModule\Models\Criteria\ScenariosCriteriaStorage;
+use Crm\ApplicationModule\Models\DataProvider\DataProviderManager;
 use Crm\ApplicationModule\Models\Event\EventsStorage;
 use Crm\ApplicationModule\Models\Event\LazyEventEmitter;
 use Crm\ApplicationModule\Models\Widget\LazyWidgetManagerInterface;
@@ -21,6 +22,7 @@ use Crm\FamilyModule\Components\FamilySubscriptionTypeDetailsWidget\FamilySubscr
 use Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget\MasterFamilySubscriptionInfoWidget;
 use Crm\FamilyModule\Components\SlaveFamilySubscriptionInfoWidget\SlaveFamilySubscriptionInfoWidget;
 use Crm\FamilyModule\Components\UsersAbusiveAdditionalWidget\UsersAbusiveAdditionalWidget;
+use Crm\FamilyModule\DataProviders\RecurrentPaymentPaymentItemContainerDataProvider;
 use Crm\FamilyModule\Events\BeforeCreateRenewalPaymentEventHandler;
 use Crm\FamilyModule\Events\FamilyRequestCreatedEvent;
 use Crm\FamilyModule\Events\NewSubscriptionHandler;
@@ -97,6 +99,14 @@ class FamilyModule extends CrmModule
         $emitter->addListener(
             BeforeCreateRenewalPaymentEvent::class,
             BeforeCreateRenewalPaymentEventHandler::class,
+        );
+    }
+
+    public function registerDataProviders(DataProviderManager $dataProviderManager)
+    {
+        $dataProviderManager->registerDataProvider(
+            'payments.dataprovider.recurrent_payment_payment_item_container',
+            $this->getInstance(RecurrentPaymentPaymentItemContainerDataProvider::class)
         );
     }
 
