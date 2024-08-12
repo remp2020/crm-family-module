@@ -23,6 +23,7 @@ use Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget\MasterFamilyS
 use Crm\FamilyModule\Components\SlaveFamilySubscriptionInfoWidget\SlaveFamilySubscriptionInfoWidget;
 use Crm\FamilyModule\Components\UsersAbusiveAdditionalWidget\UsersAbusiveAdditionalWidget;
 use Crm\FamilyModule\DataProviders\RecurrentPaymentPaymentItemContainerDataProvider;
+use Crm\FamilyModule\DataProviders\SubscriptionTransferDataProvider;
 use Crm\FamilyModule\Events\BeforeCreateRenewalPaymentEventHandler;
 use Crm\FamilyModule\Events\FamilyRequestCreatedEvent;
 use Crm\FamilyModule\Events\NewSubscriptionHandler;
@@ -107,6 +108,10 @@ class FamilyModule extends CrmModule
         $dataProviderManager->registerDataProvider(
             'payments.dataprovider.recurrent_payment_payment_item_container',
             $this->getInstance(RecurrentPaymentPaymentItemContainerDataProvider::class)
+        );
+        $dataProviderManager->registerDataProvider(
+            'subscriptions.dataprovider.transfer',
+            $this->getInstance(SubscriptionTransferDataProvider::class),
         );
     }
 

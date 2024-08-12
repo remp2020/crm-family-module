@@ -19,6 +19,9 @@ services:
 	masterFamilySubscriptionInfoWidget: Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget\MasterFamilySubscriptionInfoWidget
 	- Crm\FamilyModule\Components\SlaveFamilySubscriptionInfoWidget\SlaveFamilySubscriptionInfoWidget
 
+	# data providers
+	- Crm\FamilyModule\DataProviders\SubscriptionTransferDataProvider
+
 	# events
 	familyNewSubscriptionHandler: Crm\FamilyModule\Events\NewSubscriptionHandler
 	- Crm\FamilyModule\Events\SubscriptionShortenedHandler
