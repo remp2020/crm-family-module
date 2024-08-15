@@ -290,6 +290,7 @@ class RequestFormFactory
                         $subscriptionTypePaymentItem->unitPriceWithoutVAT()
                     );
                     $subscriptionTypePaymentItem->forceVat(0);
+                    $paymentItemContainer->setPreventOssVatChange();
                 }
                 $paymentItemContainer->addItem($subscriptionTypePaymentItem);
             }
