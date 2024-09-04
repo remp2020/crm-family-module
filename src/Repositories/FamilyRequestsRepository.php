@@ -3,6 +3,7 @@
 namespace Crm\FamilyModule\Repositories;
 
 use Crm\ApplicationModule\Models\Database\Repository;
+use Crm\ApplicationModule\Repositories\AuditLogRepository;
 use Crm\FamilyModule\Events\FamilyRequestCreatedEvent;
 use League\Event\Emitter;
 use Nette\Caching\Storage;
@@ -21,11 +22,13 @@ class FamilyRequestsRepository extends Repository
     protected $tableName = 'family_requests';
 
     public function __construct(
+        AuditLogRepository $auditLogRepository,
         Explorer $database,
         Storage $cacheStorage = null,
-        private Emitter $emitter
+        private Emitter $emitter,
     ) {
         parent::__construct($database, $cacheStorage);
+        $this->auditLogRepository = $auditLogRepository;
     }
 
     public function add(
