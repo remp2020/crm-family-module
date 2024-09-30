@@ -11,6 +11,7 @@ use Crm\PaymentsModule\Events\PaymentChangeStatusEvent;
 use Crm\PaymentsModule\Events\PaymentStatusChangeHandler;
 use Crm\PaymentsModule\Models\PaymentItem\PaymentItemContainer;
 use Crm\PaymentsModule\Repositories\PaymentGatewaysRepository;
+use Crm\PaymentsModule\Repositories\PaymentMethodsRepository;
 use Crm\PaymentsModule\Repositories\PaymentsRepository;
 use Crm\PaymentsModule\Repositories\RecurrentPaymentsRepository;
 use Crm\SubscriptionsModule\Events\NewSubscriptionEvent;
@@ -26,41 +27,27 @@ use Nette\Utils\DateTime;
 
 class FamilySubscriptionsRenewalTest extends BaseTestCase
 {
-    /** @var UserManager */
-    private $userManager;
+    private UserManager $userManager;
+    private UsersRepository $usersRepository;
+    private SubscriptionsGenerator $subscriptionGenerator;
+    private PaymentsRepository $paymentsRepository;
+    private FamilyRequestsRepository $familyRequestsRepository;
+    private ActiveRow $paymentGateway;
+    private LazyEventEmitter $lazyEventEmitter;
+    private FamilyRequests $familyRequest;
+    private DonateSubscription $donateSubscription;
+    private SubscriptionsRepository $subscriptionsRepository;
+    private RecurrentPaymentsRepository $recurrentPaymentsRepository;
+    private PaymentMethodsRepository $paymentMethodsRepository;
+    private SubscriptionMetaRepository $subscriptionMetaRepository;
 
-    /** @var UsersRepository */
-    private $usersRepository;
-
-    /** @var SubscriptionsGenerator */
-    private $subscriptionGenerator;
-
-    /** @var PaymentsRepository */
-    private $paymentsRepository;
-
-    /** @var FamilyRequestsRepository */
-    private $familyRequestsRepository;
-
-    /** @var PaymentGatewaysRepository */
-    private $paymentGateway;
-
-    /** @var LazyEventEmitter */
-    private $lazyEventEmitter;
-
-    /** @var FamilyRequests */
-    private $familyRequest;
-
-    /** @var DonateSubscription */
-    private $donateSubscription;
-
-    /** @var SubscriptionsRepository */
-    private $subscriptionsRepository;
-
-    /** @var RecurrentPaymentsRepository */
-    private $recurrentPaymentsRepository;
-
-    /** @var SubscriptionMetaRepository */
-    private $subscriptionMetaRepository;
+    protected function requiredRepositories(): array
+    {
+        return [
+            ...parent::requiredRepositories(),
+            PaymentMethodsRepository::class,
+        ];
+    }
 
     protected function setUp(): void
     {
@@ -72,6 +59,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
         $this->subscriptionGenerator = $this->inject(SubscriptionsGenerator::class);
         $this->paymentsRepository = $this->inject(PaymentsRepository::class);
         $this->recurrentPaymentsRepository = $this->inject(RecurrentPaymentsRepository::class);
+        $this->paymentMethodsRepository = $this->inject(PaymentMethodsRepository::class);
         $this->familyRequestsRepository = $this->inject(FamilyRequestsRepository::class);
         $this->subscriptionMetaRepository = $this->inject(SubscriptionMetaRepository::class);
         $this->familyRequest = $this->inject(FamilyRequests::class);
@@ -405,7 +393,12 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
 
     private function makeRecurrentPayment($user, $previousPayment, $subscriptionType, $paidAtString)
     {
-        $recurrent = $this->recurrentPaymentsRepository->add('1111', $previousPayment, new DateTime('now - 1 minute'), 1, 1);
+        $paymentMethod = $this->paymentMethodsRepository->findOrAdd(
+            $user->id,
+            $previousPayment->payment_gateway_id,
+            '1111',
+        );
+        $recurrent = $this->recurrentPaymentsRepository->add($paymentMethod, $previousPayment, new DateTime('now - 1 minute'), 1, 1);
 
         $payment = $this->paymentsRepository->add(
             $subscriptionType,
