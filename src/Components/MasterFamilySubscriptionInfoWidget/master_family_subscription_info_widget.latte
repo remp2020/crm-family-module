@@ -124,7 +124,7 @@
                     {/ifset}
                 </h1>
                 {ifset $subscriptionData['familyType']->slave_subscription_type}
-                    {$subscriptionData['familyType']->slave_subscription_type|typeContent|noescape}
+                    {$subscriptionData['familyType']->slave_subscription_type|typeContent}
                 {/ifset}
                 <br>
                 <b>{$subscription->start_time|localizedDate,true} - {$subscription->end_time|localizedDate,true}</b>

@@ -45,7 +45,7 @@
                 <td>
                     {$request->subscription_type->user_label}
                     <br>
-                    {$request->subscription_type|typeContent|noescape}
+                    {$request->subscription_type|typeContent}
                 </td>
                 <td>
                     <input readonly dir="rtl" class="form-control" id="request{$request->id}" name="request{$request->id}" value="{plink //:Family:Requests:default $request->code}" title="{plink //:Family:Requests:default $request->code}" style="cursor: text;">
