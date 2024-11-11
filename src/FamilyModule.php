@@ -36,6 +36,7 @@ use Crm\FamilyModule\Seeders\FamilySeeder;
 use Crm\FamilyModule\Seeders\MeasurementsSeeder;
 use Crm\FamilyModule\Seeders\SubscriptionExtensionMethodsSeeder;
 use Crm\FamilyModule\Seeders\SubscriptionTypeNamesSeeder;
+use Crm\PaymentsModule\DataProviders\RecurrentPaymentPaymentItemContainerDataProviderInterface;
 use Crm\PaymentsModule\Events\BeforeCreateRenewalPaymentEvent;
 use Crm\SubscriptionsModule\Events\NewSubscriptionEvent;
 use Crm\SubscriptionsModule\Events\SubscriptionShortenedEvent;
@@ -106,7 +107,7 @@ class FamilyModule extends CrmModule
     public function registerDataProviders(DataProviderManager $dataProviderManager)
     {
         $dataProviderManager->registerDataProvider(
-            'payments.dataprovider.recurrent_payment_payment_item_container',
+            RecurrentPaymentPaymentItemContainerDataProviderInterface::PATH,
             $this->getInstance(RecurrentPaymentPaymentItemContainerDataProvider::class)
         );
         $dataProviderManager->registerDataProvider(
