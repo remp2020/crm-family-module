@@ -6,7 +6,6 @@ namespace Crm\FamilyModule\DataProviders;
 
 use Crm\ApplicationModule\Models\DataProvider\DataProviderException;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
-use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\DataProviders\SubscriptionTransferDataProviderInterface;
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\ArrayHash;
@@ -15,7 +14,6 @@ class SubscriptionTransferDataProvider implements SubscriptionTransferDataProvid
 {
     public function __construct(
         private readonly FamilyRequestsRepository $familyRequestsRepository,
-        private readonly FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
     ) {
     }
 
@@ -41,10 +39,9 @@ class SubscriptionTransferDataProvider implements SubscriptionTransferDataProvid
 
     public function isTransferable(ActiveRow $subscription): bool
     {
-        $isSlaveSubscription = $this->familySubscriptionTypesRepository->getTable()
-            ->where(['slave_subscription_type_id' => $subscription->subscription_type_id])
-            ->count('*') > 0;
+        $familyRequest = $this->familyRequestsRepository->findSlaveSubscriptionFamilyRequest($subscription);
 
+        $isSlaveSubscription = $familyRequest !== null;
         if ($isSlaveSubscription) {
             return false;
         }
