@@ -140,21 +140,27 @@ class NewSubscriptionHandler extends AbstractListener
                 return $donatedSubscriptions;
             }
 
-            $donatedSubscription = $this->donateSubscription->connectFamilyUser($previousFamilyRequest->slave_subscription->user, $request);
-            if ($donatedSubscription === DonateSubscription::ERROR_INTERNAL) {
+            $donatedFamilyRequest = $this->donateSubscription->connectFamilyUser($previousFamilyRequest->slave_subscription->user, $request);
+            if ($donatedFamilyRequest === DonateSubscription::ERROR_INTERNAL) {
                 throw new FamilyChildSubscriptionRenewalException("Unable to renew subscription for user #{$previousFamilyRequest->slave_subscription->user->id}, parent subscription #{$newSubscription->id}, request #{$request->id}");
             }
 
-            if ($donatedSubscription === DonateSubscription::ERROR_IN_USE) {
+            if ($donatedFamilyRequest === DonateSubscription::ERROR_IN_USE) {
                 // this should not happen (duplicate donations are OK in this case)
                 throw new FamilyChildSubscriptionRenewalException("Duplicated donation for user #{$previousFamilyRequest->slave_subscription->user->id}, parent subscription #{$newSubscription->id}, request #{$request->id}");
             }
 
-            if ($donatedSubscription === DonateSubscription::ERROR_MASTER_SUBSCRIPTION_EXPIRED) {
+            if ($donatedFamilyRequest === DonateSubscription::ERROR_MASTER_SUBSCRIPTION_EXPIRED) {
                 throw new FamilyChildSubscriptionRenewalException("Master subscription already expired #{$previousSubscription->id}}, request #{$request->id}");
             }
 
-            $donatedSubscriptions[] = $donatedSubscription;
+            if ($previousFamilyRequest->slave_subscription->address_id !== null && $donatedFamilyRequest->slave_subscription->address_id === null) {
+                $this->subscriptionsRepository->update($donatedFamilyRequest->slave_subscription, [
+                    'address_id' => $previousFamilyRequest->slave_subscription->address_id,
+                ]);
+            }
+
+            $donatedSubscriptions[] = $donatedFamilyRequest;
         }
 
         return $donatedSubscriptions;
