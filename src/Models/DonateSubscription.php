@@ -11,8 +11,10 @@ use Crm\SubscriptionsModule\Models\Subscription\StopSubscriptionHandler;
 use Crm\SubscriptionsModule\Repositories\SubscriptionMetaRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypesMetaRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
+use Crm\UsersModule\Repositories\UsersRepository;
 use League\Event\Emitter;
 use Nette\Database\Table\ActiveRow;
+use Nette\Security\User;
 use Nette\Utils\DateTime;
 use Tracy\Debugger;
 
@@ -27,13 +29,14 @@ class DonateSubscription
     public const ERROR_REQUEST_WRONG_STATUS = 'error-request-wrong-status';
 
     public function __construct(
-        private SubscriptionsRepository $subscriptionsRepository,
-        private SubscriptionMetaRepository $subscriptionMetaRepository,
-        private SubscriptionTypesMetaRepository $subscriptionTypesMetaRepository,
-        private FamilyRequestsRepository $familyRequestsRepository,
-        private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
-        private StopSubscriptionHandler $stopSubscriptionHandler,
-        private Emitter $emitter,
+        private readonly SubscriptionsRepository $subscriptionsRepository,
+        private readonly SubscriptionMetaRepository $subscriptionMetaRepository,
+        private readonly SubscriptionTypesMetaRepository $subscriptionTypesMetaRepository,
+        private readonly FamilyRequestsRepository $familyRequestsRepository,
+        private readonly FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
+        private readonly StopSubscriptionHandler $stopSubscriptionHandler,
+        private readonly Emitter $emitter,
+        private readonly User $user,
     ) {
     }
 
@@ -44,15 +47,18 @@ class DonateSubscription
         $familySubscriptionType = $this->familySubscriptionTypesRepository->findByMasterSubscriptionType($masterSubscription->subscription_type);
 
         $subscriptionMeta = $this->subscriptionMetaRepository->subscriptionMeta($masterSubscription);
+        $isAdmin = $this->user->getIdentity()->role === UsersRepository::ROLE_ADMIN;
 
-        if ($familySubscriptionType && $familySubscriptionType->donation_method === 'copy') {
-            if ($this->familyRequestsRepository->userAlreadyHasSubscriptionFromMasterWithSubscriptionType($masterSubscription, $slaveUser, $familyRequest->subscription_type)) {
-                return self::ERROR_IN_USE;
+        if (!$isAdmin) {
+            if ($familySubscriptionType && $familySubscriptionType->donation_method === 'copy') {
+                if ($this->familyRequestsRepository->userAlreadyHasSubscriptionFromMasterWithSubscriptionType($masterSubscription, $slaveUser, $familyRequest->subscription_type)) {
+                    return self::ERROR_IN_USE;
+                }
             }
-        }
-        if (isset($subscriptionMeta['family_subscription_type']) && in_array($subscriptionMeta['family_subscription_type'], ['days', 'fixed'], true)) {
-            if ($masterSubscription->user_id === $slaveUser->id) {
-                return self::ERROR_SELF_USE;
+            if (isset($subscriptionMeta['family_subscription_type']) && in_array($subscriptionMeta['family_subscription_type'], ['days', 'fixed'], true)) {
+                if ($masterSubscription->user_id === $slaveUser->id) {
+                    return self::ERROR_SELF_USE;
+                }
             }
         }
 
