@@ -47,7 +47,7 @@ class DonateSubscription
         $familySubscriptionType = $this->familySubscriptionTypesRepository->findByMasterSubscriptionType($masterSubscription->subscription_type);
 
         $subscriptionMeta = $this->subscriptionMetaRepository->subscriptionMeta($masterSubscription);
-        $isAdmin = $this->user->getIdentity()->role === UsersRepository::ROLE_ADMIN;
+        $isAdmin = $this->user->getIdentity()?->role === UsersRepository::ROLE_ADMIN;
 
         if (!$isAdmin) {
             if ($familySubscriptionType && $familySubscriptionType->donation_method === 'copy') {
