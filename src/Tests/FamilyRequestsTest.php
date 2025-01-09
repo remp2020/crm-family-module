@@ -3,6 +3,8 @@
 namespace Crm\FamilyModule\Tests;
 
 use Crm\ApplicationModule\Models\Event\LazyEventEmitter;
+use Crm\FamilyModule\Models\ConfigurableFamilySubscription\PaymentItemConfig;
+use Crm\FamilyModule\Models\ConfigurableFamilySubscription\PaymentItemsConfig;
 use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Models\InvalidConfigurationException;
 use Crm\FamilyModule\Models\MissingFamilySubscriptionTypeException;
@@ -11,40 +13,29 @@ use Crm\PaymentsModule\Events\PaymentChangeStatusEvent;
 use Crm\PaymentsModule\Events\PaymentStatusChangeHandler;
 use Crm\PaymentsModule\Models\PaymentItem\PaymentItemContainer;
 use Crm\PaymentsModule\Repositories\PaymentGatewaysRepository;
+use Crm\PaymentsModule\Repositories\PaymentItemsRepository;
 use Crm\PaymentsModule\Repositories\PaymentsRepository;
 use Crm\SubscriptionsModule\Models\PaymentItem\SubscriptionTypePaymentItem;
-use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
 use Crm\UsersModule\Models\Auth\UserManager;
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
 
 class FamilyRequestsTest extends BaseTestCase
 {
-    /** @var FamilyRequests */
-    private $familyRequests;
-
-    /** @var FamilyRequestsRepository */
-    private $familyRequestsRepository;
-
-    /** @var ActiveRow */
-    private $paymentGateway;
-
-    /** @var PaymentsRepository */
-    private $paymentsRepository;
-
-    /** @var SubscriptionsRepository */
-    private $subscriptionsRepository;
-
-    /** @var UserManager */
-    private $userManager;
+    private FamilyRequests $familyRequests;
+    private FamilyRequestsRepository $familyRequestsRepository;
+    private ActiveRow $paymentGateway;
+    private PaymentsRepository $paymentsRepository;
+    private PaymentItemsRepository $paymentItemsRepository;
+    private UserManager $userManager;
 
     protected function setUp(): void
     {
         parent::setUp();
         $this->familyRequests = $this->inject(FamilyRequests::class);
-        $this->familyRequestsRepository = $this->inject(FamilyRequestsRepository::class);
-        $this->paymentsRepository = $this->inject(PaymentsRepository::class);
-        $this->subscriptionsRepository = $this->inject(SubscriptionsRepository::class);
+        $this->familyRequestsRepository = $this->getRepository(FamilyRequestsRepository::class);
+        $this->paymentsRepository = $this->getRepository(PaymentsRepository::class);
+        $this->paymentItemsRepository = $this->getRepository(PaymentItemsRepository::class);
         $this->userManager = $this->inject(UserManager::class);
 
         /** @var PaymentGatewaysRepository $pgr */
@@ -186,7 +177,7 @@ class FamilyRequestsTest extends BaseTestCase
         $this->assertCount(0, $familyRequests);
     }
 
-    public function testWithCustomizableMasterSubscription()
+    public function testWithConfigurableMasterSubscriptionDeprecatedMethod()
     {
         [$masterSubscriptionType, $printSlaveSubscriptionType, $webSlaveSubscriptionType] = $this->seedFamilyCustomizableSubscriptionType();
 
@@ -217,6 +208,50 @@ class FamilyRequestsTest extends BaseTestCase
             1,
             new DateTime()
         );
+
+        $this->paymentsRepository->update($payment, ['paid_at' => new DateTime()]);
+        $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID);
+
+        $payment = $this->paymentsRepository->find($payment->id);
+        $subscription = $payment->subscription;
+
+        $requests = $this->familyRequests->createFromSubscription($payment->subscription);
+        $this->assertCount(5, $requests);
+
+        $familyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($subscription)
+            ->where(['status' => FamilyRequestsRepository::STATUS_CREATED]);
+
+        $this->assertSame(3, (clone $familyRequests)->where(['subscription_type_id' => $printSlaveSubscriptionType->id])->count('*'));
+        $this->assertSame(2, (clone $familyRequests)->where(['subscription_type_id' => $webSlaveSubscriptionType->id])->count('*'));
+    }
+
+    public function testWithConfigurableMasterSubscription()
+    {
+        [$masterSubscriptionType, $printSlaveSubscriptionType, $webSlaveSubscriptionType] = $this->seedFamilyCustomizableSubscriptionType();
+
+        $masterUser = $this->createUser('master@example.com');
+
+        $printItem = $masterSubscriptionType->related('subscription_type_items')->where('name', 'Print')->fetch();
+        $webItem = $masterSubscriptionType->related('subscription_type_items')->where('name', 'Web')->fetch();
+
+        $paymentItemsConfig = new PaymentItemsConfig();
+        $paymentItemsConfig->addItem(new PaymentItemConfig($printItem, 3, 10, 20));
+        $paymentItemsConfig->addItem(new PaymentItemConfig($webItem, 2, 5, 20));
+        $paymentItemContainer = $this->familyRequests->createConfigurableFamilySubscriptionPaymentItemContainer($paymentItemsConfig);
+
+        $payment = $this->paymentsRepository->add(
+            $masterSubscriptionType,
+            $this->paymentGateway,
+            $masterUser,
+            $paymentItemContainer,
+            null,
+            1,
+            new DateTime()
+        );
+
+        foreach ($this->paymentItemsRepository->getByPayment($payment) as $paymentItem) {
+            $this->assertEquals($paymentItem->subscription_type_id, $paymentItem->subscription_type_item->subscription_type_id);
+        }
 
         $this->paymentsRepository->update($payment, ['paid_at' => new DateTime()]);
         $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID);

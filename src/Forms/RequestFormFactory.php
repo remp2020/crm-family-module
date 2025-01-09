@@ -7,17 +7,17 @@ use Crm\ApplicationModule\Helpers\PriceHelper;
 use Crm\ApplicationModule\Models\DataProvider\DataProviderManager;
 use Crm\ApplicationModule\Models\Database\ActiveRow;
 use Crm\FamilyModule\DataProviders\RequestFormDataProviderInterface;
+use Crm\FamilyModule\Models\ConfigurableFamilySubscription\PaymentItemConfig;
+use Crm\FamilyModule\Models\ConfigurableFamilySubscription\PaymentItemsConfig;
 use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\InvoicesModule\Gateways\ProformaInvoice;
 use Crm\PaymentsModule\Models\Gateways\BankTransfer;
 use Crm\PaymentsModule\Models\OneStopShop\OneStopShop;
 use Crm\PaymentsModule\Models\OneStopShop\OneStopShopCountryConflictException;
-use Crm\PaymentsModule\Models\PaymentItem\PaymentItemContainer;
 use Crm\PaymentsModule\Repositories\PaymentGatewaysRepository;
 use Crm\PaymentsModule\Repositories\PaymentMetaRepository;
 use Crm\PaymentsModule\Repositories\PaymentsRepository;
-use Crm\SubscriptionsModule\Models\PaymentItem\SubscriptionTypePaymentItem;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypeItemMetaRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypeItemsRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypesRepository;
@@ -51,6 +51,7 @@ class RequestFormFactory
         private readonly OneStopShop $oneStopShop,
         private readonly CountriesRepository $countriesRepository,
         private readonly CountriesSelectItemsBuilder $countriesSelectItemsBuilder,
+        private readonly FamilyRequests $familyRequests,
     ) {
     }
 
@@ -97,10 +98,7 @@ class RequestFormFactory
             ->setHtmlAttribute('flatpickr_datetime', "1")
             ->setRequired(false)
             ->addRule(function (TextInput $field, $user) {
-                if (DateTime::from($field->getValue()) < new DateTime('today midnight')) {
-                    return false;
-                }
-                return true;
+                return DateTime::from($field->getValue()) >= new DateTime('today midnight');
             }, 'family.admin.form.request.subscription_start_at.not_past', $user);
 
         $subscriptionStartAt
@@ -250,54 +248,21 @@ class RequestFormFactory
         $selectedPaymentCountry = $this->countriesRepository->find($values['payment_country_id'] ?? null);
 
         $user = $this->user;
-        $paymentItemContainer = new PaymentItemContainer();
+        $paymentItemsConfig = new PaymentItemsConfig();
 
         foreach ($this->subscriptionTypeItemsRepository->getItemsForSubscriptionType($subscriptionType) as $itemId => $subscriptionTypeItem) {
-            if (isset($values[$subscriptionType->id][$itemId]['count']) && $values[$subscriptionType->id][$itemId]['count'] > 0) {
-                $subscriptionTypeItemMeta = $this->subscriptionTypeItemMetaRepository
-                    ->findBySubscriptionTypeItemAndKey($subscriptionTypeItem, 'family_slave_subscription_type_id')
-                    ->fetch();
-                if (!isset($subscriptionTypeItemMeta->value)) {
-                    throw new \Exception("No family slave subscription types associated to subscription type item: {$subscriptionTypeItem->id}");
-                }
-
-                $slaveSubscriptionType = $this->subscriptionTypesRepository->find($subscriptionTypeItemMeta->value);
-                if (!$slaveSubscriptionType) {
-                    throw new \Exception("No slave subscription type found with ID: {$subscriptionTypeItemMeta->value}");
-                }
-
-                // load meta from subscription type item & merge with new information
-                $slaveSubscriptionTypeItems = $this->subscriptionTypeItemsRepository->getItemsForSubscriptionType($slaveSubscriptionType)->fetchAll();
-                if (count($slaveSubscriptionTypeItems) > 1) {
-                    throw new \Exception("There should be only one subscription type item for " .
-                    "child subscription type [ID: {$slaveSubscriptionType->id}] of configurable family/company subscription [ID: {$subscriptionType->id}]. " .
-                    "Otherwise number of payment items won't match number of configurable subscription type items.");
-                }
-                $slaveSubscriptionTypeItem = reset($slaveSubscriptionTypeItems);
-                $metas = $this->subscriptionTypeItemMetaRepository->findBySubscriptionTypeItem($slaveSubscriptionTypeItem)->fetchPairs('key', 'value');
-
-                $subscriptionTypeItemPrice = (float) str_replace(',', '.', $form[$subscriptionType->id][$itemId]['price']->getRawValue());
-
-                $subscriptionTypePaymentItem = new SubscriptionTypePaymentItem(
-                    $slaveSubscriptionType->id,
-                    $values[$subscriptionType->id][$itemId]['name'],
-                    $subscriptionTypeItemPrice,
-                    $subscriptionTypeItem->vat,
-                    $values[$subscriptionType->id][$itemId]['count'],
-                    $metas,
-                    $subscriptionTypeItem->id
-                );
-                if ($values['no_vat'] === true) {
-                    $subscriptionTypePaymentItem->forcePrice(
-                        $subscriptionTypePaymentItem->unitPriceWithoutVAT()
-                    );
-                    $subscriptionTypePaymentItem->forceVat(0);
-                    $paymentItemContainer->setPreventOssVatChange();
-                }
-                $paymentItemContainer->addItem($subscriptionTypePaymentItem);
+            $count = $values[$subscriptionType->id][$itemId]['count'] ?? 0;
+            if ($count > 0) {
+                $paymentItemsConfig->addItem(new PaymentItemConfig(
+                    subscriptionTypeItem: $subscriptionTypeItem,
+                    count: $count,
+                    price: (float) str_replace(',', '.', $form[$subscriptionType->id][$itemId]['price']->getRawValue()),
+                    noVat: $values['no_vat'] ?? false
+                ));
             }
         }
 
+        $paymentItemContainer = $this->familyRequests->createConfigurableFamilySubscriptionPaymentItemContainer($paymentItemsConfig);
         if (count($paymentItemContainer->items()) === 0) {
             throw new \Exception("No payment item has been added for subscription type: {$subscriptionType->id}");
         }

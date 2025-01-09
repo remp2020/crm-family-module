@@ -4,11 +4,17 @@ namespace Crm\FamilyModule\Models;
 
 use Crm\ApplicationModule\Models\Database\Selection;
 use Crm\ApplicationModule\Repositories\CacheRepository;
+use Crm\FamilyModule\Models\ConfigurableFamilySubscription\PaymentItemsConfig;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
+use Crm\PaymentsModule\Models\PaymentItem\PaymentItemContainer;
+use Crm\PaymentsModule\Repositories\PaymentItemMetaRepository;
 use Crm\PaymentsModule\Repositories\PaymentMetaRepository;
 use Crm\PaymentsModule\Repositories\PaymentsRepository;
 use Crm\SubscriptionsModule\Models\PaymentItem\SubscriptionTypePaymentItem;
+use Crm\SubscriptionsModule\Repositories\SubscriptionTypeItemMetaRepository;
+use Crm\SubscriptionsModule\Repositories\SubscriptionTypeItemsRepository;
+use Crm\SubscriptionsModule\Repositories\SubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
 use Nette\Database\Table\ActiveRow;
 use Nette\Utils\DateTime;
@@ -19,32 +25,20 @@ class FamilyRequests
 
     public const KEEP_REQUESTS_UNACTIVATED_PAYMENT_META = 'keep_requests_unactivated';
 
-    private CacheRepository $cacheRepository;
-
-    private FamilyRequestsRepository $familyRequestsRepository;
-
-    private PaymentsRepository $paymentsRepository;
-
-    private SubscriptionsRepository $subscriptionsRepository;
-
-    private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository;
-
-    private PaymentMetaRepository $paymentMetaRepository;
+    public const PAYMENT_ITEM_META_SLAVE_SUBSCRIPTION_TYPE_ID = 'slave_subscription_type_id';
 
     public function __construct(
-        CacheRepository $cacheRepository,
-        FamilyRequestsRepository $familyRequestsRepository,
-        PaymentsRepository $paymentsRepository,
-        SubscriptionsRepository $subscriptionsRepository,
-        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
-        PaymentMetaRepository $paymentMetaRepository
+        private CacheRepository $cacheRepository,
+        private FamilyRequestsRepository $familyRequestsRepository,
+        private PaymentsRepository $paymentsRepository,
+        private SubscriptionsRepository $subscriptionsRepository,
+        private SubscriptionTypesRepository $subscriptionTypesRepository,
+        private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
+        private PaymentMetaRepository $paymentMetaRepository,
+        private PaymentItemMetaRepository $paymentItemMetaRepository,
+        private SubscriptionTypeItemMetaRepository $subscriptionTypeItemMetaRepository,
+        private SubscriptionTypeItemsRepository $subscriptionTypeItemsRepository,
     ) {
-        $this->cacheRepository = $cacheRepository;
-        $this->familyRequestsRepository = $familyRequestsRepository;
-        $this->paymentsRepository = $paymentsRepository;
-        $this->subscriptionsRepository = $subscriptionsRepository;
-        $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
-        $this->paymentMetaRepository = $paymentMetaRepository;
     }
 
     /**
@@ -219,6 +213,65 @@ class FamilyRequests
         return $callable();
     }
 
+    public function createConfigurableFamilySubscriptionPaymentItemContainer(
+        PaymentItemsConfig $paymentItemsConfig,
+    ): PaymentItemContainer {
+        $paymentItemContainer = new PaymentItemContainer();
+
+        foreach ($paymentItemsConfig->getItemsConfig() as $itemConfig) {
+            $subscriptionTypeItemMeta = $this->subscriptionTypeItemMetaRepository
+                ->findBySubscriptionTypeItemAndKey($itemConfig->subscriptionTypeItem, 'family_slave_subscription_type_id')
+                ->fetch();
+            if (!$subscriptionTypeItemMeta) {
+                throw new \Exception("No family slave subscription types associated to subscription type item: {$itemConfig->subscriptionTypeItem->id}");
+            }
+
+            $slaveSubscriptionType = $this->subscriptionTypesRepository->find($subscriptionTypeItemMeta->value);
+            if (!$slaveSubscriptionType) {
+                throw new \Exception("No slave subscription type found with ID: {$subscriptionTypeItemMeta->value}");
+            }
+
+            // load meta from subscription type item & merge with new information
+            $slaveSubscriptionTypeItems = $this->subscriptionTypeItemsRepository->getItemsForSubscriptionType($slaveSubscriptionType)->fetchAll();
+            if (count($slaveSubscriptionTypeItems) > 1) {
+                throw new \Exception("There should be only one subscription type item for " .
+                    "child subscription type [ID: {$slaveSubscriptionType->id}] of configurable family/company subscription [ID: {$itemConfig->subscriptionTypeItem->subcription_type_id}]. " .
+                    "Otherwise number of payment items won't match number of configurable subscription type items.");
+            }
+            $slaveSubscriptionTypeItem = reset($slaveSubscriptionTypeItems);
+            $metas = $this->subscriptionTypeItemMetaRepository
+                ->findBySubscriptionTypeItem($slaveSubscriptionTypeItem)
+                ->fetchPairs('key', 'value');
+
+            $metas = [
+                ...$metas,
+                FamilyRequests::PAYMENT_ITEM_META_SLAVE_SUBSCRIPTION_TYPE_ID => $slaveSubscriptionType->id,
+            ];
+
+            $subscriptionTypePaymentItem = SubscriptionTypePaymentItem::fromSubscriptionTypeItem($itemConfig->subscriptionTypeItem, $itemConfig->count)
+                ->forceMeta($metas);
+
+            if ($itemConfig->price) {
+                $subscriptionTypePaymentItem->forcePrice($itemConfig->price);
+            }
+
+            if ($itemConfig->vat) {
+                $subscriptionTypePaymentItem->forceVat($itemConfig->vat);
+            }
+
+            if ($itemConfig->noVat) {
+                $subscriptionTypePaymentItem->forcePrice(
+                    $subscriptionTypePaymentItem->unitPriceWithoutVAT()
+                );
+                $subscriptionTypePaymentItem->forceVat(0);
+                $paymentItemContainer->setPreventOssVatChange();
+            }
+            $paymentItemContainer->addItem($subscriptionTypePaymentItem);
+        }
+
+        return $paymentItemContainer;
+    }
+
     private function generateRequestFromCustomSubscription(ActiveRow $subscription): array
     {
         $payment = $this->paymentsRepository->subscriptionPayment($subscription);
@@ -233,13 +286,28 @@ class FamilyRequests
 
         $newRequests = [];
         foreach ($paymentItems as $paymentItem) {
-            $count = $paymentItem->count;
-            $slaveSubscriptionType = $paymentItem->subscription_type;
-            if (!$slaveSubscriptionType) {
-                throw new InvalidConfigurationException("Unable to load slave subscription from payment item ID [{$paymentItem->id}].");
+            $slaveSubscriptionTypeIdMeta = $this->paymentItemMetaRepository->findByPaymentItemAndKey(
+                $paymentItem,
+                self::PAYMENT_ITEM_META_SLAVE_SUBSCRIPTION_TYPE_ID
+            )->fetch();
+            if ($slaveSubscriptionTypeIdMeta) {
+                $slaveSubscriptionTypeId = $slaveSubscriptionTypeIdMeta->value;
+            } else {
+                // @deprecated option, used only for backward compatibility
+                $slaveSubscriptionTypeId = $paymentItem->subscription_type_id;
             }
 
-            for ($i = 0; $i < $count; $i++) {
+            if ($slaveSubscriptionTypeId === $payment->subscription_type_id) {
+                // this should never happen but check nevertheless
+                throw new \RuntimeException("Payment subscription type ID [{$payment->subscription_type_id}] is the same as slave subscription type ID - there is probably an error in master/slave family subscription type definition.");
+            }
+
+            $slaveSubscriptionType = $this->subscriptionTypesRepository->find($slaveSubscriptionTypeId);
+            if (!$slaveSubscriptionType) {
+                throw new InvalidConfigurationException("Unable to load slave subscription from payment item [{$paymentItem->name}] of payment [{$payment->id}].");
+            }
+
+            for ($i = 0; $i < $paymentItem->count; $i++) {
                 $newRequests[] = $this->familyRequestsRepository->add($subscription, $slaveSubscriptionType);
             }
         }
