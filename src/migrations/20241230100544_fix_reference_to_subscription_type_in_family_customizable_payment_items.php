@@ -18,7 +18,6 @@ from payment_items
     join subscription_type_items sti on payment_items.subscription_type_item_id = sti.id
     join family_subscription_types fst2 on sti.subscription_type_id = fst2.master_subscription_type_id
 where sti.subscription_type_id != payment_items.subscription_type_id
-limit 1
 SQL;
 
         $rows = $this->query($q);
