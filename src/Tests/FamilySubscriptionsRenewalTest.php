@@ -14,6 +14,7 @@ use Crm\PaymentsModule\Repositories\PaymentGatewaysRepository;
 use Crm\PaymentsModule\Repositories\PaymentMethodsRepository;
 use Crm\PaymentsModule\Repositories\PaymentsRepository;
 use Crm\PaymentsModule\Repositories\RecurrentPaymentsRepository;
+use Crm\PaymentsModule\Tests\Gateways\TestRecurrentGateway;
 use Crm\SubscriptionsModule\Events\NewSubscriptionEvent;
 use Crm\SubscriptionsModule\Models\Generator\SubscriptionsGenerator;
 use Crm\SubscriptionsModule\Models\Generator\SubscriptionsParams;
@@ -67,7 +68,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
 
         /** @var PaymentGatewaysRepository $pgr */
         $pgr = $this->getRepository(PaymentGatewaysRepository::class);
-        $this->paymentGateway = $pgr->add('test', 'test', 10, true, true);
+        $this->paymentGateway = $pgr->findByCode(TestRecurrentGateway::GATEWAY_CODE);
 
         // To create subscriptions from payments, register listener
         $this->lazyEventEmitter->addListener(PaymentChangeStatusEvent::class, $this->inject(PaymentStatusChangeHandler::class));

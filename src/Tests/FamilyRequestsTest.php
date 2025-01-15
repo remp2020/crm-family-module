@@ -15,6 +15,7 @@ use Crm\PaymentsModule\Models\PaymentItem\PaymentItemContainer;
 use Crm\PaymentsModule\Repositories\PaymentGatewaysRepository;
 use Crm\PaymentsModule\Repositories\PaymentItemsRepository;
 use Crm\PaymentsModule\Repositories\PaymentsRepository;
+use Crm\PaymentsModule\Tests\Gateways\TestRecurrentGateway;
 use Crm\SubscriptionsModule\Models\PaymentItem\SubscriptionTypePaymentItem;
 use Crm\UsersModule\Models\Auth\UserManager;
 use Nette\Database\Table\ActiveRow;
@@ -40,7 +41,7 @@ class FamilyRequestsTest extends BaseTestCase
 
         /** @var PaymentGatewaysRepository $pgr */
         $pgr = $this->getRepository(PaymentGatewaysRepository::class);
-        $this->paymentGateway = $pgr->add('test', 'test', 10, true, true);
+        $this->paymentGateway = $pgr->findByCode(TestRecurrentGateway::GATEWAY_CODE);
 
         $emitter = $this->inject(LazyEventEmitter::class);
         // To create subscriptions from payments, register listener
