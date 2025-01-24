@@ -245,11 +245,16 @@ class FamilyRequests
 
             $metas = [
                 ...$metas,
+                ...$itemConfig->meta,
                 FamilyRequests::PAYMENT_ITEM_META_SLAVE_SUBSCRIPTION_TYPE_ID => $slaveSubscriptionType->id,
             ];
 
             $subscriptionTypePaymentItem = SubscriptionTypePaymentItem::fromSubscriptionTypeItem($itemConfig->subscriptionTypeItem, $itemConfig->count)
                 ->forceMeta($metas);
+
+            if ($itemConfig->name) {
+                $subscriptionTypePaymentItem->forceName($itemConfig->name);
+            }
 
             if ($itemConfig->price) {
                 $subscriptionTypePaymentItem->forcePrice($itemConfig->price);
