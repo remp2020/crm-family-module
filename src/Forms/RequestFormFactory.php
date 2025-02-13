@@ -19,7 +19,6 @@ use Crm\PaymentsModule\Models\OneStopShop\OneStopShopCountryConflictException;
 use Crm\PaymentsModule\Repositories\PaymentGatewaysRepository;
 use Crm\PaymentsModule\Repositories\PaymentMetaRepository;
 use Crm\PaymentsModule\Repositories\PaymentsRepository;
-use Crm\SubscriptionsModule\Repositories\SubscriptionTypeItemMetaRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypeItemsRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypesRepository;
 use Crm\UsersModule\Repositories\CountriesRepository;
@@ -41,7 +40,6 @@ class RequestFormFactory
         private readonly FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
         private readonly SubscriptionTypesRepository $subscriptionTypesRepository,
         private readonly SubscriptionTypeItemsRepository $subscriptionTypeItemsRepository,
-        private readonly SubscriptionTypeItemMetaRepository $subscriptionTypeItemMetaRepository,
         private readonly PaymentGatewaysRepository $paymentGatewaysRepository,
         private readonly PaymentsRepository $paymentsRepository,
         private readonly PaymentMetaRepository $paymentMetaRepository,
