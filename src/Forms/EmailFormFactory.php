@@ -3,8 +3,8 @@
 namespace Crm\FamilyModule\Forms;
 
 use Crm\ApplicationModule\Models\DataProvider\DataProviderManager;
+use Crm\ApplicationModule\UI\Form;
 use Crm\FamilyModule\DataProviders\EmailFormDataProviderInterface;
-use Nette\Application\UI\Form;
 use Nette\Localization\Translator;
 use Tomaj\Form\Renderer\BootstrapRenderer;
 
