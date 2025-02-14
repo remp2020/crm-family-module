@@ -306,7 +306,7 @@ class RequestFormFactory
         $totalCount = 0;
         $totalAmount = 0.0;
         foreach ($this->subscriptionTypeItemsRepository->getItemsForSubscriptionType($subscriptionType) as $id => $item) {
-            $subscriptionTypeItemPrice = $form->getComponent($subscriptionType->id)[$id]['price']->getRawValue();
+            $subscriptionTypeItemPrice = $form->getComponent((string) $subscriptionType->id)[$id]['price']->getRawValue();
 
             $totalCount += $values[$subscriptionType->id][$id]['count'];
             $totalAmount += (float) $subscriptionTypeItemPrice * $values[$subscriptionType->id][$id]['count'];
