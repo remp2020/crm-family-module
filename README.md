@@ -41,10 +41,10 @@ These codes can be accessed via two channels:
 
     class DemoModule
     {
-        public function registerWidgets(\Crm\ApplicationModule\Widget\WidgetManagerInterface $widgetManager) {
-            $widgetManager->registerWidget(
+        public function registerLazyWidgets(\Crm\ApplicationModule\Widget\LazyWidgetManagerInterface $lazyWidgetManager) {
+            $lazyWidgetManager->registerWidget(
                 'frontend.subscriptions.top',
-                $this->getInstance(\Crm\FamilyModule\Components\FamilyRequestsListWidget\FamilyRequestsListWidget::class),
+                \Crm\FamilyModule\Components\FamilyRequestsListWidget\FamilyRequestsListWidget::class,
                 300
             );
         }
