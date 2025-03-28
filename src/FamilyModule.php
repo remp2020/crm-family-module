@@ -25,6 +25,7 @@ use Crm\FamilyModule\Components\UsersAbusiveAdditionalWidget\UsersAbusiveAdditio
 use Crm\FamilyModule\DataProviders\RecurrentPaymentPaymentItemContainerDataProvider;
 use Crm\FamilyModule\DataProviders\SubscriptionTransferDataProvider;
 use Crm\FamilyModule\Events\BeforeCreateRenewalPaymentEventHandler;
+use Crm\FamilyModule\Events\FamilyRequestAcceptedEvent;
 use Crm\FamilyModule\Events\FamilyRequestCreatedEvent;
 use Crm\FamilyModule\Events\NewSubscriptionHandler;
 use Crm\FamilyModule\Events\SubscriptionShortenedHandler;
@@ -162,7 +163,7 @@ class FamilyModule extends CrmModule
     public function registerEvents(EventsStorage $eventsStorage)
     {
         $eventsStorage->register('family_request_created', FamilyRequestCreatedEvent::class, true);
-        $eventsStorage->register('family_request_accepted', Events\FamilyRequestAcceptedEvent::class, true);
+        $eventsStorage->register('family_request_accepted', FamilyRequestAcceptedEvent::class, true);
     }
 
     public function cache(OutputInterface $output, array $tags = [])
