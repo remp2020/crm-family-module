@@ -11,6 +11,7 @@ use Crm\FamilyModule\Models\MissingFamilySubscriptionTypeException;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\PaymentsModule\Events\PaymentChangeStatusEvent;
 use Crm\PaymentsModule\Events\PaymentStatusChangeHandler;
+use Crm\PaymentsModule\Models\Payment\PaymentStatusEnum;
 use Crm\PaymentsModule\Models\PaymentItem\PaymentItemContainer;
 use Crm\PaymentsModule\Repositories\PaymentGatewaysRepository;
 use Crm\PaymentsModule\Repositories\PaymentItemsRepository;
@@ -211,7 +212,7 @@ class FamilyRequestsTest extends BaseTestCase
         );
 
         $this->paymentsRepository->update($payment, ['paid_at' => new DateTime()]);
-        $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID);
+        $this->paymentsRepository->updateStatus($payment, PaymentStatusEnum::Paid->value);
 
         $payment = $this->paymentsRepository->find($payment->id);
         $subscription = $payment->subscription;
@@ -255,7 +256,7 @@ class FamilyRequestsTest extends BaseTestCase
         }
 
         $this->paymentsRepository->update($payment, ['paid_at' => new DateTime()]);
-        $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID);
+        $this->paymentsRepository->updateStatus($payment, PaymentStatusEnum::Paid->value);
 
         $payment = $this->paymentsRepository->find($payment->id);
         $subscription = $payment->subscription;
@@ -302,7 +303,7 @@ class FamilyRequestsTest extends BaseTestCase
             $startSubscriptionDateTime
         );
         $this->paymentsRepository->update($payment, ['paid_at' => new \DateTime($paidAtString)]);
-        $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID);
+        $this->paymentsRepository->updateStatus($payment, PaymentStatusEnum::Paid->value);
         return $this->paymentsRepository->find($payment->id);
     }
 }

@@ -9,6 +9,7 @@ use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\PaymentsModule\Events\PaymentChangeStatusEvent;
 use Crm\PaymentsModule\Events\PaymentStatusChangeHandler;
+use Crm\PaymentsModule\Models\Payment\PaymentStatusEnum;
 use Crm\PaymentsModule\Models\PaymentItem\PaymentItemContainer;
 use Crm\PaymentsModule\Repositories\PaymentGatewaysRepository;
 use Crm\PaymentsModule\Repositories\PaymentMethodsRepository;
@@ -238,7 +239,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             'paid_at' => new DateTime(),
             'subscription_start_at' => $previousSubscription->end_time,
         ]);
-        $this->paymentsRepository->updateStatus($nextPayment, PaymentsRepository::STATUS_PAID);
+        $this->paymentsRepository->updateStatus($nextPayment, PaymentStatusEnum::Paid->value);
 
         $nextPayment = $this->paymentsRepository->find($nextPayment->id);
         $nextSubscription = $nextPayment->subscription;
@@ -388,7 +389,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             new DateTime($startSubscriptionAtString)
         );
         $this->paymentsRepository->update($payment, ['paid_at' => new DateTime($paidAtString)]);
-        $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID);
+        $this->paymentsRepository->updateStatus($payment, PaymentStatusEnum::Paid->value);
         return $this->paymentsRepository->find($payment->id);
     }
 
@@ -423,7 +424,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
         ]);
 
         $this->paymentsRepository->update($payment, ['paid_at' => new DateTime($paidAtString)]);
-        $this->paymentsRepository->updateStatus($payment, PaymentsRepository::STATUS_PAID);
+        $this->paymentsRepository->updateStatus($payment, PaymentStatusEnum::Paid->value);
 
         $this->recurrentPaymentsRepository->setCharged($recurrent, $payment, 'OK', 'OK');
 
