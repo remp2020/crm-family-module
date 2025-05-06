@@ -174,7 +174,7 @@ class RequestFormFactory
         }
 
         $form->addCheckbox('no_vat', 'family.admin.form.request.no_vat.label')
-            ->setOption('description', 'family.admin.form.request.no_vat.description');
+            ->setOption('description', $this->translator->translate('family.admin.form.request.no_vat.description'));
 
         if ($this->oneStopShop->isEnabled()) {
             $paymentCountry = $form->addSelect(
