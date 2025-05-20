@@ -19,7 +19,7 @@ class SlaveFamilySubscriptionInfoWidget extends BaseLazyWidget
     public function __construct(
         LazyWidgetManager $lazyWidgetManager,
         FamilyRequestsRepository $familyRequestsRepository,
-        UsersRepository $usersRepository
+        UsersRepository $usersRepository,
     ) {
         parent::__construct($lazyWidgetManager);
 

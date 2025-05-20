@@ -23,7 +23,7 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
         private ContentAccessRepository $contentAccessRepository,
         private DonateSubscription $donateSubscription,
         private FamilyRequestsRepository $familyRequestsRepository,
-        private UserActionsLogRepository $userActionsLogRepository
+        private UserActionsLogRepository $userActionsLogRepository,
     ) {
         parent::__construct();
     }
@@ -48,7 +48,7 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
 
         $requestValidationResult = $this->validateInput(
             __DIR__ . '/activate-family-request.schema.json',
-            $this->rawPayload()
+            $this->rawPayload(),
         );
         if ($requestValidationResult->hasErrorResponse()) {
             return $requestValidationResult->getErrorResponse();
@@ -93,7 +93,7 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
                 $this->userActionsLogRepository->add(
                     $user->id,
                     'family.logged.error.internal',
-                    ['request' => $requestApi->code]
+                    ['request' => $requestApi->code],
                 );
                 $response = new JsonApiResponse(Response::S500_INTERNAL_SERVER_ERROR, [
                     'message' => 'Internal server error',
@@ -104,7 +104,7 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
                 $this->userActionsLogRepository->add(
                     $user->id,
                     'family.logged.error.in-use',
-                    ['request' => $requestApi->code]
+                    ['request' => $requestApi->code],
                 );
                 $response = new JsonApiResponse(Response::S400_BAD_REQUEST, [
                     'message' => "User [$user->email] already used company code from this company subscription.",
@@ -115,7 +115,7 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
                 $this->userActionsLogRepository->add(
                     $user->id,
                     'family.logged.error.self-use',
-                    ['request' => $requestApi->code]
+                    ['request' => $requestApi->code],
                 );
                 $response = new JsonApiResponse(Response::S400_BAD_REQUEST, [
                     'message' => "Cannot activate family request code [$requestApi->code] on parent's account",
@@ -126,7 +126,7 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
                 $this->userActionsLogRepository->add(
                     $user->id,
                     'family.register.error.master-subscription-expired',
-                    ['user_id' => $user->id, 'request' => $requestApi->code]
+                    ['user_id' => $user->id, 'request' => $requestApi->code],
                 );
                 $response = new JsonApiResponse(Response::S400_BAD_REQUEST, [
                     'message' => "Family request code [$requestApi->code] expired",
@@ -137,7 +137,7 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
                 $this->userActionsLogRepository->add(
                     $user->id,
                     'family.register.error.request-wrong-state',
-                    ['user_id' => $user->id, 'request' => $requestApi->code]
+                    ['user_id' => $user->id, 'request' => $requestApi->code],
                 );
                 $response = new JsonApiResponse(Response::S409_CONFLICT, [
                     'message' => "Family request code [$requestApi->code] has wrong status: {$familyRequest->status}",
@@ -147,7 +147,7 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
             default:
                 Debugger::log(
                     "Unknown error status [$connectResult] from family request activation of code [$requestApi->code].",
-                    Debugger::ERROR
+                    Debugger::ERROR,
                 );
                 $response = new JsonApiResponse(Response::S500_INTERNAL_SERVER_ERROR, [
                     'message' => 'Internal server error',

@@ -23,7 +23,7 @@ class ExtendFamilyExtension implements ExtensionInterface
 
     public function __construct(
         private SubscriptionsRepository $subscriptionsRepository,
-        private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository
+        private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
     ) {
     }
 
@@ -32,7 +32,7 @@ class ExtendFamilyExtension implements ExtensionInterface
         // load IDs of all family subscription types
         $familySubscriptionTypeIds = array_merge(
             $this->familySubscriptionTypesRepository->masterSubscriptionTypes(),
-            $this->familySubscriptionTypesRepository->slaveSubscriptionTypes()
+            $this->familySubscriptionTypesRepository->slaveSubscriptionTypes(),
         );
 
         $userFamilySubscription = $this->subscriptionsRepository->userSubscriptions($user->id)

@@ -144,7 +144,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
         // update expires_at to past
         $this->familyRequestsRepository->update(
             $testFamilyRequest,
-            ['expires_at' => new DateTime('2020-06-10')]
+            ['expires_at' => new DateTime('2020-06-10')],
         );
 
         // call & test API
@@ -189,7 +189,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
         $this->subscriptionMetaRepository->add(
             $testFamilyRequest->master_subscription,
             'family_subscription_type',
-            'days'
+            'days',
         );
 
         // call & test API
@@ -221,7 +221,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
     {
         [$masterSubscriptionType, ] = $this->seedFamilySubscriptionTypes(
             self::COMPANY_SUBSCRIPTIONS_LENGTH,
-            self::COMPANY_SUBSCRIPTIONS_COUNT
+            self::COMPANY_SUBSCRIPTIONS_COUNT,
         );
 
         $masterUser = $this->createUser('master@example.com');
@@ -235,7 +235,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
             'family',
             new DateTime('2020-07-01'),
             new DateTime('2020-08-01'),
-            true
+            true,
         ), 1);
 
         // check number of generated requests
@@ -247,7 +247,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
         $this->donateSubscription->setNow(new \DateTime('2020-07-10'));
         $this->donateSubscription->connectFamilyUser(
             $slaveUserWithAccepted,
-            $acceptedFamilyRequest
+            $acceptedFamilyRequest,
         );
 
         // reload & return
@@ -264,7 +264,7 @@ class ActivateFamilyRequestApiHandlerTest extends BaseTestCase
             false,
             'unknown',
             null,
-            false
+            false,
         );
     }
 

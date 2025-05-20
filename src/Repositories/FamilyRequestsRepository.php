@@ -67,7 +67,7 @@ class FamilyRequestsRepository extends Repository
     public function assignSlaveUserToFamilyRequest(ActiveRow $request, ActiveRow $user): int
     {
         return $this->getTable()->where(['id' => $request->id])->update([
-            'slave_user_id' => $user->id
+            'slave_user_id' => $user->id,
         ]);
     }
 
@@ -111,13 +111,13 @@ class FamilyRequestsRepository extends Repository
     public function userAlreadyHasSubscriptionFromMasterWithSubscriptionType(
         ActiveRow $masterSubscription,
         ActiveRow $user,
-        ActiveRow $subscriptionType
+        ActiveRow $subscriptionType,
     ): bool {
         return $this->getTable()->where([
                 'master_subscription_id' => $masterSubscription->id,
                 'slave_user_id' => $user->id,
                 'subscription_type_id' => $subscriptionType->id,
-                'status' => self::STATUS_ACCEPTED
+                'status' => self::STATUS_ACCEPTED,
             ])->count('*') > 0;
     }
 

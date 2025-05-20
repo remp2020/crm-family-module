@@ -81,7 +81,7 @@ class ActivateRequestTest extends BaseTestCase
             'family',
             new DateTime('now - 31 days'),
             new DateTime('now - 1 day'), // Expired
-            true
+            true,
         ), 1);
 
         // Grab one of the requests (there should be 5 of them)
@@ -106,7 +106,7 @@ class ActivateRequestTest extends BaseTestCase
             'family',
             new DateTime('now'),
             new DateTime('now + 1 day'),
-            true
+            true,
         ), 1);
 
         // Grab one of the requests (there should be 5 of them)

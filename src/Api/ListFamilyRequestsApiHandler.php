@@ -14,7 +14,7 @@ class ListFamilyRequestsApiHandler extends ApiHandler
     private $familyRequestsRepository;
 
     public function __construct(
-        FamilyRequestsRepository $familyRequestsRepository
+        FamilyRequestsRepository $familyRequestsRepository,
     ) {
         $this->familyRequestsRepository = $familyRequestsRepository;
     }

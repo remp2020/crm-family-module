@@ -14,7 +14,7 @@ class FamilyRequestsDashboardWidget extends BaseLazyWidget
 
     public function __construct(
         LazyWidgetManager $lazyWidgetManager,
-        FamilyRequests $familyRequests
+        FamilyRequests $familyRequests,
     ) {
         parent::__construct($lazyWidgetManager);
 

@@ -27,7 +27,7 @@ class SubscriptionShortenedHandler extends AbstractListener
         FamilyRequestsRepository $familyRequestsRepository,
         FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
         DonateSubscription $donateSubscription,
-        StopSubscriptionHandler $stopSubscriptionHandler
+        StopSubscriptionHandler $stopSubscriptionHandler,
     ) {
         $this->familyRequestsRepository = $familyRequestsRepository;
         $this->donateSubscription = $donateSubscription;

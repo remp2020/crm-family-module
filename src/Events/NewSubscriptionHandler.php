@@ -32,7 +32,7 @@ class NewSubscriptionHandler extends AbstractListener
         private DonateSubscription $donateSubscription,
         private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
         private FamilyRequestsRepository $familyRequestsRepository,
-        private PaymentMetaRepository $paymentMetaRepository
+        private PaymentMetaRepository $paymentMetaRepository,
     ) {
     }
 

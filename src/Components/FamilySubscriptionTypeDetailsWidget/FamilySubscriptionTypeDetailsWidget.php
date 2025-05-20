@@ -15,7 +15,7 @@ class FamilySubscriptionTypeDetailsWidget extends BaseLazyWidget
 
     public function __construct(
         LazyWidgetManager $lazyWidgetManager,
-        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository
+        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
     ) {
         parent::__construct($lazyWidgetManager);
 

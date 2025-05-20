@@ -73,7 +73,7 @@ class UpdateFamilyRequestSubscriptionsTest extends BaseTestCase
 
         $this->subscriptionsRepository->update($masterSubscription, [
             'start_time' => $newStartTime,
-            'end_time' => $newEndTime
+            'end_time' => $newEndTime,
         ]);
 
         $slaveSubscription = $this->subscriptionsRepository->find($accepted1->slave_subscription->id);
@@ -112,7 +112,7 @@ class UpdateFamilyRequestSubscriptionsTest extends BaseTestCase
 
         $familySubscriptionType = $this->familySubscriptionTypesRepository->findByMasterSubscriptionType($masterSubscriptionType);
         $this->familySubscriptionTypesRepository->update($familySubscriptionType, [
-            'donation_method' => 'custom'
+            'donation_method' => 'custom',
         ]);
 
         $accepted = $this->familyRequestsRepository->masterSubscriptionAcceptedFamilyRequests($masterSubscription)->fetchAll();
@@ -134,7 +134,7 @@ class UpdateFamilyRequestSubscriptionsTest extends BaseTestCase
     {
         [$masterSubscriptionType, $slaveSubscriptionType] = $this->seedFamilySubscriptionTypes(
             self::COMPANY_SUBSCRIPTIONS_LENGTH,
-            self::COMPANY_SUBSCRIPTIONS_COUNT
+            self::COMPANY_SUBSCRIPTIONS_COUNT,
         );
 
         $masterUser = $this->createUser('master@example.com');
@@ -149,7 +149,7 @@ class UpdateFamilyRequestSubscriptionsTest extends BaseTestCase
             'family',
             new DateTime('2020-07-01'),
             new DateTime('2020-08-01'),
-            true
+            true,
         ), 1);
 
         // check number of generated requests
@@ -161,21 +161,21 @@ class UpdateFamilyRequestSubscriptionsTest extends BaseTestCase
         $this->donateSubscription->setNow(new \DateTime('2020-07-10'));
         $this->donateSubscription->connectFamilyUser(
             $slaveUserWithAccepted,
-            $acceptedFamilyRequest
+            $acceptedFamilyRequest,
         );
 
         $acceptedFamilyRequest2 = next($familyRequests);
         $this->donateSubscription->setNow(new \DateTime('2020-07-11'));
         $this->donateSubscription->connectFamilyUser(
             $slaveUserWithAccepted2,
-            $acceptedFamilyRequest2
+            $acceptedFamilyRequest2,
         );
 
         $canceledFamilyRequest1 = next($familyRequests);
         $this->donateSubscription->setNow(new \DateTime('2020-07-10'));
         $this->donateSubscription->connectFamilyUser(
             $slaveUserWithCanceled1,
-            $canceledFamilyRequest1
+            $canceledFamilyRequest1,
         );
         $canceledFamilyRequest1 = $this->familyRequestsRepository->find($canceledFamilyRequest1->id);
         $this->donateSubscription->releaseFamilyRequest($canceledFamilyRequest1);
@@ -190,7 +190,7 @@ class UpdateFamilyRequestSubscriptionsTest extends BaseTestCase
             false,
             'unknown',
             null,
-            false
+            false,
         );
     }
 }

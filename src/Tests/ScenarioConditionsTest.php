@@ -120,8 +120,8 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
                     'type' => TriggersRepository::TRIGGER_TYPE_EVENT,
                     'id' => 'trigger1',
                     'event' => ['code' => 'new_subscription'],
-                    'elements' => ['element_condition']
-                ])
+                    'elements' => ['element_condition'],
+                ]),
             ],
             'elements' => [
                 self::obj([
@@ -131,7 +131,7 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
                     'condition' => [
                         'descendants' => [
                             ['uuid' => 'element_email_pos', 'direction' => 'positive'],
-                            ['uuid' => 'element_email_neg', 'direction' => 'negative']
+                            ['uuid' => 'element_email_neg', 'direction' => 'negative'],
                         ],
                         'conditions' => [
                             'event' => 'subscription',
@@ -143,28 +143,28 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
                                         [
                                             'key' => 'is_family_master',
                                             'values' => [
-                                                'selection' => true
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
+                                                'selection' => true,
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
                 ]),
                 self::obj([
                     'name' => '',
                     'id' => 'element_email_pos',
                     'type' => ElementsRepository::ELEMENT_TYPE_EMAIL,
-                    'email' => ['code' => self::EMAIL_TEMPLATE_SUCCESS]
+                    'email' => ['code' => self::EMAIL_TEMPLATE_SUCCESS],
                 ]),
                 self::obj([
                     'name' => '',
                     'id' => 'element_email_neg',
                     'type' => ElementsRepository::ELEMENT_TYPE_EMAIL,
-                    'email' => ['code' => self::EMAIL_TEMPLATE_FAIL]
-                ])
-            ]
+                    'email' => ['code' => self::EMAIL_TEMPLATE_FAIL],
+                ]),
+            ],
         ]);
 
         $masterUser = $this->userManager->addNewUser('master@email.com', false, 'unknown', null, false);
@@ -179,7 +179,7 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
             SubscriptionsRepository::TYPE_FREE,
             new DateTime(),
             null,
-            false
+            false,
         ), 1);
 
         // SIMULATE RUN
@@ -232,8 +232,8 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
                     'type' => TriggersRepository::TRIGGER_TYPE_EVENT,
                     'id' => 'trigger1',
                     'event' => ['code' => 'new_subscription'],
-                    'elements' => ['element_condition']
-                ])
+                    'elements' => ['element_condition'],
+                ]),
             ],
             'elements' => [
                 self::obj([
@@ -243,7 +243,7 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
                     'condition' => [
                         'descendants' => [
                             ['uuid' => 'element_email_pos', 'direction' => 'positive'],
-                            ['uuid' => 'element_email_neg', 'direction' => 'negative']
+                            ['uuid' => 'element_email_neg', 'direction' => 'negative'],
                         ],
                         'conditions' => [
                             'event' => 'subscription',
@@ -255,28 +255,28 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
                                         [
                                             'key' => 'is_family_slave',
                                             'values' => [
-                                                'selection' => true
-                                            ]
-                                        ]
-                                    ]
-                                ]
-                            ]
-                        ]
-                    ]
+                                                'selection' => true,
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
                 ]),
                 self::obj([
                     'name' => '',
                     'id' => 'element_email_pos',
                     'type' => ElementsRepository::ELEMENT_TYPE_EMAIL,
-                    'email' => ['code' => self::EMAIL_TEMPLATE_SUCCESS]
+                    'email' => ['code' => self::EMAIL_TEMPLATE_SUCCESS],
                 ]),
                 self::obj([
                     'name' => '',
                     'id' => 'element_email_neg',
                     'type' => ElementsRepository::ELEMENT_TYPE_EMAIL,
-                    'email' => ['code' => self::EMAIL_TEMPLATE_FAIL]
-                ])
-            ]
+                    'email' => ['code' => self::EMAIL_TEMPLATE_FAIL],
+                ]),
+            ],
         ]);
 
         $masterUser = $this->userManager->addNewUser('master@email.com', false, 'unknown', null, false);
@@ -291,7 +291,7 @@ class ScenarioConditionsTest extends ScenariosBaseTestCase
             SubscriptionsRepository::TYPE_FREE,
             new DateTime(),
             null,
-            false
+            false,
         ), 1);
 
         // SIMULATE RUN

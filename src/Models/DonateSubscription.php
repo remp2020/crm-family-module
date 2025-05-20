@@ -96,7 +96,7 @@ class DonateSubscription
                 $slaveUser,
                 FamilyModule::SUBSCRIPTION_TYPE_FAMILY,
                 $startTime,
-                $endTime
+                $endTime,
             );
         } elseif (isset($subscriptionMeta['family_subscription_type']) && $subscriptionMeta['family_subscription_type'] === 'fixed') {
             $endTime = null;
@@ -122,7 +122,7 @@ class DonateSubscription
                 $slaveUser,
                 FamilyModule::SUBSCRIPTION_TYPE_FAMILY,
                 $this->getNow(),
-                $endTime
+                $endTime,
             );
         }
 
@@ -172,7 +172,7 @@ class DonateSubscription
 
         $this->familyRequestsRepository->add(
             $familyRequest->master_subscription,
-            $familyRequest->subscription_type
+            $familyRequest->subscription_type,
         );
     }
 

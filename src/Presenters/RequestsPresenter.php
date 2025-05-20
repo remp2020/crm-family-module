@@ -165,7 +165,7 @@ class RequestsPresenter extends FrontendPresenter
         $form->setRenderer(new BootstrapInlineRenderer());
         $form->addHidden('request', $this->params['id']);
         $form->addSubmit('send', $this->translator->translate('family.frontend.logged_in.activate', [
-            'email' => $email
+            'email' => $email,
         ]));
 
         $form->onSuccess[] = function (Form $form) {

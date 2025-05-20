@@ -142,11 +142,11 @@ class RequestFormFactory
                 /** @var RequestFormDataProviderInterface[] $providers */
                 $providers = $this->dataProviderManager->getProviders(
                     'family.dataprovider.request_form',
-                    RequestFormDataProviderInterface::class
+                    RequestFormDataProviderInterface::class,
                 );
                 $subscriptionTypeItemPriceOptions = [sprintf('%.2f', $item->amount) => $this->priceHelper->getFormattedPrice(
                     value: $item->amount,
-                    withoutCurrencySymbol: true
+                    withoutCurrencySymbol: true,
                 )];
                 foreach ($providers as $sorting => $provider) {
                     $options = $provider->provideSubscriptionTypeItemPriceOptions($item);
@@ -255,7 +255,7 @@ class RequestFormFactory
                     subscriptionTypeItem: $subscriptionTypeItem,
                     count: $count,
                     price: (float) str_replace(',', '.', $form[$subscriptionType->id][$itemId]['price']->getRawValue()),
-                    noVat: $values['no_vat'] ?? false
+                    noVat: $values['no_vat'] ?? false,
                 ));
             }
         }
@@ -270,7 +270,7 @@ class RequestFormFactory
             $countryResolution  = $this->oneStopShop->resolveCountry(
                 user: $user,
                 selectedCountryCode: $selectedPaymentCountry?->iso_code,
-                paymentItemContainer: $paymentItemContainer
+                paymentItemContainer: $paymentItemContainer,
             );
         } catch (OneStopShopCountryConflictException $exception) {
             Debugger::log("RequestFormFactory OSS conflict: " . $exception->getMessage(), Debugger::ERROR);

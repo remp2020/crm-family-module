@@ -110,7 +110,7 @@ class ListFamilyRequestsApiHandlerTest extends BaseTestCase
     {
         [$masterSubscriptionType, ] = $this->seedFamilySubscriptionTypes(
             self::COMPANY_SUBSCRIPTIONS_LENGTH,
-            self::COMPANY_SUBSCRIPTIONS_COUNT
+            self::COMPANY_SUBSCRIPTIONS_COUNT,
         );
 
         $masterUser = $this->createUser('master@example.com');
@@ -123,7 +123,7 @@ class ListFamilyRequestsApiHandlerTest extends BaseTestCase
             'family',
             new DateTime('now - 1 days'),
             new DateTime('now + 30 days'),
-            true
+            true,
         ), 1);
 
         // check number of generated requests (based on
@@ -134,7 +134,7 @@ class ListFamilyRequestsApiHandlerTest extends BaseTestCase
         $acceptedFamilyRequest = reset($familyRequests);
         $this->donateSubscription->connectFamilyUser(
             $slaveUser,
-            $acceptedFamilyRequest
+            $acceptedFamilyRequest,
         );
         $acceptedFamilyRequest = $this->familyRequestsRepository->findByCode($acceptedFamilyRequest->code);
 
@@ -148,7 +148,7 @@ class ListFamilyRequestsApiHandlerTest extends BaseTestCase
             false,
             'unknown',
             null,
-            false
+            false,
         );
     }
 

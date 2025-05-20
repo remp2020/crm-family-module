@@ -23,7 +23,7 @@ class SubscriptionUpdatedHandler extends AbstractListener
     public function __construct(
         FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
         FamilyRequestsRepository $familyRequestsRepository,
-        SubscriptionsRepository $subscriptionsRepository
+        SubscriptionsRepository $subscriptionsRepository,
     ) {
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
         $this->familyRequestsRepository = $familyRequestsRepository;
@@ -62,7 +62,7 @@ class SubscriptionUpdatedHandler extends AbstractListener
                 [
                     'start_time' => $subscription->start_time,
                     'end_time' => $subscription->end_time,
-                ]
+                ],
             );
         }
     }

@@ -24,7 +24,7 @@ class SubscriptionExtensionMethodsSeeder implements ISeeder
                 $method,
                 ExtendFamilyExtension::METHOD_NAME,
                 'Put new subscription after newest family subscription or start now',
-                400
+                400,
             );
             $output->writeln("  <comment>* subscription extension method <info>{$method}</info> created</comment>");
         } else {

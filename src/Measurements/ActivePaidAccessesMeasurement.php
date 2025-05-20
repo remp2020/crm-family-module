@@ -46,7 +46,7 @@ class ActivePaidAccessesMeasurement extends BaseMeasurement
                 'end_time >=' => $date,
                 'users.active' => 1,
                 'subscription_type_id NOT IN' => $this->db()::literal(
-                    '(SELECT master_subscription_type_id FROM family_subscription_types)'
+                    '(SELECT master_subscription_type_id FROM family_subscription_types)',
                 ),
             ],
         );

@@ -52,7 +52,7 @@ final class RecurrentPaymentPaymentItemContainerDataProviderTest extends BaseTes
         $dataProviderManager = $this->inject(DataProviderManager::class);
         $dataProviderManager->registerDataProvider(
             RecurrentPaymentPaymentItemContainerDataProviderInterface::PATH,
-            $this->inject(RecurrentPaymentPaymentItemContainerDataProvider::class)
+            $this->inject(RecurrentPaymentPaymentItemContainerDataProvider::class),
         );
 
         // Setting countries and VATs
@@ -101,12 +101,12 @@ final class RecurrentPaymentPaymentItemContainerDataProviderTest extends BaseTes
         $paymentItemContainer->addItem(
             SubscriptionTypePaymentItem::fromSubscriptionTypeItem($masterWebSubscriptionTypeItem)
             ->forceCount(2)
-            ->forcePrice(10)
+            ->forcePrice(10),
         );
         $paymentItemContainer->addItem(
             SubscriptionTypePaymentItem::fromSubscriptionTypeItem($masterPrintSubscriptionTypeItem)
                 ->forceCount(3)
-                ->forcePrice(5)
+                ->forcePrice(5),
         );
 
         // Assert payment items are correctly copied from parent payment,
@@ -136,7 +136,7 @@ final class RecurrentPaymentPaymentItemContainerDataProviderTest extends BaseTes
         ActiveRow $user,
         ActiveRow $subscriptionType,
         ActiveRow $paymentGateway,
-        PaymentItemContainer $paymentItemContainer
+        PaymentItemContainer $paymentItemContainer,
     ) {
         $payment = $this->paymentsRepository->add(
             subscriptionType: $subscriptionType,

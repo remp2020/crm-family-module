@@ -79,7 +79,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
                 'usedFamilyRequests' => $this->familyRequestsRepository->masterSubscriptionAcceptedFamilyRequests($subscription),
                 'activeFamilyRequests' => $this->familyRequestsRepository->masterSubscriptionActiveFamilyRequests($subscription),
                 'canceledFamilyRequests' => $this->familyRequestsRepository->masterSubscriptionCanceledFamilyRequests($subscription),
-                'familyType' => $this->familySubscriptionTypesRepository->findByMasterSubscriptionType($subscription->subscription_type)
+                'familyType' => $this->familySubscriptionTypesRepository->findByMasterSubscriptionType($subscription->subscription_type),
             ];
         }
         return $subscriptionsData;
@@ -95,7 +95,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
             if ($snippet) {
                 $renderedSnippet = $this->snippetRenderer->render([
                     $this->activationEmailSnippetIdentifier,
-                    'link' => $this->linkGenerator->link('Family:Requests:default', ['id' => $this->presenter->getParameter('familyRequestCode')])
+                    'link' => $this->linkGenerator->link('Family:Requests:default', ['id' => $this->presenter->getParameter('familyRequestCode')]),
                 ]);
 
                 // convert line breaks for usage in mailto link (https://www.rfc-editor.org/rfc/rfc2368#page-3)
@@ -107,7 +107,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
                         'email' => $this->presenter->getParameter('email'),
                         'subject' => rawurlencode($snippet->title),
                         'text' => $text,
-                    ]
+                    ],
                 );
             }
 
@@ -152,14 +152,14 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
         if (!$familyRequest) {
             $presenter = $this->getPresenter();
             $presenter->sendJson([
-                'status' => 'error'
+                'status' => 'error',
             ]);
             return;
         }
 
         $this->familyRequestsRepository->update($familyRequest, [
             'updated_at' => new \DateTime(),
-            'note' => substr($this->presenter->getParameter('note'), 0, 255)
+            'note' => substr($this->presenter->getParameter('note'), 0, 255),
         ]);
 
         $this->redirect('this');

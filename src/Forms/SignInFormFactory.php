@@ -9,7 +9,7 @@ use Tomaj\Form\Renderer\BootstrapRenderer;
 class SignInFormFactory
 {
     public function __construct(
-        private readonly Translator $translator
+        private readonly Translator $translator,
     ) {
     }
 

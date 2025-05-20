@@ -65,7 +65,7 @@ abstract class BaseTestCase extends DatabaseTestCase
             FamilyRequestsRepository::class,
             FamilySubscriptionTypesRepository::class,
             // Cache
-            CacheRepository::class
+            CacheRepository::class,
         ];
     }
 

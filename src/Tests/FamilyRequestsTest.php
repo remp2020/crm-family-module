@@ -63,7 +63,7 @@ class FamilyRequestsTest extends BaseTestCase
 
         [$masterSubscriptionType, ] = $this->seedFamilySubscriptionTypes(
             31,
-            $preconfiguredCount
+            $preconfiguredCount,
         );
         $masterUser = $this->createUser('master@example.com');
 
@@ -73,7 +73,7 @@ class FamilyRequestsTest extends BaseTestCase
             $masterSubscriptionType,
             'now',
             'now',
-            $paymentItemCount
+            $paymentItemCount,
         );
         $subscription = $payment->subscription;
 
@@ -92,7 +92,7 @@ class FamilyRequestsTest extends BaseTestCase
 
         [$masterSubscriptionType, ] = $this->seedFamilySubscriptionTypes(
             31,
-            $preconfiguredCount
+            $preconfiguredCount,
         );
         $masterUser = $this->createUser('master@example.com');
 
@@ -102,7 +102,7 @@ class FamilyRequestsTest extends BaseTestCase
             $masterSubscriptionType,
             'now',
             'now',
-            $paymentItemCount
+            $paymentItemCount,
         );
         $subscription = $payment->subscription;
 
@@ -121,7 +121,7 @@ class FamilyRequestsTest extends BaseTestCase
 
         [$masterSubscriptionType, ] = $this->seedFamilySubscriptionTypes(
             31,
-            $preconfiguredCount
+            $preconfiguredCount,
         );
         $masterUser = $this->createUser('master@example.com');
 
@@ -131,7 +131,7 @@ class FamilyRequestsTest extends BaseTestCase
             $masterSubscriptionType,
             'now',
             'now',
-            $paymentItemCount
+            $paymentItemCount,
         );
         $subscription = $payment->subscription;
 
@@ -151,7 +151,7 @@ class FamilyRequestsTest extends BaseTestCase
 
         [$masterSubscriptionType, ] = $this->seedFamilySubscriptionTypes(
             31,
-            $preconfiguredCount
+            $preconfiguredCount,
         );
 
         // TEST missing family subscription configuration; removing link
@@ -166,7 +166,7 @@ class FamilyRequestsTest extends BaseTestCase
             $masterSubscriptionType,
             'now',
             'now',
-            $paymentItemCount
+            $paymentItemCount,
         );
         $subscription = $payment->subscription;
 
@@ -191,14 +191,14 @@ class FamilyRequestsTest extends BaseTestCase
             $webSlaveSubscriptionType->name,
             10,
             20,
-            2
+            2,
         ));
         $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
             $printSlaveSubscriptionType->id,
             $printSlaveSubscriptionType->name,
             5,
             20,
-            3
+            3,
         ));
 
         $payment = $this->paymentsRepository->add(
@@ -208,7 +208,7 @@ class FamilyRequestsTest extends BaseTestCase
             $paymentItemContainer,
             null,
             1,
-            new DateTime()
+            new DateTime(),
         );
 
         $this->paymentsRepository->update($payment, ['paid_at' => new DateTime()]);
@@ -248,7 +248,7 @@ class FamilyRequestsTest extends BaseTestCase
             $paymentItemContainer,
             null,
             1,
-            new DateTime()
+            new DateTime(),
         );
 
         foreach ($this->paymentItemsRepository->getByPayment($payment) as $paymentItem) {
@@ -286,7 +286,7 @@ class FamilyRequestsTest extends BaseTestCase
                 $subscriptionType->name,
                 $subscriptionType->price * $childrenCountToGenerate,
                 20,
-                $childrenCountToGenerate
+                $childrenCountToGenerate,
             ));
         }
 
@@ -300,7 +300,7 @@ class FamilyRequestsTest extends BaseTestCase
             $paymentItemContainer,
             null,
             1,
-            $startSubscriptionDateTime
+            $startSubscriptionDateTime,
         );
         $this->paymentsRepository->update($payment, ['paid_at' => new \DateTime($paidAtString)]);
         $this->paymentsRepository->updateStatus($payment, PaymentStatusEnum::Paid->value);

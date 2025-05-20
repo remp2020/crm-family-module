@@ -15,7 +15,7 @@ class FamilySeeder implements ISeeder
 
     public function __construct(
         SubscriptionTypeNamesRepository $subscriptionTypeNamesRepository,
-        SnippetsRepository $snippetsRepository
+        SnippetsRepository $snippetsRepository,
     ) {
         $this->subscriptionTypeNamesRepository = $subscriptionTypeNamesRepository;
         $this->snippetsRepository = $snippetsRepository;

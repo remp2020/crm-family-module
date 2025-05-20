@@ -52,7 +52,7 @@ class FamilyRequests
         $familySubscriptionType = $this->familySubscriptionTypesRepository->findByMasterSubscriptionType($subscription->subscription_type);
         if (!$familySubscriptionType) {
             throw new MissingFamilySubscriptionTypeException(
-                "Unable to find FamilySubscriptionType for subscription ID [{$subscription->id}]."
+                "Unable to find FamilySubscriptionType for subscription ID [{$subscription->id}].",
             );
         }
 
@@ -63,7 +63,7 @@ class FamilyRequests
         $requestsToGenerateCount = $this->getRequestsToGenerateCount($subscription, $familySubscriptionType);
         if ($requestsToGenerateCount === 0) {
             throw new InvalidConfigurationException(
-                "Unable to load number of family requests from subscription type or payment for subscription ID [{$subscription->id}]."
+                "Unable to load number of family requests from subscription type or payment for subscription ID [{$subscription->id}].",
             );
         }
 
@@ -93,7 +93,7 @@ class FamilyRequests
             $payment = $this->paymentsRepository->subscriptionPayment($subscription);
             if (!$payment) {
                 throw new InvalidConfigurationException(
-                    "Unable to load number of family requests from subscription type or payment for subscription ID [{$subscription->id}]."
+                    "Unable to load number of family requests from subscription type or payment for subscription ID [{$subscription->id}].",
                 );
             }
 
@@ -145,7 +145,7 @@ class FamilyRequests
                 'active_family_owners_count',
                 $callable,
                 DateTime::from('-1 hour'),
-                $forceCacheUpdate
+                $forceCacheUpdate,
             );
         }
 
@@ -169,7 +169,7 @@ class FamilyRequests
                 'active_family_requests_count',
                 $callable,
                 DateTime::from('-1 hour'),
-                $forceCacheUpdate
+                $forceCacheUpdate,
             );
         }
 
@@ -206,7 +206,7 @@ class FamilyRequests
                 'active_paid_subscribers_with_family_requests_count',
                 $callable,
                 DateTime::from('-1 hour'),
-                $forceCacheUpdate
+                $forceCacheUpdate,
             );
         }
 
@@ -266,7 +266,7 @@ class FamilyRequests
 
             if ($itemConfig->noVat) {
                 $subscriptionTypePaymentItem->forcePrice(
-                    $subscriptionTypePaymentItem->unitPriceWithoutVAT()
+                    $subscriptionTypePaymentItem->unitPriceWithoutVAT(),
                 );
                 $subscriptionTypePaymentItem->forceVat(0);
                 $paymentItemContainer->setPreventOssVatChange();
@@ -293,7 +293,7 @@ class FamilyRequests
         foreach ($paymentItems as $paymentItem) {
             $slaveSubscriptionTypeIdMeta = $this->paymentItemMetaRepository->findByPaymentItemAndKey(
                 $paymentItem,
-                self::PAYMENT_ITEM_META_SLAVE_SUBSCRIPTION_TYPE_ID
+                self::PAYMENT_ITEM_META_SLAVE_SUBSCRIPTION_TYPE_ID,
             )->fetch();
             if ($slaveSubscriptionTypeIdMeta) {
                 $slaveSubscriptionTypeId = $slaveSubscriptionTypeIdMeta->value;

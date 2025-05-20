@@ -19,7 +19,7 @@ class GenerateFamilyRequestsCommand extends Command
     public function __construct(
         private FamilyRequests $familyRequests,
         private SubscriptionsRepository $subscriptionsRepository,
-        private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository
+        private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
     ) {
         parent::__construct();
     }

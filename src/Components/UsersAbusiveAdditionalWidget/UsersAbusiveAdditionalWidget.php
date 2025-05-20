@@ -20,7 +20,7 @@ class UsersAbusiveAdditionalWidget extends BaseLazyWidget
     public function __construct(
         LazyWidgetManager $lazyWidgetManager,
         FamilyRequestsRepository $familyRequestsRepository,
-        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository
+        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
     ) {
         parent::__construct($lazyWidgetManager);
         $this->familyRequestsRepository = $familyRequestsRepository;

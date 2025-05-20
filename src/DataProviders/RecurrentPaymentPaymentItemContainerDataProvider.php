@@ -32,7 +32,7 @@ final class RecurrentPaymentPaymentItemContainerDataProvider implements Recurren
         // (of type SubscriptionTypePaymentItem) and ignore all potential price differences (but do not ignore VAT changes)
         $paymentItemContainer = $this->paymentItemContainerFactory->createFromPayment(
             $recurrentPayment->parent_payment,
-            [SubscriptionTypePaymentItem::TYPE]
+            [SubscriptionTypePaymentItem::TYPE],
         );
 
         foreach ($paymentItemContainer->items() as $item) {

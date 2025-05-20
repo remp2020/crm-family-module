@@ -40,7 +40,7 @@ class ExtendFamilyExtensionTest extends BaseTestCase
             'regular',
             new DateTime('now - 15 days'),
             null,
-            true
+            true,
         ), 1);
         $currentSubscription = $this->subscriptionsRepository->actualUserSubscription($user);
 
@@ -64,7 +64,7 @@ class ExtendFamilyExtensionTest extends BaseTestCase
             'regular',
             new DateTime('now - 15 days'),
             null,
-            true
+            true,
         ), 1);
         $currentSubscription = $this->subscriptionsRepository->actualUserSubscription($user);
 
@@ -92,7 +92,7 @@ class ExtendFamilyExtensionTest extends BaseTestCase
             'regular',
             new DateTime('now - 15 days'),
             null,
-            true
+            true,
         ), 1);
 
         // Generate next non family subscription starting now
@@ -102,7 +102,7 @@ class ExtendFamilyExtensionTest extends BaseTestCase
             'regular',
             new DateTime('now'),
             null,
-            true
+            true,
         ), 1);
 
         $currentSubscriptions = $this->subscriptionsRepository->actualUserSubscriptions($user);

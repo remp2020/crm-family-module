@@ -32,7 +32,7 @@ class FamilyRequestsListWidget extends BaseLazyWidget
         FamilyRequests $familyRequests,
         FamilyRequestsRepository $familyRequestsRepository,
         SubscriptionsRepository $subscriptionsRepository,
-        Translator $translator
+        Translator $translator,
     ) {
         parent::__construct($lazyWidgetManager);
         $this->familyRequests = $familyRequests;
@@ -68,9 +68,9 @@ class FamilyRequestsListWidget extends BaseLazyWidget
                 $this->flashMessage(
                     $this->translator->translate(
                         'family.frontend.family_requests.failed_to_generate',
-                        ['subscription_id' => $activeSubscription->id]
+                        ['subscription_id' => $activeSubscription->id],
                     ),
-                    'error'
+                    'error',
                 );
                 continue;
             }

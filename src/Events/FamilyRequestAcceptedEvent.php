@@ -9,7 +9,7 @@ use League\Event\AbstractEvent;
 class FamilyRequestAcceptedEvent extends AbstractEvent implements FamilyRequestEventInterface
 {
     public function __construct(
-        private ActiveRow $familyRequest
+        private ActiveRow $familyRequest,
     ) {
     }
 

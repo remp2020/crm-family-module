@@ -9,7 +9,7 @@ final class PaymentItemsConfig
     private array $itemsConfig = [];
 
     public function addItem(
-        PaymentItemConfig $config
+        PaymentItemConfig $config,
     ): void {
         $this->itemsConfig[] = $config;
     }

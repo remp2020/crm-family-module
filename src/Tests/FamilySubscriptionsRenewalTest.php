@@ -101,7 +101,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             'family',
             new DateTime('now - 30 days'),
             new DateTime('now + 1 days'),
-            true
+            true,
         ), 1);
 
         // Grab one of the requests (there should be 5 of them)
@@ -120,7 +120,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             'family',
             new DateTime('now + 1 days'),
             new DateTime('now + 31 days'),
-            true
+            true,
         ), 1);
 
         // Check family subscriptions were connected
@@ -191,14 +191,14 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             $webSlaveSubscriptionType->name,
             10,
             20,
-            3
+            3,
         ));
         $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
             $printSlaveSubscriptionType->id,
             $printSlaveSubscriptionType->name,
             5,
             20,
-            2
+            2,
         ));
 
         $payment = $this->makePayment(
@@ -206,7 +206,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             $masterSubscriptionType,
             'now',
             'now',
-            $paymentItemContainer
+            $paymentItemContainer,
         );
 
         $previousSubscription = $payment->subscription;
@@ -232,7 +232,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             $paymentItemContainer,
             null,
             1,
-            new DateTime()
+            new DateTime(),
         );
 
         $this->paymentsRepository->update($nextPayment, [
@@ -274,14 +274,14 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             $webSlaveSubscriptionType->name,
             10,
             20,
-            2
+            2,
         ));
         $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
             $printSlaveSubscriptionType->id,
             $printSlaveSubscriptionType->name,
             5,
             20,
-            2
+            2,
         ));
 
         $firstPayment = $this->makePayment(
@@ -289,7 +289,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             $masterSubscriptionType,
             'now',
             'now',
-            $paymentItemContainer
+            $paymentItemContainer,
         );
 
         $firstSubscription = $firstPayment->subscription;
@@ -309,21 +309,21 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             $webSlaveSubscriptionType->name,
             10,
             20,
-            3
+            3,
         ));
         $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
             $printSlaveSubscriptionType->id,
             $printSlaveSubscriptionType->name,
             5,
             20,
-            3
+            3,
         ));
         $secondPayment = $this->makePayment(
             $masterUser,
             $masterSubscriptionType,
             'now',
             $firstSubscription->end_time,
-            $paymentItemContainer
+            $paymentItemContainer,
         );
 
         // Check family subscriptions were connected
@@ -344,21 +344,21 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             $webSlaveSubscriptionType->name,
             10,
             20,
-            2
+            2,
         ));
         $paymentItemContainer->addItem(new SubscriptionTypePaymentItem(
             $printSlaveSubscriptionType->id,
             $printSlaveSubscriptionType->name,
             5,
             20,
-            3
+            3,
         ));
         $thirdPayment = $this->makePayment(
             $masterUser,
             $masterSubscriptionType,
             'now',
             $secondSubscription->end_time,
-            $paymentItemContainer
+            $paymentItemContainer,
         );
 
         // Check family subscriptions weren't connected
@@ -377,7 +377,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
         ActiveRow $subscriptionType,
         string $paidAtString,
         string $startSubscriptionAtString,
-        PaymentItemContainer $paymentItemContainer
+        PaymentItemContainer $paymentItemContainer,
     ) {
         $payment = $this->paymentsRepository->add(
             $subscriptionType,
@@ -386,7 +386,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             $paymentItemContainer,
             null,
             1,
-            new DateTime($startSubscriptionAtString)
+            new DateTime($startSubscriptionAtString),
         );
         $this->paymentsRepository->update($payment, ['paid_at' => new DateTime($paidAtString)]);
         $this->paymentsRepository->updateStatus($payment, PaymentStatusEnum::Paid->value);
@@ -416,7 +416,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             null,
             null,
             null,
-            true
+            true,
         );
 
         $this->recurrentPaymentsRepository->update($recurrent, [

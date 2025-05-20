@@ -55,7 +55,7 @@ class FamilyModule extends CrmModule
     public function __construct(
         Container $container,
         Translator $translator,
-        FamilyRequests $familyRequests
+        FamilyRequests $familyRequests,
     ) {
         parent::__construct($container, $translator);
 
@@ -73,15 +73,15 @@ class FamilyModule extends CrmModule
             new ApiRoute(
                 new ApiIdentifier('1', 'family', 'list'),
                 ListFamilyRequestsApiHandler::class,
-                UserTokenAuthorization::class
-            )
+                UserTokenAuthorization::class,
+            ),
         );
         $apiRoutersContainer->attachRouter(
             new ApiRoute(
                 new ApiIdentifier('1', 'family', 'activate'),
                 ActivateFamilyRequestApiHandler::class,
-                UserTokenAuthorization::class
-            )
+                UserTokenAuthorization::class,
+            ),
         );
     }
 
@@ -89,15 +89,15 @@ class FamilyModule extends CrmModule
     {
         $emitter->addListener(
             NewSubscriptionEvent::class,
-            NewSubscriptionHandler::class
+            NewSubscriptionHandler::class,
         );
         $emitter->addListener(
             SubscriptionShortenedEvent::class,
-            SubscriptionShortenedHandler::class
+            SubscriptionShortenedHandler::class,
         );
         $emitter->addListener(
             SubscriptionUpdatedEvent::class,
-            SubscriptionUpdatedHandler::class
+            SubscriptionUpdatedHandler::class,
         );
         $emitter->addListener(
             BeforeCreateRenewalPaymentEvent::class,
@@ -109,7 +109,7 @@ class FamilyModule extends CrmModule
     {
         $dataProviderManager->registerDataProvider(
             RecurrentPaymentPaymentItemContainerDataProviderInterface::PATH,
-            $this->getInstance(RecurrentPaymentPaymentItemContainerDataProvider::class)
+            $this->getInstance(RecurrentPaymentPaymentItemContainerDataProvider::class),
         );
         $dataProviderManager->registerDataProvider(
             'subscriptions.dataprovider.transfer',
@@ -121,28 +121,28 @@ class FamilyModule extends CrmModule
     {
         $widgetManager->registerWidget(
             'admin.user.abusive.additional',
-            UsersAbusiveAdditionalWidget::class
+            UsersAbusiveAdditionalWidget::class,
         );
 
         $widgetManager->registerWidget(
             'dashboard.simplewidget.additional',
-            FamilyRequestsDashboardWidget::class
+            FamilyRequestsDashboardWidget::class,
         );
 
         $widgetManager->registerWidget(
             'admin.user.detail.center',
-            MasterFamilySubscriptionInfoWidget::class
+            MasterFamilySubscriptionInfoWidget::class,
         );
 
         $widgetManager->registerWidget(
             'admin.user.detail.center',
-            SlaveFamilySubscriptionInfoWidget::class
+            SlaveFamilySubscriptionInfoWidget::class,
         );
 
         $widgetManager->registerWidget(
             'subscription_types_admin.show.right',
             FamilySubscriptionTypeDetailsWidget::class,
-            200
+            200,
         );
     }
 
