@@ -6,7 +6,7 @@ frontend:
         form:
             email: "Email"
             email_required: "Prosím zadejte Váš e-mail"
-            email_placeholder: "Například moj@email.cz"
+            email_placeholder: "Například muj@email.cz"
             submit: "Zaregistrovat a aktivovat předplatné"
             error_email: "Zadaný email je neplatný"
 
