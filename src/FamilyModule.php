@@ -22,6 +22,7 @@ use Crm\FamilyModule\Components\FamilySubscriptionTypeDetailsWidget\FamilySubscr
 use Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget\MasterFamilySubscriptionInfoWidget;
 use Crm\FamilyModule\Components\SlaveFamilySubscriptionInfoWidget\SlaveFamilySubscriptionInfoWidget;
 use Crm\FamilyModule\Components\UsersAbusiveAdditionalWidget\UsersAbusiveAdditionalWidget;
+use Crm\FamilyModule\DataProviders\FamilyRequestVatModeFormDataProvider;
 use Crm\FamilyModule\DataProviders\RecurrentPaymentPaymentItemContainerDataProvider;
 use Crm\FamilyModule\DataProviders\SubscriptionTransferDataProvider;
 use Crm\FamilyModule\Events\BeforeCreateRenewalPaymentEventHandler;
@@ -114,6 +115,10 @@ class FamilyModule extends CrmModule
         $dataProviderManager->registerDataProvider(
             'subscriptions.dataprovider.transfer',
             $this->getInstance(SubscriptionTransferDataProvider::class),
+        );
+        $dataProviderManager->registerDataProvider(
+            'family.dataprovider.request_form',
+            $this->getInstance(FamilyRequestVatModeFormDataProvider::class),
         );
     }
 
