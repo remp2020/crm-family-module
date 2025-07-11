@@ -22,7 +22,7 @@ class FamilySubscriptionTypeDetailsWidget extends BaseLazyWidget
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
     }
 
-    public function header($id = '')
+    public function header()
     {
         return 'Family subscription type details widget';
     }

@@ -42,7 +42,7 @@ class FamilyRequestsListWidget extends BaseLazyWidget
         $this->translator = $translator;
     }
 
-    public function header($id = '')
+    public function header()
     {
         return 'Family requests list widget';
     }

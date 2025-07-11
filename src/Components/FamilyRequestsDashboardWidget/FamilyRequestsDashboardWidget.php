@@ -21,7 +21,7 @@ class FamilyRequestsDashboardWidget extends BaseLazyWidget
         $this->familyRequests = $familyRequests;
     }
 
-    public function header($id = '')
+    public function header()
     {
         return 'Family Requests Dashboard';
     }
