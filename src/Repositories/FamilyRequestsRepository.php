@@ -132,6 +132,11 @@ class FamilyRequestsRepository extends Repository
         return $this->getTable()->where('slave_subscription_id', $subscription->id)->fetch();
     }
 
+    final public function findMasterUserFamilyRequests(ActiveRow $user): Selection
+    {
+        return $this->getTable()->where('master_user_id', $user->id);
+    }
+
     final public function findSlaveSubscriptionsWithContentAccess(ActiveRow $masterSubscription, string $contentAccess): Selection
     {
         return $this->masterSubscriptionActiveFamilyRequests($masterSubscription)
