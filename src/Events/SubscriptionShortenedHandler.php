@@ -5,7 +5,6 @@ namespace Crm\FamilyModule\Events;
 use Crm\ApplicationModule\Models\NowTrait;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
-use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Events\SubscriptionShortenedEvent;
 use Crm\SubscriptionsModule\Models\Subscription\StopSubscriptionHandler;
 use League\Event\AbstractListener;
@@ -19,19 +18,15 @@ class SubscriptionShortenedHandler extends AbstractListener
 
     private $donateSubscription;
 
-    private $familySubscriptionTypesRepository;
-
     private $stopSubscriptionHandler;
 
     public function __construct(
         FamilyRequestsRepository $familyRequestsRepository,
-        FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
         DonateSubscription $donateSubscription,
         StopSubscriptionHandler $stopSubscriptionHandler,
     ) {
         $this->familyRequestsRepository = $familyRequestsRepository;
         $this->donateSubscription = $donateSubscription;
-        $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
         $this->stopSubscriptionHandler = $stopSubscriptionHandler;
     }
 
@@ -43,8 +38,8 @@ class SubscriptionShortenedHandler extends AbstractListener
 
         $subscription = $event->getBaseSubscription();
 
-        if ($this->familySubscriptionTypesRepository->isSlaveSubscriptionType($subscription->subscription_type)) {
-            $slaveFamilyRequest = $this->familyRequestsRepository->findSlaveSubscriptionFamilyRequest($subscription);
+        $slaveFamilyRequest = $this->familyRequestsRepository->findSlaveSubscriptionFamilyRequest($subscription);
+        if ($slaveFamilyRequest) {
             $masterSubscription = $slaveFamilyRequest->master_subscription;
             if ($masterSubscription->end_time > $this->getNow()) {
                 $this->donateSubscription->releaseFamilyRequest($slaveFamilyRequest);
@@ -52,9 +47,9 @@ class SubscriptionShortenedHandler extends AbstractListener
             return;
         }
 
-        if ($this->familySubscriptionTypesRepository->isMasterSubscriptionType($subscription->subscription_type)) {
-            $familyRequests = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($subscription);
-            foreach ($familyRequests as $familyRequest) {
+        $masterFamilyRequest = $this->familyRequestsRepository->masterSubscriptionFamilyRequests($subscription);
+        if ($masterFamilyRequest->count('*') > 0) {
+            foreach ($masterFamilyRequest as $familyRequest) {
                 if ($familyRequest->status === FamilyRequestsRepository::STATUS_ACCEPTED) {
                     $this->stopSubscriptionHandler->stopSubscription($familyRequest->slave_subscription);
                 }

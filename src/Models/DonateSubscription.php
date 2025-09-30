@@ -70,12 +70,22 @@ class DonateSubscription
             return self::ERROR_REQUEST_WRONG_STATUS;
         }
 
+        $donationMethod = null;
+        $isPaid = false;
+        if ($familySubscriptionType) {
+            $donationMethod = $familySubscriptionType->donation_method;
+            $isPaid = $familySubscriptionType->is_paid;
+        } elseif (isset($subscriptionMeta['family_subscription_type'])) {
+            $donationMethod = $subscriptionMeta['family_subscription_type'];
+            $isPaid = $masterSubscription->is_paid;
+        }
+
         $slaveSubscription = null;
-        if ($familySubscriptionType && $familySubscriptionType->donation_method === 'copy') {
+        if ($donationMethod === 'copy') {
             $slaveSubscription = $this->subscriptionsRepository->add(
                 $familyRequest->subscription_type,
                 false,
-                $familySubscriptionType->is_paid,
+                $isPaid,
                 $slaveUser,
                 FamilyModule::SUBSCRIPTION_TYPE_FAMILY,
                 $masterSubscription->start_time,

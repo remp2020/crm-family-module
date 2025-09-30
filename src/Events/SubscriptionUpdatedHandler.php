@@ -6,6 +6,7 @@ use Crm\ApplicationModule\Models\NowTrait;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Events\SubscriptionUpdatedEvent;
+use Crm\SubscriptionsModule\Repositories\SubscriptionMetaRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
 use League\Event\AbstractListener;
 use League\Event\EventInterface;
@@ -20,14 +21,18 @@ class SubscriptionUpdatedHandler extends AbstractListener
 
     private $subscriptionsRepository;
 
+    private $subscriptionMetaRepository;
+
     public function __construct(
         FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
         FamilyRequestsRepository $familyRequestsRepository,
         SubscriptionsRepository $subscriptionsRepository,
+        SubscriptionMetaRepository $subscriptionMetaRepository,
     ) {
         $this->familySubscriptionTypesRepository = $familySubscriptionTypesRepository;
         $this->familyRequestsRepository = $familyRequestsRepository;
         $this->subscriptionsRepository = $subscriptionsRepository;
+        $this->subscriptionMetaRepository = $subscriptionMetaRepository;
     }
 
     public function handle(EventInterface $event)
@@ -37,12 +42,22 @@ class SubscriptionUpdatedHandler extends AbstractListener
         }
 
         $subscription = $event->getSubscription();
-        if (!$this->familySubscriptionTypesRepository->isMasterSubscriptionType($subscription->subscription_type)) {
+        if ($this->familyRequestsRepository->masterSubscriptionFamilyRequests($subscription)->count('*') === 0) {
             return;
         }
 
+        $donationMethod = null;
+
         $familySubscriptionType = $this->familySubscriptionTypesRepository->findByMasterSubscriptionType($subscription->subscription_type);
-        if ($familySubscriptionType->donation_method !== 'copy') {
+        if ($familySubscriptionType) {
+            $donationMethod = $familySubscriptionType->donation_method;
+        } else {
+            $metaDonationMethod = $this->subscriptionMetaRepository->getMeta($subscription, 'family_subscription_type')->fetch();
+            if ($metaDonationMethod) {
+                $donationMethod = $metaDonationMethod->value;
+            }
+        }
+        if ($donationMethod !== 'copy') {
             return;
         }
 
