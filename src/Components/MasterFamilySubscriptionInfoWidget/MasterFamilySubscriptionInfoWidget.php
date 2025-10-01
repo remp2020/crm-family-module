@@ -45,7 +45,10 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
     {
         $user = $this->usersRepository->find($userId);
         $userMasterSubscriptions = $this->subscriptionsRepository->userSubscriptions($user->id)
-            ->where('subscription_type_id IN ?', $this->familySubscriptionTypesRepository->masterSubscriptionTypes());
+            ->where(
+                'subscriptions.subscription_type_id IN (?) OR :family_requests(master_subscription_id).id IS NOT NULL',
+                $this->familySubscriptionTypesRepository->masterSubscriptionTypes(),
+            );
 
         $hasFamilySubscription = true;
         if (count($userMasterSubscriptions) === 0) {
