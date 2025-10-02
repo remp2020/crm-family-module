@@ -50,15 +50,13 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
                 $this->familySubscriptionTypesRepository->masterSubscriptionTypes(),
             );
 
-        $hasFamilySubscription = true;
-        if (count($userMasterSubscriptions) === 0) {
-            $hasFamilySubscription = false;
-        }
-
         $isAdmin = false;
         if ($this->getPresenter() instanceof AdminPresenter) {
             $isAdmin = true;
         }
+
+        $subscriptionsData = $this->getSubscriptionsData($userMasterSubscriptions);
+        $hasFamilySubscription = count($subscriptionsData) > 0;
 
         if (!$hasFamilySubscription && !$isAdmin) {
             return;
@@ -66,7 +64,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
         $this->template->isAdmin = $isAdmin;
         $this->template->userId = $userId;
         $this->template->hasFamilySubscription = $hasFamilySubscription;
-        $this->template->subscriptionsData = $this->getSubscriptionsData($userMasterSubscriptions);
+        $this->template->subscriptionsData = $subscriptionsData;
         $this->template->showAddButton = $isAdmin && $this->familySubscriptionTypesRepository->getCustomizableSubscriptionTypes();
 
         $this->template->setFile(__DIR__ . '/' . $this->templateName);
@@ -75,11 +73,18 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
 
     private function getSubscriptionsData($subscriptions)
     {
+        $now = new \DateTime();
         $subscriptionsData = [];
         foreach ($subscriptions as $subscription) {
+            $usedFamilyRequests = $this->familyRequestsRepository->masterSubscriptionAcceptedFamilyRequests($subscription)->count('*');
+            // ignore expired subscriptions with 0 accepted family requests
+            if ($subscription->end_time < $now && $usedFamilyRequests === 0) {
+                continue;
+            }
+
             $subscriptionsData[$subscription->id] = [
                 'subscription' => $subscription,
-                'usedFamilyRequests' => $this->familyRequestsRepository->masterSubscriptionAcceptedFamilyRequests($subscription),
+                'usedFamilyRequests' => $usedFamilyRequests,
                 'activeFamilyRequests' => $this->familyRequestsRepository->masterSubscriptionActiveFamilyRequests($subscription),
                 'canceledFamilyRequests' => $this->familyRequestsRepository->masterSubscriptionCanceledFamilyRequests($subscription),
                 'familyType' => $this->familySubscriptionTypesRepository->findByMasterSubscriptionType($subscription->subscription_type),

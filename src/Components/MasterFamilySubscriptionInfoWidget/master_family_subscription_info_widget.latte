@@ -82,7 +82,7 @@
                 </td>
                 <td style="white-space: nowrap;">
                     <span data-toggle="tooltip" data-placement="top"
-                          title={_family.components.master_family_subscription_info.stats.active_tooltip}>{$subscriptionData['usedFamilyRequests']->count()}</span>
+                          title={_family.components.master_family_subscription_info.stats.active_tooltip}>{$subscriptionData['usedFamilyRequests']}</span>
                     / <span data-toggle="tooltip" data-placement="top"
                             title={_family.components.master_family_subscription_info.stats.total_tooltip}>{$subscriptionData['activeFamilyRequests']->count()}</span>
                     <i n:if="$subscriptionData['canceledFamilyRequests']->count()"
