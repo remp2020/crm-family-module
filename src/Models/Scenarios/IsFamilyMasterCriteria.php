@@ -21,9 +21,9 @@ class IsFamilyMasterCriteria implements ScenariosCriteriaInterface
         $values = $paramValues['is_family_master'];
 
         if ($values->selection) {
-            $selection->where('subscription_type:family_subscription_types(master_subscription_type_id).id IS NOT NULL');
+            $selection->where(':family_requests(master_subscription_id).id IS NOT NULL');
         } else {
-            $selection->where('subscription_type:family_subscription_types(master_subscription_type_id).id IS NULL');
+            $selection->where(':family_requests(master_subscription_id).id IS NULL');
         }
 
         return true;
