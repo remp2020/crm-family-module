@@ -28,6 +28,8 @@ class DonateSubscription
     public const ERROR_MASTER_SUBSCRIPTION_EXPIRED = 'master-subscription-expired';
     public const ERROR_REQUEST_WRONG_STATUS = 'error-request-wrong-status';
 
+    public const IS_PAID_SUBSCRIPTION_TYPE_META_KEY = 'family_subscription_type_is_paid';
+
     public function __construct(
         private readonly SubscriptionsRepository $subscriptionsRepository,
         private readonly SubscriptionMetaRepository $subscriptionMetaRepository,
@@ -78,6 +80,14 @@ class DonateSubscription
         } elseif (isset($subscriptionMeta['family_subscription_type'])) {
             $donationMethod = $subscriptionMeta['family_subscription_type'];
             $isPaid = $masterSubscription->is_paid;
+        }
+
+        $subscriptionTypeIsPaidMetaValue = $this->subscriptionTypesMetaRepository->getMetaValue(
+            $familyRequest->subscription_type,
+            self::IS_PAID_SUBSCRIPTION_TYPE_META_KEY,
+        );
+        if ($subscriptionTypeIsPaidMetaValue !== null) {
+            $isPaid = (bool) $subscriptionTypeIsPaidMetaValue;
         }
 
         $slaveSubscription = null;
