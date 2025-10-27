@@ -22,6 +22,7 @@ services:
 	# data providers
 	- Crm\FamilyModule\DataProviders\SubscriptionTransferDataProvider
 	- Crm\FamilyModule\DataProviders\FamilyRequestVatModeFormDataProvider
+	- Crm\FamilyModule\DataProviders\IsSubscriptionPausableDataProvider
 
 	# events
 	familyNewSubscriptionHandler: Crm\FamilyModule\Events\NewSubscriptionHandler
