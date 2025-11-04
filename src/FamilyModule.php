@@ -17,6 +17,7 @@ use Crm\ApplicationModule\Models\Widget\LazyWidgetManagerInterface;
 use Crm\FamilyModule\Api\ActivateFamilyRequestApiHandler;
 use Crm\FamilyModule\Api\ListFamilyRequestsApiHandler;
 use Crm\FamilyModule\Commands\GenerateFamilyRequestsCommand;
+use Crm\FamilyModule\Components\FamilyRequestActivationInfoWidget\FamilyRequestActivationInfoWidget;
 use Crm\FamilyModule\Components\FamilyRequestsDashboardWidget\FamilyRequestsDashboardWidget;
 use Crm\FamilyModule\Components\FamilySubscriptionTypeDetailsWidget\FamilySubscriptionTypeDetailsWidget;
 use Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget\MasterFamilySubscriptionInfoWidget;
@@ -153,6 +154,11 @@ class FamilyModule extends CrmModule
             'subscription_types_admin.show.right',
             FamilySubscriptionTypeDetailsWidget::class,
             200,
+        );
+
+        $widgetManager->registerWidget(
+            'admin.payments.show.right.top',
+            FamilyRequestActivationInfoWidget::class,
         );
     }
 

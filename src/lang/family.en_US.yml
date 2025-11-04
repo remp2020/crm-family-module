@@ -105,6 +105,11 @@ components:
         child:
             title: Child subscription of company subscription types
 
+    family_request_activation_info_widget:
+        header: Child Subscription Activation
+        will_activate: Child subscriptions will be activated automatically after payment confirmation.
+        will_not_activate: Child subscriptions will NOT be activated automatically - manual activation required.
+
 admin:
     form:
         request:

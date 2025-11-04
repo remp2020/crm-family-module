@@ -1,0 +1,17 @@
+<div style="margin-bottom: 20px; padding: 10px; border-left: 3px solid {if $willActivate}#3c763d{else}#8a6d3b{/if}; background-color: #f9f9f9;">
+    <div style="display: flex; align-items: baseline; gap: 8px;">
+        {if $willActivate}
+            <i class="fa fa-check text-success"></i>
+        {else}
+            <i class="fa fa-exclamation-triangle text-warning"></i>
+        {/if}
+        <div>
+            <strong>{_'family.components.family_request_activation_info_widget.header'}:</strong>
+            {if $willActivate}
+                {_'family.components.family_request_activation_info_widget.will_activate'}
+            {else}
+                {_'family.components.family_request_activation_info_widget.will_not_activate'}
+            {/if}
+        </div>
+    </div>
+</div>

@@ -12,6 +12,7 @@ services:
 	- Crm\FamilyModule\Api\ListFamilyRequestsApiHandler
 
 	# components
+	- Crm\FamilyModule\Components\FamilyRequestActivationInfoWidget\FamilyRequestActivationInfoWidget
 	- Crm\FamilyModule\Components\FamilyRequestsDashboardWidget\FamilyRequestsDashboardWidget
 	- Crm\FamilyModule\Components\FamilyRequestsListWidget\FamilyRequestsListWidget
 	- Crm\FamilyModule\Components\FamilySubscriptionTypeDetailsWidget\FamilySubscriptionTypeDetailsWidget
