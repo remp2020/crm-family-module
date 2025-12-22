@@ -190,6 +190,13 @@ class DonateSubscription
             $this->stopSubscriptionHandler->stopSubscription($slaveSubscription, $isAdmin);
         }
 
+        // If there is already some future family subscription, deactivate one of its (unused) requests as well
+        $nextFamilySubscription = $this->getNextFamilySubscription($familyRequest->master_subscription);
+        if ($nextFamilySubscription) {
+            $this->deactivateNextFamilySubscriptionRequest($nextFamilySubscription, $familyRequest->slave_user, $isAdmin);
+        }
+
+        // create new family request to use
         $this->familyRequestsRepository->add(
             $familyRequest->master_subscription,
             $familyRequest->subscription_type,
@@ -205,6 +212,17 @@ class DonateSubscription
             $this->connectFamilyUser($user, $nextSubscriptionRequest);
         } else {
             Debugger::log("Not enough family requests when activating consecutive family subscription: subscription #{$subscription->id}, user #{$user->id}", Debugger::WARNING);
+        }
+    }
+
+    private function deactivateNextFamilySubscriptionRequest(ActiveRow $familySubscription, ActiveRow $user, bool $isAdmin)
+    {
+        $nextActiveUserFamilyRequest = $this->familyRequestsRepository->masterSubscriptionActiveFamilyRequests($familySubscription)
+            ->where('slave_user_id = ?', $user->id)
+            ->fetch();
+
+        if ($nextActiveUserFamilyRequest) {
+            $this->releaseFamilyRequest($nextActiveUserFamilyRequest, $isAdmin);
         }
     }
 
