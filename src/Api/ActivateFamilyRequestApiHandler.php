@@ -70,7 +70,7 @@ class ActivateFamilyRequestApiHandler extends ApiHandler
         if ($connectResult instanceof ActiveRow) {
             $subscription = $connectResult->slave_subscription;
             $subscriptionType = $subscription->subscription_type;
-            $access = $this->contentAccessRepository->allForSubscriptionType($subscriptionType)->fetchAssoc('name');
+            $access = $this->contentAccessRepository->pairsForSubscriptionType($subscriptionType, 'name', 'name');
 
             $result = [
                 'code' => $requestApi->code,
