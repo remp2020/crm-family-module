@@ -28,6 +28,13 @@ final class RecurrentPaymentPaymentItemContainerDataProvider implements Recurren
             return null;
         }
 
+        // do not copy payment items if next subscription type is different
+        if ($recurrentPayment->next_subscription_type_id
+            && $recurrentPayment->next_subscription_type_id != $recurrentPayment->subscription_type_id
+        ) {
+            return null;
+        }
+
         // for master family subscription, create payment container just by copying previous payment items
         // (of type SubscriptionTypePaymentItem) and ignore all potential price differences (but do not ignore VAT changes)
         $paymentItemContainer = $this->paymentItemContainerFactory->createFromPayment(
