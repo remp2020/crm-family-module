@@ -6,7 +6,7 @@ namespace Crm\FamilyModule\Events;
 use League\Event\AbstractEvent;
 use Nette\Database\Table\ActiveRow;
 
-class FamilyRequestAcceptedEvent extends AbstractEvent implements FamilyRequestEventInterface
+class FamilyRequestCanceledEvent extends AbstractEvent implements FamilyRequestEventInterface
 {
     public function __construct(
         private readonly ActiveRow $familyRequest,

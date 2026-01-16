@@ -14,6 +14,8 @@ use Crm\PaymentsModule\Repositories\RecurrentPaymentsRepository;
 use Crm\SubscriptionsModule\Events\NewSubscriptionEvent;
 use Crm\SubscriptionsModule\Repositories\SubscriptionMetaRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
+use DateTime;
+use Exception;
 use League\Event\AbstractListener;
 use League\Event\EventInterface;
 use Nette\Database\Table\ActiveRow;
@@ -44,7 +46,7 @@ class NewSubscriptionHandler extends AbstractListener
     public function handle(EventInterface $event)
     {
         if (!($event instanceof NewSubscriptionEvent)) {
-            throw new \Exception('Unable to handle event, expected NewSubscriptionEvent, received [' . get_class($event) . ']');
+            throw new Exception('Unable to handle event, expected NewSubscriptionEvent, received [' . get_class($event) . ']');
         }
 
         $subscription = $event->getSubscription();
@@ -69,7 +71,7 @@ class NewSubscriptionHandler extends AbstractListener
         } catch (MissingFamilySubscriptionTypeException $exception) {
             // everything all right, we don't want to create family requests if meta is missing
             return;
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             Debugger::log($exception, Debugger::EXCEPTION);
             return;
         }
@@ -88,7 +90,7 @@ class NewSubscriptionHandler extends AbstractListener
 
         // Second, try to find previous family subscription with time gap (if set by setSubscriptionsTimeGap)
         if ($this->subscriptionsTimeGap !== null) {
-            $dateGapStart = (new \DateTime($subscription->start_time))->modify('-' . $this->subscriptionsTimeGap);
+            $dateGapStart = (new DateTime($subscription->start_time))->modify('-' . $this->subscriptionsTimeGap);
         } else {
             $dateGapStart = $subscription->start_time;
         }
@@ -138,6 +140,15 @@ class NewSubscriptionHandler extends AbstractListener
             if (!$request) {
                 Debugger::log("Not enough family requests when activating child subscriptions: subscription #{$newSubscription->id}, previous subscription {$previousSubscription->id}, request #{$familyRequestId} generated", Debugger::WARNING);
                 return $donatedSubscriptions;
+            }
+
+            // Copy note from previous request to new request before activating
+            if ($previousFamilyRequest->note) {
+                $this->familyRequestsRepository->update($request, [
+                    'note' => $previousFamilyRequest->note,
+                    'updated_at' => new DateTime(),
+                ]);
+                $request = $this->familyRequestsRepository->find($request->id);
             }
 
             $donatedFamilyRequest = $this->donateSubscription->connectFamilyUser($previousFamilyRequest->slave_subscription->user, $request);

@@ -12,6 +12,7 @@ use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
 use Crm\UsersModule\Repositories\UsersRepository;
+use DateTime;
 use Nette\Application\LinkGenerator;
 use Nette\Localization\Translator;
 
@@ -73,7 +74,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
 
     private function getSubscriptionsData($subscriptions)
     {
-        $now = new \DateTime();
+        $now = new DateTime();
         $subscriptionsData = [];
         foreach ($subscriptions as $subscription) {
             $usedFamilyRequests = $this->familyRequestsRepository->masterSubscriptionAcceptedFamilyRequests($subscription)->count('*');
@@ -166,9 +167,13 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
         }
 
         $this->familyRequestsRepository->update($familyRequest, [
-            'updated_at' => new \DateTime(),
+            'updated_at' => new DateTime(),
             'note' => substr($this->presenter->getParameter('note'), 0, 255),
         ]);
+
+        $this->donateSubscription->syncNoteToNextSubscription(
+            $this->familyRequestsRepository->find($familyRequest->id),
+        );
 
         $this->redirect('this');
     }

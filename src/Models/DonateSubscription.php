@@ -4,6 +4,7 @@ namespace Crm\FamilyModule\Models;
 
 use Crm\ApplicationModule\Models\NowTrait;
 use Crm\FamilyModule\Events\FamilyRequestAcceptedEvent;
+use Crm\FamilyModule\Events\FamilyRequestCanceledEvent;
 use Crm\FamilyModule\FamilyModule;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
@@ -12,11 +13,11 @@ use Crm\SubscriptionsModule\Repositories\SubscriptionMetaRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypesMetaRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
 use Crm\UsersModule\Repositories\UsersRepository;
+use Exception;
 use League\Event\Emitter;
 use Nette\Database\Table\ActiveRow;
 use Nette\Security\User;
 use Nette\Utils\DateTime;
-use Tracy\Debugger;
 
 class DonateSubscription
 {
@@ -46,25 +47,35 @@ class DonateSubscription
     {
         $masterSubscription = $familyRequest->master_subscription;
 
-        $familySubscriptionType = $this->familySubscriptionTypesRepository->findByMasterSubscriptionType($masterSubscription->subscription_type);
+        $familySubscriptionType = $this->familySubscriptionTypesRepository
+            ->findByMasterSubscriptionType($masterSubscription->subscription_type);
 
         $subscriptionMeta = $this->subscriptionMetaRepository->subscriptionMeta($masterSubscription);
         $isAdmin = $this->user->getIdentity()?->role === UsersRepository::ROLE_ADMIN;
 
         if (!$isAdmin) {
             if ($familySubscriptionType && $familySubscriptionType->donation_method === 'copy') {
-                if ($this->familyRequestsRepository->userAlreadyHasSubscriptionFromMasterWithSubscriptionType($masterSubscription, $slaveUser, $familyRequest->subscription_type)) {
+                if ($this->familyRequestsRepository->userAlreadyHasSubscriptionFromMasterWithSubscriptionType(
+                    $masterSubscription,
+                    $slaveUser,
+                    $familyRequest->subscription_type,
+                )) {
                     return self::ERROR_IN_USE;
                 }
             }
-            if (isset($subscriptionMeta['family_subscription_type']) && in_array($subscriptionMeta['family_subscription_type'], ['days', 'fixed'], true)) {
-                if ($masterSubscription->user_id === $slaveUser->id) {
-                    return self::ERROR_SELF_USE;
-                }
+
+            $hasTimeLimitedFamilyType = isset($subscriptionMeta['family_subscription_type'])
+                && in_array($subscriptionMeta['family_subscription_type'], ['days', 'fixed'], true);
+
+            if ($hasTimeLimitedFamilyType && $masterSubscription->user_id === $slaveUser->id) {
+                return self::ERROR_SELF_USE;
             }
         }
 
-        if ($masterSubscription->end_time <= $this->getNow() || ($familyRequest->expires_at && $familyRequest->expires_at <= $this->getNow())) {
+        $masterSubscriptionExpired = $masterSubscription->end_time <= $this->getNow();
+        $familyRequestExpired = $familyRequest->expires_at && $familyRequest->expires_at <= $this->getNow();
+
+        if ($masterSubscriptionExpired || $familyRequestExpired) {
             return self::ERROR_MASTER_SUBSCRIPTION_EXPIRED;
         }
 
@@ -103,10 +114,11 @@ class DonateSubscription
             );
         } elseif (isset($subscriptionMeta['family_subscription_type']) && $subscriptionMeta['family_subscription_type'] === 'days') {
             if (!isset($subscriptionMeta['family_subscription_days'])) {
-                throw new \Exception("Missing required subscription meta 'family_subscription_days' for 'family_subscription_type' = 'days',  subscription #{$masterSubscription->id}");
+                throw new Exception("Missing required subscription meta 'family_subscription_days' for 'family_subscription_type' = 'days',  subscription #{$masterSubscription->id}");
             }
 
-            $subscriptionExtension = $this->subscriptionsRepository->getSubscriptionExtension($familyRequest->subscription_type, $slaveUser);
+            $subscriptionExtension = $this->subscriptionsRepository
+                ->getSubscriptionExtension($familyRequest->subscription_type, $slaveUser);
             $startTime = $subscriptionExtension->getDate();
             $endTime = (clone $startTime)->modify(sprintf('+%d days', $subscriptionMeta['family_subscription_days']));
             $slaveSubscription = $this->subscriptionsRepository->add(
@@ -127,10 +139,11 @@ class DonateSubscription
             }
 
             if (!isset($endTime)) {
-                throw new \Exception("Missing subscription end time set either with subscription meta key 'family_subscription_fixed_expiration' or in 'fixed_end' column of gifted subscription type.");
+                throw new Exception("Missing subscription end time set either with subscription meta key 'family_subscription_fixed_expiration' or in 'fixed_end' column of gifted subscription type.");
             }
 
-            $isPaid = $this->subscriptionTypesMetaRepository->getMetaValue($familyRequest->subscription_type, 'is_paid');
+            $isPaid = $this->subscriptionTypesMetaRepository
+                ->getMetaValue($familyRequest->subscription_type, 'is_paid');
             if ($isPaid === null) {
                 $isPaid = $masterSubscription->is_paid;
             }
@@ -161,17 +174,13 @@ class DonateSubscription
         $familyRequest = $this->familyRequestsRepository->find($familyRequest->id);
         $this->emitter->emit(new FamilyRequestAcceptedEvent($familyRequest));
 
-        // If there is already some future family subscription, activate one of its (unused) requests as well
-        $nextSubscription = $this->getNextFamilySubscription($masterSubscription);
-        if ($nextSubscription) {
-            $this->activateNextFamilySubscriptionRequest($nextSubscription, $slaveUser);
-        }
-
         return $familyRequest;
     }
 
-    public function releaseFamilyRequest(ActiveRow $familyRequest, bool $isAdmin = false)
-    {
+    public function releaseFamilyRequest(
+        ActiveRow $familyRequest,
+        bool $isAdmin = false,
+    ): void {
         // do not cancel already cancelled family request (e.g. second call on handler's URL)
         // otherwise multiple "substitute" child subscriptions will be generated
         if ($familyRequest->status !== FamilyRequestsRepository::STATUS_ACCEPTED) {
@@ -185,55 +194,56 @@ class DonateSubscription
         ]);
 
         $slaveSubscription = $familyRequest->slave_subscription;
-        // already stopped subscription
+        // only stop if subscription hasn't ended yet
         if ($slaveSubscription->end_time >= $this->getNow()) {
             $this->stopSubscriptionHandler->stopSubscription($slaveSubscription, $isAdmin);
         }
 
-        // If there is already some future family subscription, deactivate one of its (unused) requests as well
-        $nextFamilySubscription = $this->getNextFamilySubscription($familyRequest->master_subscription);
-        if ($nextFamilySubscription) {
-            $this->deactivateNextFamilySubscriptionRequest($nextFamilySubscription, $familyRequest->slave_user, $isAdmin);
-        }
-
-        // create new family request to use
+        // Create replacement request to maintain the total count of available family slots
         $this->familyRequestsRepository->add(
             $familyRequest->master_subscription,
             $familyRequest->subscription_type,
         );
+
+        // Sync cancellation to next subscription in renewal chain
+        $familyRequest = $this->familyRequestsRepository->find($familyRequest->id);
+        $this->emitter->emit(new FamilyRequestCanceledEvent($familyRequest));
     }
 
-    private function activateNextFamilySubscriptionRequest(ActiveRow $subscription, $user)
+    public function syncNoteToNextSubscription(ActiveRow $familyRequest): void
     {
-        // Future family request shouldn't be shared yet
-        // Grab one of the free requests
-        $nextSubscriptionRequest = $this->familyRequestsRepository->masterSubscriptionUnusedFamilyRequests($subscription)->fetch();
-        if ($nextSubscriptionRequest) {
-            $this->connectFamilyUser($user, $nextSubscriptionRequest);
-        } else {
-            Debugger::log("Not enough family requests when activating consecutive family subscription: subscription #{$subscription->id}, user #{$user->id}", Debugger::WARNING);
+        $nextSubscription = $this->getNextFamilySubscription($familyRequest->master_subscription);
+        if (!$nextSubscription) {
+            return;
         }
-    }
 
-    private function deactivateNextFamilySubscriptionRequest(ActiveRow $familySubscription, ActiveRow $user, bool $isAdmin)
-    {
-        $nextActiveUserFamilyRequest = $this->familyRequestsRepository->masterSubscriptionActiveFamilyRequests($familySubscription)
-            ->where('slave_user_id = ?', $user->id)
+        $isAccepted = $familyRequest->status === FamilyRequestsRepository::STATUS_ACCEPTED;
+
+        $query = $isAccepted
+            ? $this->familyRequestsRepository->masterSubscriptionAcceptedFamilyRequests($nextSubscription)
+                ->where('slave_user_id', $familyRequest->slave_user_id)
+            : $this->familyRequestsRepository->masterSubscriptionUnusedFamilyRequests($nextSubscription);
+
+        $nextRequest = $query
+            ->where('subscription_type_id', $familyRequest->subscription_type_id)
             ->fetch();
 
-        if ($nextActiveUserFamilyRequest) {
-            $this->releaseFamilyRequest($nextActiveUserFamilyRequest, $isAdmin);
+        if ($nextRequest) {
+            $this->familyRequestsRepository->update($nextRequest, [
+                'note' => $familyRequest->note,
+                'updated_at' => $this->getNow(),
+            ]);
+
+            // Recursively sync to further subscriptions
+            $this->syncNoteToNextSubscription($this->familyRequestsRepository->find($nextRequest->id));
         }
     }
 
-    private function getNextFamilySubscription(ActiveRow $subscription)
+    public function getNextFamilySubscription(ActiveRow $subscription): ?ActiveRow
     {
-        $nextSubscription = $this->subscriptionMetaRepository
-            ->getMeta($subscription, FamilyRequests::NEXT_FAMILY_SUBSCRIPTION_META)
-            ->fetch();
-        if ($nextSubscription) {
-            return $this->subscriptionsRepository->find($nextSubscription->value);
+        if (!$subscription->next_subscription_id) {
+            return null;
         }
-        return null;
+        return $this->subscriptionsRepository->find($subscription->next_subscription_id);
     }
 }

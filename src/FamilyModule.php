@@ -29,7 +29,10 @@ use Crm\FamilyModule\DataProviders\RecurrentPaymentPaymentItemContainerDataProvi
 use Crm\FamilyModule\DataProviders\SubscriptionTransferDataProvider;
 use Crm\FamilyModule\Events\BeforeCreateRenewalPaymentEventHandler;
 use Crm\FamilyModule\Events\FamilyRequestAcceptedEvent;
+use Crm\FamilyModule\Events\FamilyRequestActivationSyncHandler;
+use Crm\FamilyModule\Events\FamilyRequestCanceledEvent;
 use Crm\FamilyModule\Events\FamilyRequestCreatedEvent;
+use Crm\FamilyModule\Events\FamilyRequestDeactivationSyncHandler;
 use Crm\FamilyModule\Events\NewSubscriptionHandler;
 use Crm\FamilyModule\Events\SubscriptionShortenedHandler;
 use Crm\FamilyModule\Events\SubscriptionUpdatedHandler;
@@ -106,6 +109,14 @@ class FamilyModule extends CrmModule
             BeforeCreateRenewalPaymentEvent::class,
             BeforeCreateRenewalPaymentEventHandler::class,
         );
+        $emitter->addListener(
+            FamilyRequestAcceptedEvent::class,
+            FamilyRequestActivationSyncHandler::class,
+        );
+        $emitter->addListener(
+            FamilyRequestCanceledEvent::class,
+            FamilyRequestDeactivationSyncHandler::class,
+        );
     }
 
     public function registerDataProviders(DataProviderManager $dataProviderManager)
@@ -180,6 +191,7 @@ class FamilyModule extends CrmModule
     {
         $eventsStorage->register('family_request_created', FamilyRequestCreatedEvent::class, true);
         $eventsStorage->register('family_request_accepted', FamilyRequestAcceptedEvent::class, true);
+        $eventsStorage->register('family_request_canceled', FamilyRequestCanceledEvent::class, true);
     }
 
     public function cache(OutputInterface $output, array $tags = [])
