@@ -32,6 +32,7 @@ services:
 	- Crm\FamilyModule\Events\SubscriptionShortenedHandler
 	- Crm\FamilyModule\Events\SubscriptionUpdatedHandler
 	- Crm\FamilyModule\Events\BeforeCreateRenewalPaymentEventHandler
+	- Crm\FamilyModule\Events\CreateOnDemandRequestEventHandler
 
 	# models
 	- Crm\FamilyModule\Models\FamilyRequests

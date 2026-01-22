@@ -12,6 +12,7 @@ use Crm\PaymentsModule\Repositories\PaymentItemMetaRepository;
 use Crm\PaymentsModule\Repositories\PaymentMetaRepository;
 use Crm\PaymentsModule\Repositories\PaymentsRepository;
 use Crm\SubscriptionsModule\Models\PaymentItem\SubscriptionTypePaymentItem;
+use Crm\SubscriptionsModule\Repositories\SubscriptionMetaRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypeItemMetaRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypeItemsRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionTypesRepository;
@@ -24,6 +25,8 @@ class FamilyRequests
     public const NEXT_FAMILY_SUBSCRIPTION_META = 'next_family_subscription_id';
 
     public const KEEP_REQUESTS_UNACTIVATED_PAYMENT_META = 'keep_requests_unactivated';
+
+    public const ON_DEMAND_FAMILY_REQUESTS_SUBSCRIPTIONS_META = 'on_demand_family_requests';
 
     public const PAYMENT_ITEM_META_SLAVE_SUBSCRIPTION_TYPE_ID = 'slave_subscription_type_id';
 
@@ -38,6 +41,7 @@ class FamilyRequests
         private PaymentItemMetaRepository $paymentItemMetaRepository,
         private SubscriptionTypeItemMetaRepository $subscriptionTypeItemMetaRepository,
         private SubscriptionTypeItemsRepository $subscriptionTypeItemsRepository,
+        private SubscriptionMetaRepository $subscriptionMetaRepository,
     ) {
     }
 
@@ -75,6 +79,11 @@ class FamilyRequests
         if ($requestsCount < $requestsToGenerateCount) {
             for ($i = 0; $i < $requestsToGenerateCount - $requestsCount; $i++) {
                 $newRequests[] = $this->familyRequestsRepository->add($subscription, $familySubscriptionType->slave_subscription_type);
+
+                // generate just one request, next request will be generated after the one that's available is activated
+                if ($this->hasOnDemandRequestsGeneration($subscription)) {
+                    break;
+                }
             }
         }
 
@@ -318,5 +327,11 @@ class FamilyRequests
         }
 
         return $newRequests;
+    }
+
+    public function hasOnDemandRequestsGeneration(ActiveRow $masterSubscription): bool
+    {
+        return $this->subscriptionMetaRepository
+            ->getMetaValue($masterSubscription, self::ON_DEMAND_FAMILY_REQUESTS_SUBSCRIPTIONS_META) !== null;
     }
 }

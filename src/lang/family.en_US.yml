@@ -73,6 +73,7 @@ components:
             total_tooltip: 'Number of generated family requests'
             canceled_tooltip: 'Number of canceled family requests: %number%'
         modal:
+            subscription_type: Subscription type
             status: Status
             activation_link: Activation link
             slave_account: 'Child account <i class="fa fa-question-circle" style="margin: auto;" data-toggle="tooltip" title="If there is no account with entered e-mail address, it is necessary to create it via the activation link."></i>'

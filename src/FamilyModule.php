@@ -28,6 +28,7 @@ use Crm\FamilyModule\DataProviders\IsSubscriptionPausableDataProvider;
 use Crm\FamilyModule\DataProviders\RecurrentPaymentPaymentItemContainerDataProvider;
 use Crm\FamilyModule\DataProviders\SubscriptionTransferDataProvider;
 use Crm\FamilyModule\Events\BeforeCreateRenewalPaymentEventHandler;
+use Crm\FamilyModule\Events\CreateOnDemandRequestEventHandler;
 use Crm\FamilyModule\Events\FamilyRequestAcceptedEvent;
 use Crm\FamilyModule\Events\FamilyRequestActivationSyncHandler;
 use Crm\FamilyModule\Events\FamilyRequestCanceledEvent;
@@ -108,6 +109,10 @@ class FamilyModule extends CrmModule
         $emitter->addListener(
             BeforeCreateRenewalPaymentEvent::class,
             BeforeCreateRenewalPaymentEventHandler::class,
+        );
+        $emitter->addListener(
+            FamilyRequestAcceptedEvent::class,
+            CreateOnDemandRequestEventHandler::class,
         );
         $emitter->addListener(
             FamilyRequestAcceptedEvent::class,
