@@ -23,6 +23,11 @@ class CreateOnDemandRequestEventHandler extends AbstractListener
 
         $familyRequest = $event->getFamilyRequest();
         $masterSubscription = $familyRequest->master_subscription;
+
+        if (!$this->familyRequests->hasOnDemandRequestsGeneration($masterSubscription)) {
+            return;
+        }
+
         $this->familyRequests->createFromSubscription($masterSubscription);
     }
 }
