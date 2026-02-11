@@ -323,6 +323,10 @@ class FamilyRequests
 
             for ($i = 0; $i < $paymentItem->count; $i++) {
                 $newRequests[] = $this->familyRequestsRepository->add($subscription, $slaveSubscriptionType);
+
+                if ($this->hasOnDemandRequestsGeneration($subscription)) {
+                    break;
+                }
             }
         }
 

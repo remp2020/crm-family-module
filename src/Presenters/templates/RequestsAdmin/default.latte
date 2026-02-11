@@ -113,6 +113,10 @@
         </fieldset>
         {/foreach}
 
+        {snippet familyRequestFormData}
+            {control simpleWidget 'admin.family_requests.form', ['form' => $control['requestForm'], 'user' => $user]}
+        {/snippet}
+
         <fieldset id="container-vat" class="col-md-12">
         <legend>{_family.admin.form.request.vat}</legend>
 

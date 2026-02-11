@@ -200,6 +200,11 @@ class RequestFormFactory
             ->setName('button')
             ->setHtml('<i class="fa fa-save"></i> ' . $this->translator->translate('family.admin.form.request.send'));
 
+        // final handler after data providers' handlers
+        $form->onSuccess[] = function ($form) {
+            $this->onSave->__invoke($form, $this->user);
+        };
+
         return $form;
     }
 
@@ -292,8 +297,6 @@ class RequestFormFactory
         if (isset($values['keep_requests_unactivated']) && $values['keep_requests_unactivated']) {
             $this->paymentMetaRepository->add($payment, FamilyRequests::KEEP_REQUESTS_UNACTIVATED_PAYMENT_META, 1);
         }
-
-        $this->onSave->__invoke($form, $user);
     }
 
     public function formValidate(Form $form, $values)
