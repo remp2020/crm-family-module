@@ -15,6 +15,7 @@ use Crm\SubscriptionsModule\Models\Subscription\ActualUserSubscription;
 use Crm\UsersModule\Models\Auth\Authorizator;
 use Crm\UsersModule\Models\Auth\InvalidEmailException;
 use Crm\UsersModule\Models\Auth\UserManager;
+use Crm\UsersModule\Models\User\UnclaimedUser;
 use Crm\UsersModule\Repositories\UserActionsLogRepository;
 use Nette\Application\BadRequestException;
 use Nette\DI\Attributes\Inject;
@@ -51,6 +52,9 @@ class RequestsPresenter extends FrontendPresenter
 
     #[Inject]
     public SignInFormFactory $signInFormFactory;
+
+    #[Inject]
+    public UnclaimedUser $unclaimedUser;
 
     public function renderDefault($id)
     {
@@ -199,15 +203,26 @@ class RequestsPresenter extends FrontendPresenter
         $form->addHidden('request', $this->params['id']);
 
         $form->onSuccess[] = function (Form $form) {
-            if ($this->userManager->loadUserByEmail($form->getValues()['email'])) {
-                $this->redirect('signIn', $form->getValues()['request'], $form->getValues()['email']);
+            $user = $this->userManager->loadUserByEmail($form->getValues()['email']);
+
+            if ($user) {
+                if ($this->unclaimedUser->isUnclaimedUser($user)) {
+                    $user = $this->unclaimedUser->makeUnclaimedUserRegistered(
+                        user: $user,
+                        source: 'family',
+                    );
+                } else {
+                    $this->redirect('signIn', $form->getValues()['request'], $form->getValues()['email']);
+                }
+            } else {
+                try {
+                    $user = $this->userManager->addNewUser($form->getValues()['email'], true, 'family');
+                } catch (InvalidEmailException $e) {
+                    $form->addError('family.frontend.new.form.error_email');
+                    return;
+                }
             }
-            try {
-                $user = $this->userManager->addNewUser($form->getValues()['email'], true, 'family');
-            } catch (InvalidEmailException $e) {
-                $form->addError('family.frontend.new.form.error_email');
-                return;
-            }
+
             $this->getUser()->login(['user' => $user, 'autoLogin' => true]);
 
             /** @var EmailFormDataProviderInterface[] $providers */
