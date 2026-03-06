@@ -11,6 +11,7 @@ use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Repositories\FamilyRequestsRepository;
 use Crm\FamilyModule\Repositories\FamilySubscriptionTypesRepository;
 use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
+use Crm\UsersModule\Models\User\UnclaimedUser;
 use Crm\UsersModule\Repositories\UsersRepository;
 use DateTime;
 use Nette\Application\LinkGenerator;
@@ -33,6 +34,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
         private readonly SnippetsRepository $snippetsRepository,
         private readonly SnippetRenderer $snippetRenderer,
         private readonly LinkGenerator $linkGenerator,
+        private readonly UnclaimedUser $unclaimedUser,
     ) {
         parent::__construct($lazyWidgetManager);
     }
@@ -97,7 +99,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
     public function handleActivateSubscription()
     {
         $user = $this->usersRepository->getByEmail($this->presenter->getParameter('email'));
-        if (!$user) {
+        if (!$user || $this->unclaimedUser->isUnclaimedUser($user)) {
             $message = $this->translator->translate('family.components.master_family_subscription_info.modal.error.not_registered');
 
             $snippet = $this->snippetsRepository->loadByIdentifier($this->activationEmailSnippetIdentifier);
