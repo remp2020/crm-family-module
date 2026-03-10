@@ -3,6 +3,7 @@
 namespace Crm\FamilyModule\Presenters;
 
 use Crm\ApplicationModule\Helpers\MaskEmailHelper;
+use Crm\ApplicationModule\Models\Authenticator\LoginCredentials;
 use Crm\ApplicationModule\Models\DataProvider\DataProviderManager;
 use Crm\ApplicationModule\Presenters\FrontendPresenter;
 use Crm\ApplicationModule\UI\Form;
@@ -222,8 +223,7 @@ class RequestsPresenter extends FrontendPresenter
                     return;
                 }
             }
-
-            $this->getUser()->login(['user' => $user, 'autoLogin' => true]);
+            $this->getUser()->login(new LoginCredentials(['user' => $user, 'autoLogin' => true]));
 
             /** @var EmailFormDataProviderInterface[] $providers */
             $providers = $this->dataProviderManager->getProviders('family.dataprovider.email_form', EmailFormDataProviderInterface::class);
@@ -257,7 +257,7 @@ class RequestsPresenter extends FrontendPresenter
 
         $form->onSuccess[] = function (Form $form) {
             try {
-                $this->getUser()->login(['username' => $form->getValues()['username'], 'password' => $form->getValues()['password']]);
+                $this->getUser()->login(new LoginCredentials(['username' => $form->getValues()['username'], 'password' => $form->getValues()['password']]));
                 $this->getUser()->setAuthorizator($this->authorizator);
 
                 $user = $this->userManager->loadUser($this->getUser());
