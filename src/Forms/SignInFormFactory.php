@@ -13,7 +13,7 @@ class SignInFormFactory
     ) {
     }
 
-    public function create(string $email = null): Form
+    public function create(?string $email = null): Form
     {
         $form = new Form();
         $form->setTranslator($this->translator);

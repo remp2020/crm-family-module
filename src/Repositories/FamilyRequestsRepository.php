@@ -24,8 +24,8 @@ class FamilyRequestsRepository extends Repository
     public function __construct(
         AuditLogRepository $auditLogRepository,
         Explorer $database,
-        Storage $cacheStorage = null,
         private Emitter $emitter,
+        ?Storage $cacheStorage = null,
     ) {
         parent::__construct($database, $cacheStorage);
         $this->auditLogRepository = $auditLogRepository;

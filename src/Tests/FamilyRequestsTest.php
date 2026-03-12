@@ -276,7 +276,7 @@ class FamilyRequestsTest extends BaseTestCase
         return $this->userManager->addNewUser($email, false, 'unknown', null, false);
     }
 
-    private function makePayment($user, $subscriptionType, string $paidAtString, string $startSubscriptionAtString = null, int $childrenCountToGenerate = null)
+    private function makePayment($user, $subscriptionType, string $paidAtString, ?string $startSubscriptionAtString = null, ?int $childrenCountToGenerate = null)
     {
         $paymentItemContainer = new PaymentItemContainer();
         if ($childrenCountToGenerate !== null) {
