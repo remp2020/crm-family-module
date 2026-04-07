@@ -78,6 +78,8 @@ components:
             activation_link: Aktivačný odkaz
             slave_account: 'Dcérske konto <i class="fa fa-question-circle" style="margin: auto;" data-toggle="tooltip" title="V prípade, že konto so zadanou e-mailovou adresou ešte neexistuje, je potrebné ho vytvoriť cez aktivačný odkaz."></i>'
             copy_to_clipboard: Skopírovať odkaz
+            copied_to_clipboard: Odkaz skopírovaný
+            copying_failed: Kopírovanie zlyhalo
             email_placeholder: E-mail existujúceho používateľa
             activate: Aktivovať
             canceled_requests: Zrušené prístupy

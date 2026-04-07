@@ -307,11 +307,11 @@
         }
 
         clipboard.on('success', function (element) {
-            showTooltip(element.trigger, "Odkaz skopírovaný");
+            showTooltip(element.trigger, {_family.components.master_family_subscription_info.modal.copied_to_clipboard});
         });
 
         clipboard.on('error', function (element) {
-            showTooltip(element.trigger, 'Kopírovanie zlyhalo');
+            showTooltip(element.trigger, {_family.components.master_family_subscription_info.modal.copying_failed});
         });
 
         // handle confirmation dialog
