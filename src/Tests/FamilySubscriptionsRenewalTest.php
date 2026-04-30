@@ -3,6 +3,7 @@
 namespace Crm\FamilyModule\Tests;
 
 use Crm\ApplicationModule\Models\Event\LazyEventEmitter;
+use Crm\ApplicationModule\Models\NowTrait;
 use Crm\FamilyModule\Events\FamilyRequestAcceptedEvent;
 use Crm\FamilyModule\Events\FamilyRequestActivationSyncHandler;
 use Crm\FamilyModule\Events\FamilyRequestCanceledEvent;
@@ -33,6 +34,8 @@ use Nette\Utils\DateTime;
 
 class FamilySubscriptionsRenewalTest extends BaseTestCase
 {
+    use NowTrait;
+
     private UserManager $userManager;
     private UsersRepository $usersRepository;
     private SubscriptionsGenerator $subscriptionGenerator;
@@ -58,18 +61,26 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        // Pin a single "now" per test so all relative timestamps in the test
+        // derive from the same instant. Two `new DateTime('now ± N')` calls
+        // can otherwise straddle a second boundary, which makes the
+        // end_time = start_time match in SubscriptionsRepository::add() flaky.
+        $this->setNow(new DateTime());
+
         $this->lazyEventEmitter = $this->inject(LazyEventEmitter::class);
         $this->userManager = $this->inject(UserManager::class);
-        $this->usersRepository = $this->inject(UsersRepository::class);
-        $this->subscriptionsRepository = $this->inject(SubscriptionsRepository::class);
         $this->subscriptionGenerator = $this->inject(SubscriptionsGenerator::class);
-        $this->paymentsRepository = $this->inject(PaymentsRepository::class);
-        $this->recurrentPaymentsRepository = $this->inject(RecurrentPaymentsRepository::class);
-        $this->paymentMethodsRepository = $this->inject(PaymentMethodsRepository::class);
-        $this->familyRequestsRepository = $this->inject(FamilyRequestsRepository::class);
-        $this->subscriptionMetaRepository = $this->inject(SubscriptionMetaRepository::class);
         $this->familyRequest = $this->inject(FamilyRequests::class);
         $this->donateSubscription = $this->inject(DonateSubscription::class);
+
+        $this->usersRepository = $this->getRepository(UsersRepository::class);
+        $this->subscriptionsRepository = $this->getRepository(SubscriptionsRepository::class);
+        $this->paymentsRepository = $this->getRepository(PaymentsRepository::class);
+        $this->recurrentPaymentsRepository = $this->getRepository(RecurrentPaymentsRepository::class);
+        $this->paymentMethodsRepository = $this->getRepository(PaymentMethodsRepository::class);
+        $this->familyRequestsRepository = $this->getRepository(FamilyRequestsRepository::class);
+        $this->subscriptionMetaRepository = $this->getRepository(SubscriptionMetaRepository::class);
 
         /** @var PaymentGatewaysRepository $pgr */
         $pgr = $this->getRepository(PaymentGatewaysRepository::class);
@@ -104,13 +115,15 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
         $slaveUser1 = $this->userWithRegDate('slave1@example.com');
         $slaveUser2 = $this->userWithRegDate('slave2@example.com');
 
+        $boundary = $this->getNow()->modify('+1 days');
+
         // Generate master subscription for previous month + handler generates family requests
         $previousSubscriptions = $this->subscriptionGenerator->generate(new SubscriptionsParams(
             $masterSubscriptionType,
             $masterUser,
             'family',
-            new DateTime('now - 30 days'),
-            new DateTime('now + 1 days'),
+            $this->getNow()->modify('-30 days'),
+            $boundary,
             true,
         ), 1);
 
@@ -128,8 +141,8 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             $masterSubscriptionType,
             $masterUser,
             'family',
-            new DateTime('now + 1 days'),
-            new DateTime('now + 31 days'),
+            $boundary,
+            $this->getNow()->modify('+31 days'),
             true,
         ), 1);
 
@@ -176,7 +189,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
         $this->assertEquals(1, $this->subscriptionsRepository->userSubscriptions($slaveUser2)->count());
 
         // Create recurrent payment
-        $this->makeRecurrentPayment($masterUser, $payment, $masterSubscriptionType, new DateTime('now'));
+        $this->makeRecurrentPayment($masterUser, $payment, $masterSubscriptionType, $this->getNow());
 
         // Check that subscription is renewed + slave subscriptions are renewed
         $this->assertEquals(2, $this->subscriptionsRepository->userSubscriptions($masterUser)->count());
@@ -242,11 +255,11 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             $paymentItemContainer,
             null,
             1,
-            new DateTime(),
+            $this->getNow(),
         );
 
         $this->paymentsRepository->update($nextPayment, [
-            'paid_at' => new DateTime(),
+            'paid_at' => $this->getNow(),
             'subscription_start_at' => $previousSubscription->end_time,
         ]);
         $this->paymentsRepository->updateStatus($nextPayment, PaymentStatusEnum::Paid->value);
@@ -389,13 +402,15 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
         $masterUser = $this->userWithRegDate('master@example.com');
         $slaveUser = $this->userWithRegDate('slave@example.com');
 
+        $boundary = $this->getNow()->modify('+31 days');
+
         // Create first master subscription
         $firstSubscriptions = $this->subscriptionGenerator->generate(new SubscriptionsParams(
             $masterSubscriptionType,
             $masterUser,
             'family',
-            new DateTime('now'),
-            new DateTime('now + 31 days'),
+            $this->getNow(),
+            $boundary,
             true,
         ), 1);
         $firstSubscription = $firstSubscriptions[0];
@@ -410,8 +425,8 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             $masterSubscriptionType,
             $masterUser,
             'family',
-            new DateTime('now + 31 days'),
-            new DateTime('now + 62 days'),
+            $boundary,
+            $this->getNow()->modify('+62 days'),
             true,
         ), 1);
         $secondSubscription = $secondSubscriptions[0];
@@ -446,13 +461,15 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
         $slaveUser1 = $this->userWithRegDate('slave1@example.com');
         $slaveUser2 = $this->userWithRegDate('slave2@example.com');
 
+        $boundary = $this->getNow()->modify('+31 days');
+
         // Create first master subscription
         $firstSubscriptions = $this->subscriptionGenerator->generate(new SubscriptionsParams(
             $masterSubscriptionType,
             $masterUser,
             'family',
-            new DateTime('now'),
-            new DateTime('now + 31 days'),
+            $this->getNow(),
+            $boundary,
             true,
         ), 1);
         $firstSubscription = $firstSubscriptions[0];
@@ -467,8 +484,8 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             $masterSubscriptionType,
             $masterUser,
             'family',
-            new DateTime('now + 31 days'),
-            new DateTime('now + 62 days'),
+            $boundary,
+            $this->getNow()->modify('+62 days'),
             true,
         ), 1);
         $secondSubscription = $secondSubscriptions[0];
@@ -646,12 +663,12 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
         $nextRequest = $this->familyRequestsRepository->masterSubscriptionAcceptedFamilyRequests($nextSubscription)->fetch();
         $slaveSubscription = $nextRequest->slave_subscription;
         $this->subscriptionsRepository->update($slaveSubscription, [
-            'end_time' => new DateTime('now - 1 hour'),
+            'end_time' => $this->getNow()->modify('-1 hour'),
         ]);
 
         // Verify slave subscription is stopped
         $slaveSubscription = $this->subscriptionsRepository->find($slaveSubscription->id);
-        $this->assertLessThan(new DateTime(), $slaveSubscription->end_time);
+        $this->assertLessThan($this->getNow(), $slaveSubscription->end_time);
 
         // Now cancel the request on current subscription (triggers sync to next with already-stopped subscription)
         $currentRequest = $this->familyRequestsRepository->masterSubscriptionAcceptedFamilyRequests($currentSubscription)->fetch();
@@ -677,13 +694,15 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
         $masterUser = $this->userWithRegDate('master@example.com');
         $slaveUser = $this->userWithRegDate('slave@example.com');
 
+        $boundary = $this->getNow()->modify('+31 days');
+
         // Create first master subscription
         $firstSubscriptions = $this->subscriptionGenerator->generate(new SubscriptionsParams(
             $masterSubscriptionType,
             $masterUser,
             'family',
-            new DateTime('now'),
-            new DateTime('now + 31 days'),
+            $this->getNow(),
+            $boundary,
             true,
         ), 1);
         $firstSubscription = $firstSubscriptions[0];
@@ -697,8 +716,8 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             $masterSubscriptionType,
             $masterUser,
             'family',
-            new DateTime('now + 31 days'),
-            new DateTime('now + 62 days'),
+            $boundary,
+            $this->getNow()->modify('+62 days'),
             true,
         ), 1);
         $secondSubscription = $secondSubscriptions[0];
@@ -834,17 +853,18 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
         $masterUser = $this->userWithRegDate('master@example.com');
         $slaveUser = $this->userWithRegDate('slave@example.com');
 
+        $boundary = $this->getNow()->modify('+31 days');
         $firstSubscription = $this->createMasterSubscriptionWithFamilyRequests(
             $masterUser,
             $masterSubscriptionType,
-            'now',
-            'now + 31 days',
+            $this->getNow(),
+            $boundary,
         );
         $secondSubscription = $this->createMasterSubscriptionWithFamilyRequests(
             $masterUser,
             $masterSubscriptionType,
-            'now + 31 days',
-            'now + 62 days',
+            $boundary,
+            $this->getNow()->modify('+62 days'),
         );
 
         $firstRequests = $this->familyRequestsRepository->masterSubscriptionUnusedFamilyRequests($firstSubscription)->fetchAll();
@@ -943,7 +963,7 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
             $previousPayment->payment_gateway_id,
             '1111',
         );
-        $recurrent = $this->recurrentPaymentsRepository->add($paymentMethod, $previousPayment, new DateTime('now - 1 minute'), 1, 1);
+        $recurrent = $this->recurrentPaymentsRepository->add($paymentMethod, $previousPayment, $this->getNow()->modify('-1 minute'), 1, 1);
 
         $payment = $this->paymentsRepository->add(
             $subscriptionType,
@@ -987,15 +1007,17 @@ class FamilySubscriptionsRenewalTest extends BaseTestCase
     private function createMasterSubscriptionWithFamilyRequests(
         ActiveRow $masterUser,
         ActiveRow $masterSubscriptionType,
-        string $startDate = 'now',
-        string $endDate = 'now + 31 days',
+        ?\DateTime $startDate = null,
+        ?\DateTime $endDate = null,
     ): ActiveRow {
+        $startDate ??= $this->getNow();
+        $endDate ??= $this->getNow()->modify('+31 days');
         $subscriptions = $this->subscriptionGenerator->generate(new SubscriptionsParams(
             $masterSubscriptionType,
             $masterUser,
             'family',
-            new DateTime($startDate),
-            new DateTime($endDate),
+            $startDate,
+            $endDate,
             true,
         ), 1);
         return $subscriptions[0];
