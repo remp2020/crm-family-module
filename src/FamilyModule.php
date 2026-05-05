@@ -37,6 +37,7 @@ use Crm\FamilyModule\Events\FamilyRequestDeactivationSyncHandler;
 use Crm\FamilyModule\Events\NewSubscriptionHandler;
 use Crm\FamilyModule\Events\SubscriptionShortenedHandler;
 use Crm\FamilyModule\Events\SubscriptionUpdatedHandler;
+use Crm\FamilyModule\Hermes\RenewOnDemandFamilySubscriptionsHandler;
 use Crm\FamilyModule\Models\FamilyRequests;
 use Crm\FamilyModule\Models\Scenarios\IsFamilyMasterCriteria;
 use Crm\FamilyModule\Models\Scenarios\IsFamilySlaveCriteria;
@@ -52,6 +53,7 @@ use Crm\SubscriptionsModule\Events\SubscriptionUpdatedEvent;
 use Crm\UsersModule\Models\Auth\UserTokenAuthorization;
 use Nette\DI\Container;
 use Symfony\Component\Console\Output\OutputInterface;
+use Tomaj\Hermes\Dispatcher;
 
 class FamilyModule extends CrmModule
 {
@@ -67,6 +69,14 @@ class FamilyModule extends CrmModule
         parent::__construct($container, $translator);
 
         $this->familyRequests = $familyRequests;
+    }
+
+    public function registerHermesHandlers(Dispatcher $dispatcher)
+    {
+        $dispatcher->registerHandler(
+            'renew-ondemand-family-subscriptions',
+            $this->getInstance(RenewOnDemandFamilySubscriptionsHandler::class),
+        );
     }
 
     public function registerCommands(CommandsContainerInterface $commandsContainer)

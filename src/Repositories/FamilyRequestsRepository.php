@@ -95,6 +95,20 @@ class FamilyRequestsRepository extends Repository
             ]);
     }
 
+    public function masterSubscriptionFirstUnusedFamilyRequestBySubscriptionType(
+        ActiveRow $masterSubscription,
+        ActiveRow $subscriptionType,
+    ): ?ActiveRow {
+        return $this->getTable()
+            ->where([
+                'master_subscription_id' => $masterSubscription->id,
+                'subscription_type_id' => $subscriptionType->id,
+                'status' => self::STATUS_CREATED,
+            ])
+            ->limit(1)
+            ->fetch();
+    }
+
     public function masterSubscriptionCanceledFamilyRequests(ActiveRow $subscription): Selection
     {
         return $this->masterSubscriptionFamilyRequests($subscription)->where('status', self::STATUS_CANCELED);

@@ -34,6 +34,9 @@ services:
 	- Crm\FamilyModule\Events\BeforeCreateRenewalPaymentEventHandler
 	- Crm\FamilyModule\Events\CreateOnDemandRequestEventHandler
 
+	# hermes handlers
+	- Crm\FamilyModule\Hermes\RenewOnDemandFamilySubscriptionsHandler
+
 	# models
 	- Crm\FamilyModule\Models\FamilyRequests
 	- Crm\FamilyModule\Models\DonateSubscription

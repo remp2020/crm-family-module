@@ -2,6 +2,7 @@
 
 namespace Crm\FamilyModule\Events;
 
+use Crm\ApplicationModule\Hermes\HermesMessage;
 use Crm\FamilyModule\Models\DonateSubscription;
 use Crm\FamilyModule\Models\FamilyChildSubscriptionRenewalException;
 use Crm\FamilyModule\Models\FamilyRequests;
@@ -19,6 +20,7 @@ use Exception;
 use League\Event\AbstractListener;
 use League\Event\EventInterface;
 use Nette\Database\Table\ActiveRow;
+use Tomaj\Hermes\Emitter;
 use Tracy\Debugger;
 
 class NewSubscriptionHandler extends AbstractListener
@@ -35,6 +37,7 @@ class NewSubscriptionHandler extends AbstractListener
         private FamilySubscriptionTypesRepository $familySubscriptionTypesRepository,
         private FamilyRequestsRepository $familyRequestsRepository,
         private PaymentMetaRepository $paymentMetaRepository,
+        private Emitter $hermesEmitter,
     ) {
     }
 
@@ -56,7 +59,7 @@ class NewSubscriptionHandler extends AbstractListener
 
             // Check if this has previous family subscription
             $previousFamilySubscription = $this->getPreviousFamilyPaymentSubscription($subscription);
-            if ($previousFamilySubscription && $this->hasEnoughRequests($subscription, $previousFamilySubscription)) {
+            if ($previousFamilySubscription) {
                 $linkPreviousSubscriptionAndActivateChildRequests = true;
                 if ($payment = $this->paymentsRepository->subscriptionPayment($subscription)) {
                     $keepRequestsUnactivated = $this->paymentMetaRepository->findByPaymentAndKey($payment, FamilyRequests::KEEP_REQUESTS_UNACTIVATED_PAYMENT_META);
@@ -64,8 +67,15 @@ class NewSubscriptionHandler extends AbstractListener
                 }
 
                 if ($linkPreviousSubscriptionAndActivateChildRequests) {
-                    $this->linkNextFamilySubscription($subscription, $previousFamilySubscription);
-                    $this->activateChildSubscriptions($subscription, $previousFamilySubscription, $requests);
+                    if ($this->familyRequests->hasOnDemandRequestsGeneration($subscription)) {
+                        $this->hermesEmitter->emit(new HermesMessage('renew-ondemand-family-subscriptions', [
+                            'new_subscription_id' => $subscription->id,
+                            'previous_subscription_id' => $previousFamilySubscription->id,
+                        ]));
+                    } elseif ($this->hasEnoughRequests($subscription, $previousFamilySubscription)) {
+                        $this->linkNextFamilySubscription($subscription, $previousFamilySubscription);
+                        $this->activateChildSubscriptions($subscription, $previousFamilySubscription, $requests);
+                    }
                 }
             }
         } catch (MissingFamilySubscriptionTypeException $exception) {
