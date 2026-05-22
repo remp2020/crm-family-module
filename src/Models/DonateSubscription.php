@@ -101,16 +101,27 @@ class DonateSubscription
             $isPaid = (bool) $subscriptionTypeIsPaidMetaValue;
         }
 
+        $beforeNewSubscriptionEvent = function (ActiveRow $subscription) use ($familyRequest, $slaveUser) {
+            $this->familyRequestsRepository->update($familyRequest, [
+                'status' => FamilyRequestsRepository::STATUS_ACCEPTED,
+                'slave_subscription_id' => $subscription->id,
+                'slave_user_id' => $slaveUser->id,
+                'accepted_at' => $this->getNow(),
+                'updated_at' => $this->getNow(),
+            ]);
+        };
+
         $slaveSubscription = null;
         if ($donationMethod === 'copy') {
             $slaveSubscription = $this->subscriptionsRepository->add(
-                $familyRequest->subscription_type,
-                false,
-                $isPaid,
-                $slaveUser,
-                FamilyModule::SUBSCRIPTION_TYPE_FAMILY,
-                $masterSubscription->start_time,
-                $masterSubscription->end_time,
+                subscriptionType: $familyRequest->subscription_type,
+                isRecurrent: false,
+                isPaid: $isPaid,
+                user: $slaveUser,
+                type: FamilyModule::SUBSCRIPTION_TYPE_FAMILY,
+                startTime: $masterSubscription->start_time,
+                endTime: $masterSubscription->end_time,
+                callbackBeforeNewSubscriptionEvent: $beforeNewSubscriptionEvent,
             );
         } elseif (isset($subscriptionMeta['family_subscription_type']) && $subscriptionMeta['family_subscription_type'] === 'days') {
             if (!isset($subscriptionMeta['family_subscription_days'])) {
@@ -122,13 +133,14 @@ class DonateSubscription
             $startTime = $subscriptionExtension->getDate();
             $endTime = (clone $startTime)->modify(sprintf('+%d days', $subscriptionMeta['family_subscription_days']));
             $slaveSubscription = $this->subscriptionsRepository->add(
-                $familyRequest->subscription_type,
-                false,
-                $masterSubscription->is_paid,
-                $slaveUser,
-                FamilyModule::SUBSCRIPTION_TYPE_FAMILY,
-                $startTime,
-                $endTime,
+                subscriptionType: $familyRequest->subscription_type,
+                isRecurrent: false,
+                isPaid: $masterSubscription->is_paid,
+                user: $slaveUser,
+                type: FamilyModule::SUBSCRIPTION_TYPE_FAMILY,
+                startTime: $startTime,
+                endTime: $endTime,
+                callbackBeforeNewSubscriptionEvent: $beforeNewSubscriptionEvent,
             );
         } elseif (isset($subscriptionMeta['family_subscription_type']) && $subscriptionMeta['family_subscription_type'] === 'fixed') {
             $endTime = null;
@@ -149,27 +161,20 @@ class DonateSubscription
             }
 
             $slaveSubscription = $this->subscriptionsRepository->add(
-                $familyRequest->subscription_type,
-                false,
-                $isPaid,
-                $slaveUser,
-                FamilyModule::SUBSCRIPTION_TYPE_FAMILY,
-                $this->getNow(),
-                $endTime,
+                subscriptionType: $familyRequest->subscription_type,
+                isRecurrent: false,
+                isPaid: $isPaid,
+                user: $slaveUser,
+                type: FamilyModule::SUBSCRIPTION_TYPE_FAMILY,
+                startTime: $this->getNow(),
+                endTime: $endTime,
+                callbackBeforeNewSubscriptionEvent: $beforeNewSubscriptionEvent,
             );
         }
 
         if (!$slaveSubscription) {
             return self::ERROR_INTERNAL;
         }
-
-        $this->familyRequestsRepository->update($familyRequest, [
-            'status' => FamilyRequestsRepository::STATUS_ACCEPTED,
-            'slave_subscription_id' => $slaveSubscription->id,
-            'slave_user_id' => $slaveUser->id,
-            'accepted_at' => $this->getNow(),
-            'updated_at' => $this->getNow(),
-        ]);
 
         $familyRequest = $this->familyRequestsRepository->find($familyRequest->id);
         $this->emitter->emit(new FamilyRequestAcceptedEvent($familyRequest));
