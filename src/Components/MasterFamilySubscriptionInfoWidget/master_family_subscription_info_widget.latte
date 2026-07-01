@@ -115,8 +115,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <div class="close-button">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                                aria-hidden="true">&times;</span></button>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
                 <h1>
                     {ifset $subscriptionData['familyType']->slave_subscription_type}
@@ -127,6 +128,9 @@
                     {$subscriptionData['familyType']->slave_subscription_type|typeContent}
                 {/ifset}
                 <br>
+                {if isAdmin}
+                    <b>{_family.components.master_family_subscription_info.heading}:</b><br>
+                {/if}
                 <b>{$subscription->start_time|localizedDate,true} - {$subscription->end_time|localizedDate,true}</b>
             </div>
             <div class="modal-body">
@@ -144,7 +148,7 @@
                     <tbody>
                     <tr n:if="!empty($subscriptionData['activeFamilyRequests'])" n:foreach="$subscriptionData['activeFamilyRequests'] as $request">
                         <td>
-                            {$request->subscription_type->user_label}
+                            {$request->subscription_type->user_label} {$request->subscription_type|typeContent:true}
                         </td>
                         <td>
                             {if $request->status == \Crm\FamilyModule\Repositories\FamilyRequestsRepository::STATUS_CREATED}

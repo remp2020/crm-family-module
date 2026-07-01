@@ -66,6 +66,7 @@ components:
         copying_failed: Copying failed
 
     master_family_subscription_info:
+        heading: Subscription management
         title: 'Child subscriptions management'
         stats:
             title: 'Active'

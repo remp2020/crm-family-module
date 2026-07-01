@@ -66,6 +66,7 @@ components:
         copying_failed: Kopírování selhalo
 
     master_family_subscription_info:
+        heading: Firemní předplatné
         title: 'Správa dceřiných předplatných'
         stats:
             title: 'Aktivní'
