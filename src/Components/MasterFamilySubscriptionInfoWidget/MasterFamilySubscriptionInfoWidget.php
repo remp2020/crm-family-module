@@ -3,6 +3,7 @@
 namespace Crm\FamilyModule\Components\MasterFamilySubscriptionInfoWidget;
 
 use Crm\AdminModule\Presenters\AdminPresenter;
+use Crm\ApplicationModule\Models\NowTrait;
 use Crm\ApplicationModule\Models\Snippet\SnippetRenderer;
 use Crm\ApplicationModule\Models\Widget\BaseLazyWidget;
 use Crm\ApplicationModule\Models\Widget\LazyWidgetManager;
@@ -14,14 +15,22 @@ use Crm\SubscriptionsModule\Repositories\SubscriptionsRepository;
 use Crm\UsersModule\Models\User\UnclaimedUser;
 use Crm\UsersModule\Repositories\UsersRepository;
 use DateTime;
+use Nette\Application\Attributes\Persistent;
 use Nette\Application\LinkGenerator;
 use Nette\Localization\Translator;
 
 class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
 {
+    use NowTrait;
+
     private string $templateName = 'master_family_subscription_info_widget.latte';
 
     private ?string $activationEmailSnippetIdentifier = null;
+
+    private bool $showInactiveSubscriptions = false;
+
+    #[Persistent]
+    public int $userId;
 
     public function __construct(
         LazyWidgetManager $lazyWidgetManager,
@@ -39,52 +48,79 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
         parent::__construct($lazyWidgetManager);
     }
 
-    public function identifier()
+    public function identifier(): string
     {
         return 'masterfamilysubscriptioninfowidget';
     }
 
-    public function render(int $userId)
+    public function render(?int $userId = null): void
     {
-        $user = $this->usersRepository->find($userId);
-        $userMasterSubscriptions = $this->subscriptionsRepository->userSubscriptions($user->id)
+        if ($userId !== null) {
+            $this->userId = $userId;
+        }
+
+        $isAdmin = $this->getPresenter() instanceof AdminPresenter;
+        if (!$isAdmin) {
+            $this->userId = $this->getPresenter()->getUser()->getId();
+        }
+
+        $userMasterSubscriptions = $this->subscriptionsRepository->userSubscriptions($this->userId)
             ->where(
                 'subscriptions.subscription_type_id IN (?) OR :family_requests(master_subscription_id).id IS NOT NULL',
                 $this->familySubscriptionTypesRepository->masterSubscriptionTypes(),
             );
 
-        $isAdmin = false;
-        if ($this->getPresenter() instanceof AdminPresenter) {
-            $isAdmin = true;
+        $now = $this->getNow();
+        $subscriptionsData = $this->getSubscriptionsData(
+            (clone $userMasterSubscriptions)->where('subscriptions.end_time >= ?', $now),
+        );
+
+        $inactiveSubscriptions = (clone $userMasterSubscriptions)
+            ->where('subscriptions.end_time < ?', $now)
+            ->where(
+                ':family_requests(master_subscription_id).status',
+                FamilyRequestsRepository::STATUS_ACCEPTED,
+            );
+
+        $canLoadInactiveSubscriptions = false;
+        if ($this->showInactiveSubscriptions) {
+            $subscriptionsData = array_merge($subscriptionsData, $this->getSubscriptionsData($inactiveSubscriptions));
+        } else {
+            $canLoadInactiveSubscriptions = $inactiveSubscriptions->count('*') > 0;
         }
 
-        $subscriptionsData = $this->getSubscriptionsData($userMasterSubscriptions);
-        $hasFamilySubscription = count($subscriptionsData) > 0;
-
-        if (!$hasFamilySubscription && !$isAdmin) {
+        $showTable = count($subscriptionsData) > 0 || $canLoadInactiveSubscriptions;
+        if (!$showTable && !$isAdmin) {
             return;
         }
+
         $this->template->isAdmin = $isAdmin;
-        $this->template->userId = $userId;
-        $this->template->hasFamilySubscription = $hasFamilySubscription;
+        $this->template->userId = $this->userId;
+        $this->template->showTable = $showTable;
         $this->template->subscriptionsData = $subscriptionsData;
+        $this->template->canLoadInactiveSubscriptions = $canLoadInactiveSubscriptions;
         $this->template->showAddButton = $isAdmin && $this->familySubscriptionTypesRepository->getCustomizableSubscriptionTypes();
 
         $this->template->setFile(__DIR__ . '/' . $this->templateName);
         $this->template->render();
     }
 
-    private function getSubscriptionsData($subscriptions)
+    public function handleLoadInactiveSubscriptions(): void
     {
-        $now = new DateTime();
+        $this->showInactiveSubscriptions = true;
+
+        if ($this->getPresenter()->isAjax()) {
+            $this->redrawControl('subscriptions');
+            $this->redrawControl('subscriptionModals');
+            $this->redrawControl('loadInactiveButton');
+        }
+    }
+
+    private function getSubscriptionsData($subscriptions): array
+    {
         $subscriptionsData = [];
         foreach ($subscriptions as $subscription) {
             $usedFamilyRequests = $this->familyRequestsRepository->masterSubscriptionAcceptedFamilyRequests($subscription)->count('*');
-            // ignore expired subscriptions with 0 accepted family requests
-            if ($subscription->end_time < $now && $usedFamilyRequests === 0) {
-                continue;
-            }
-
             $subscriptionsData[$subscription->id] = [
                 'subscription' => $subscription,
                 'usedFamilyRequests' => $usedFamilyRequests,
@@ -96,7 +132,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
         return $subscriptionsData;
     }
 
-    public function handleActivateSubscription()
+    public function handleActivateSubscription(): void
     {
         $user = $this->usersRepository->getByEmail($this->presenter->getParameter('email'));
         if (!$user || $this->unclaimedUser->isUnclaimedUser($user)) {
@@ -134,7 +170,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
         }
 
         $donateResponse = $this->donateSubscription->connectFamilyUser($user, $familyRequest);
-        if (is_string($donateResponse) && $donateResponse === DonateSubscription::ERROR_REQUEST_WRONG_STATUS) {
+        if ($donateResponse === DonateSubscription::ERROR_REQUEST_WRONG_STATUS) {
             $this->getPresenter()->sendJson([
                 'status' => 'error',
                 'message' => $this->translator->translate('family.components.master_family_subscription_info.modal.error.wrong_status'),
@@ -144,7 +180,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
         $this->redirect('this');
     }
 
-    public function handleDeactivateSubscription($requestId)
+    public function handleDeactivateSubscription($requestId): void
     {
         $familyRequest = $this->familyRequestsRepository->find($requestId);
         if (!$familyRequest) {
@@ -157,15 +193,13 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
         $this->redirect('this');
     }
 
-    public function handleSaveNote()
+    public function handleSaveNote(): void
     {
         $familyRequest = $this->familyRequestsRepository->findByCode($this->presenter->getParameter('familyRequestCode'));
         if (!$familyRequest) {
-            $presenter = $this->getPresenter();
-            $presenter->sendJson([
+            $this->getPresenter()->sendJson([
                 'status' => 'error',
             ]);
-            return;
         }
 
         $this->familyRequestsRepository->update($familyRequest, [

@@ -52,69 +52,81 @@
 
 </style>
 
-<div n:if="$hasFamilySubscription || $showAddButton" class="panel panel-default">
+{define subscriptionRow, $subscriptionData}
+    {* show to users only family subscription types *}
+    {if $isAdmin || $subscriptionData['familyType'] !== null }
+        <tr>
+            {var $subscription = $subscriptionData['subscription']}
+            <td>
+                {if $isAdmin}
+                    <small class="text-muted">#{$subscription->id}</small>
+                    <i n:if="$subscription->note" class="fa fa-info-circle text-danger fa-wh" data-toggle="tooltip"
+                                                  data-placement="top" title="{$subscription->note|breaklines}"></i>
+
+                    <a href="{plink :Subscriptions:SubscriptionTypesAdmin:Show $subscription->subscription_type->id}">
+                        {$subscription->subscription_type->user_label}
+                    </a>
+                {else}
+                    {$subscription->subscription_type->user_label}
+                {/if}
+                <br>
+                <small>{$subscription->start_time|localizedDate} - {$subscription->end_time|localizedDate}</small>
+            </td>
+            <td style="white-space: nowrap;">
+                <span data-toggle="tooltip" data-placement="top"
+                      title={_family.components.master_family_subscription_info.stats.active_tooltip}>{$subscriptionData['usedFamilyRequests']}</span>
+                / <span data-toggle="tooltip" data-placement="top"
+                        title={_family.components.master_family_subscription_info.stats.total_tooltip}>{$subscriptionData['activeFamilyRequests']->count()}</span>
+                <i n:if="$subscriptionData['canceledFamilyRequests']->count()"
+                   class="fa fa-exclamation-circle"
+                   data-toggle="tooltip"
+                   data-html="true"
+                   title="{_family.components.master_family_subscription_info.stats.canceled_tooltip, ['number' => $subscriptionData['canceledFamilyRequests']->count()]}"
+                ></i>
+
+            </td>
+            <td><a href="#" data-toggle="modal" data-target="#detail-modal-{$subscription->id}"
+                   data-id={$subscription->id} class="btn btn-sm btn-primary" title="{_system.show}"><i
+                        class="fa fa-info-circle"></i> {_system.show}</a>
+
+                {control simpleWidget 'family.master_subscription.actions', $subscription}
+            </td>
+        </tr>
+    {/if}
+{/define}
+
+<div n:if="$showTable || $showAddButton" class="panel panel-default">
     <div class="panel-heading">{_family.components.master_family_subscription_info.title}</div>
     <div class="panel-body table-responsive">
-        {if $hasFamilySubscription}
+        {if $showTable}
         <table class="table table-striped table-hover">
             <thead>
             <th>{_subscriptions.menu.subscriptions}</th>
             <th>{_family.components.master_family_subscription_info.stats.title}</th>
             <th>{_system.actions}</th>
             </thead>
-            <tbody>
+            <tbody n:snippet="subscriptions">
             {foreach $subscriptionsData as $subscriptionData}
-                {* show to users only family subscription types *}
-                {if $isAdmin || $subscriptionData['familyType'] !== null }
-                    <tr>
-                        {var $subscription = $subscriptionData['subscription']}
-                        <td>
-                            {if $isAdmin}
-                                <small class="text-muted">#{$subscription->id}</small>
-                                <i n:if="$subscription->note" class="fa fa-info-circle text-danger fa-wh" data-toggle="tooltip"
-                                                              data-placement="top" title="{$subscription->note|breaklines}"></i>
-
-                                <a href="{plink :Subscriptions:SubscriptionTypesAdmin:Show $subscription->subscription_type->id}">
-                                    {$subscription->subscription_type->user_label}
-                                </a>
-                            {else}
-                                {$subscription->subscription_type->user_label}
-                            {/if}
-                            <br>
-                            <small>{$subscription->start_time|localizedDate} - {$subscription->end_time|localizedDate}</small>
-                        </td>
-                        <td style="white-space: nowrap;">
-                            <span data-toggle="tooltip" data-placement="top"
-                                  title={_family.components.master_family_subscription_info.stats.active_tooltip}>{$subscriptionData['usedFamilyRequests']}</span>
-                            / <span data-toggle="tooltip" data-placement="top"
-                                    title={_family.components.master_family_subscription_info.stats.total_tooltip}>{$subscriptionData['activeFamilyRequests']->count()}</span>
-                            <i n:if="$subscriptionData['canceledFamilyRequests']->count()"
-                               class="fa fa-exclamation-circle"
-                               data-toggle="tooltip"
-                               data-html="true"
-                               title="{_family.components.master_family_subscription_info.stats.canceled_tooltip, ['number' => $subscriptionData['canceledFamilyRequests']->count()]}"
-                            ></i>
-
-                        </td>
-                        <td><a href="#" data-toggle="modal" data-target="#detail-modal-{$subscription->id}"
-                               data-id={$subscription->id} class="btn btn-sm btn-primary" title="{_system.show}"><i
-                                    class="fa fa-info-circle"></i> {_system.show}</a>
-
-                            {control simpleWidget 'family.master_subscription.actions', $subscription}
-                        </td>
-                    </tr>
-                {/if}
+                {include subscriptionRow, $subscriptionData}
             {/foreach}
             </tbody>
         </table>
         {/if}
+        {snippet loadInactiveButton}
+            {if $canLoadInactiveSubscriptions}
+                <p class="text-center">
+                    <a class="btn btn-sm btn-link ajax" href="{link loadInactiveSubscriptions!, userId => $userId}"><i class="fa fa-chevron-down"></i>&nbsp;{_family.components.master_family_subscription_info.load_inactive}</a>
+                </p>
+            {/if}
+        {/snippet}
         <p n:if="$showAddButton" class="text-center">
             <a class="btn btn-sm btn-default" href="{plink :Family:RequestsAdmin:Default, userId => $userId}"><i class="fa fa-plus"></i>&nbsp;{_family.components.master_family_subscription_info.add_button}</a>
         </p>
     </div>
 </div>
 
-<div n:foreach="$subscriptionsData as $subscriptionData" class="modal fade" id="detail-modal-{$subscriptionData['subscription']->id}">
+{define subscriptionModal, $subscriptionData}
+<div class="modal fade" id="detail-modal-{$subscriptionData['subscription']->id}">
     {var $subscription = $subscriptionData['subscription']}
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -294,6 +306,13 @@
         </div>
     </div>
 </div>
+{/define}
+
+<div n:snippet="subscriptionModals">
+    {foreach $subscriptionsData as $subscriptionData}
+        {include subscriptionModal, $subscriptionData}
+    {/foreach}
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js"></script>
 <script>
@@ -331,7 +350,7 @@
             }
         });
 
-        $('.activate-child-subscription').on('click', function() {
+        $(document).on('click', '.activate-child-subscription', function() {
             var emailInputWrapper = $(this).closest('tr').find('.child-subscription-email-wrapper');
             var emailInputError = $(this).closest('tr').find('.child-subscription-email-error');
 
@@ -358,7 +377,7 @@
             });
         });
 
-        $('.request-note').on('change', function () {
+        $(document).on('change', '.request-note', function () {
             var check = $(this).closest('tr').find('.fa-check');
             var times = $(this).closest('tr').find('.fa-times');
 

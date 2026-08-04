@@ -94,6 +94,7 @@ components:
             note_placeholder: Meno používateľa
             no_active_requests: Žiadne aktívne dcérske predplatné
         add_button: Pridaj firemné konfigurovateľné predplatné
+        load_inactive: Načítať neaktívne predplatné
 
     slave_family_subscription_info:
         title: 'Dcérske predplatné'

@@ -94,6 +94,7 @@ components:
             note_placeholder: Jméno uživatele
             no_active_requests: Žádné aktivní dceřiné předplatné
         add_button: Přidej firemní konfigurovatelné předplatné
+        load_inactive: Načíst neaktivní předplatná
 
     slave_family_subscription_info:
         title: 'Dceřiné předplatné'
