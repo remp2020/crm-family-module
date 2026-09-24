@@ -134,7 +134,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
 
     public function handleActivateSubscription(): void
     {
-        $user = $this->usersRepository->getByEmail($this->presenter->getParameter('email'));
+        $user = $this->usersRepository->getByEmail($this->getPresenter()->getParameter('email'));
         if (!$user || $this->unclaimedUser->isUnclaimedUser($user)) {
             $message = $this->translator->translate('family.components.master_family_subscription_info.modal.error.not_registered');
 
@@ -142,7 +142,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
             if ($snippet) {
                 $renderedSnippet = $this->snippetRenderer->render([
                     $this->activationEmailSnippetIdentifier,
-                    'link' => $this->linkGenerator->link('Family:Requests:default', ['id' => $this->presenter->getParameter('familyRequestCode')]),
+                    'link' => $this->linkGenerator->link('Family:Requests:default', ['id' => $this->getPresenter()->getParameter('familyRequestCode')]),
                 ]);
 
                 // convert line breaks for usage in mailto link (https://www.rfc-editor.org/rfc/rfc2368#page-3)
@@ -151,7 +151,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
                 $message = $this->translator->translate(
                     'family.components.master_family_subscription_info.modal.error.not_registered_send_link',
                     [
-                        'email' => $this->presenter->getParameter('email'),
+                        'email' => $this->getPresenter()->getParameter('email'),
                         'subject' => rawurlencode($snippet->title),
                         'text' => $text,
                     ],
@@ -164,7 +164,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
             ]);
         }
 
-        $familyRequest = $this->familyRequestsRepository->findByCode($this->presenter->getParameter('familyRequestCode'));
+        $familyRequest = $this->familyRequestsRepository->findByCode($this->getPresenter()->getParameter('familyRequestCode'));
         if (!$familyRequest) {
             return;
         }
@@ -195,7 +195,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
 
     public function handleSaveNote(): void
     {
-        $familyRequest = $this->familyRequestsRepository->findByCode($this->presenter->getParameter('familyRequestCode'));
+        $familyRequest = $this->familyRequestsRepository->findByCode($this->getPresenter()->getParameter('familyRequestCode'));
         if (!$familyRequest) {
             $this->getPresenter()->sendJson([
                 'status' => 'error',
@@ -204,7 +204,7 @@ class MasterFamilySubscriptionInfoWidget extends BaseLazyWidget
 
         $this->familyRequestsRepository->update($familyRequest, [
             'updated_at' => new DateTime(),
-            'note' => substr($this->presenter->getParameter('note'), 0, 255),
+            'note' => substr($this->getPresenter()->getParameter('note'), 0, 255),
         ]);
 
         $this->donateSubscription->syncNoteToNextSubscription(
