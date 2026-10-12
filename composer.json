@@ -11,6 +11,7 @@
   "autoload": {
     "psr-4": {
       "Crm\\FamilyModule\\": "src/"
-    }
+    },
+    "classmap": ["src/"]
   }
 }
