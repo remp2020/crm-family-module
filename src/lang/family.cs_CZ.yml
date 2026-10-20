@@ -1,7 +1,7 @@
 frontend:
     header: "Darování předplatného"
     new:
-        header: "Aktivace darovaného předplatného"
+        header: "Aktivace předplatného"
 
         form:
             email: "Email"
@@ -11,7 +11,7 @@ frontend:
             error_email: "Zadaný email je neplatný"
 
     signin:
-        header: "Aktivace darovaného předplatného"
+        header: "Aktivace předplatného"
         description: "Váš e-mail je již registrován. Prosím zadejte heslo a přihlaste se."
         forgot_password: "Zapomněli jste heslo?"
 
