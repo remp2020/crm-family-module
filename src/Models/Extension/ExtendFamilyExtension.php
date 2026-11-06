@@ -35,8 +35,7 @@ class ExtendFamilyExtension implements ExtensionInterface
             $this->familySubscriptionTypesRepository->slaveSubscriptionTypes(),
         );
 
-        $userFamilySubscription = $this->subscriptionsRepository->userSubscriptions($user->id)
-            ->where('end_time > ?', $this->getNow())
+        $userFamilySubscription = $this->subscriptionsRepository->futureEndingUserSubscriptions($user->id)
             ->where('subscription_type_id IN ?', $familySubscriptionTypeIds)
             ->fetch();
 

@@ -116,6 +116,61 @@ class ExtendFamilyExtensionTest extends BaseTestCase
         $this->assertEquals($currentFamilySubscription->end_time, $extensionStartDate->getDate());
     }
 
+    public function testFamilyTypeAfterStoppedFutureFamilySubscription()
+    {
+        [$masterSubscriptionType, ] = $this->seedFamilySubscriptionTypes();
+
+        $user = $this->createUser('user@example.com');
+        $this->subscriptionGenerator->generate(new SubscriptionsParams(
+            $masterSubscriptionType,
+            $user,
+            'regular',
+            new DateTime('now - 15 days'),
+            null,
+            true,
+        ), 1);
+        $currentSubscription = $this->subscriptionsRepository->actualUserSubscription($user);
+
+        // stopped before it started; end_time equals start_time
+        $stoppedAt = $currentSubscription->end_time->modifyClone('+30 days');
+        $this->subscriptionsRepository->add(
+            subscriptionType: $masterSubscriptionType,
+            isRecurrent: false,
+            isPaid: true,
+            user: $user,
+            startTime: $stoppedAt,
+            endTime: $stoppedAt,
+        );
+
+        $extensionStartDate = $this->subscriptionsRepository->getSubscriptionExtension($masterSubscriptionType, $user);
+
+        $this->assertEquals($currentSubscription->end_time, $extensionStartDate->getDate());
+        $this->assertTrue($extensionStartDate->isExtending());
+    }
+
+    public function testFamilyTypeAfterOnlyStoppedFutureFamilySubscription()
+    {
+        [$masterSubscriptionType, ] = $this->seedFamilySubscriptionTypes();
+
+        $user = $this->createUser('user@example.com');
+        $stoppedAt = new DateTime('now + 30 days');
+        $this->subscriptionsRepository->add(
+            subscriptionType: $masterSubscriptionType,
+            isRecurrent: false,
+            isPaid: true,
+            user: $user,
+            startTime: $stoppedAt,
+            endTime: $stoppedAt,
+        );
+
+        $nowDate = new DateTime();
+        $extensionStartDate = $this->subscriptionsRepository->getSubscriptionExtension($masterSubscriptionType, $user);
+
+        // unable to check NOW because seconds can be different; checking dates should be enough
+        $this->assertEquals($nowDate->format('Y-m-d H:i'), $extensionStartDate->getDate()->format('Y-m-d H:i'));
+        $this->assertFalse($extensionStartDate->isExtending());
+    }
+
     private function createUser($email)
     {
         return $this->userManager->addNewUser($email, false, 'unknown', null, false);
