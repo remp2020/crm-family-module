@@ -1,5 +1,5 @@
 {block #head}
-    {control snippet 'family.html_head'}
+    {control snippet, 'family.html_head'}
 {/block}
 
 {block #content}
@@ -9,7 +9,7 @@
 </div>
 
 {if $from == 'new'}
-    {control snippet 'family-request-success'}
+    {control snippet, 'family-request-success'}
 {else}
-    {control snippet 'family-request-success-sign'}
+    {control snippet, 'family-request-success-sign'}
 {/if}
